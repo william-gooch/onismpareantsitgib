@@ -52,8 +52,16 @@ public class Player_Plugin implements Plugin_Interface {
             
             dom.findEntitiesWith(Player.class, Position.class, Collider.class, Velocity.class)
                 .stream().forEach(player -> {
-                    // System.out.println(player.comp2().position);
-                    // System.out.println(player.comp4().velocity);
+                    //loop through ground objects, if not touching any set to not grounded
+                    //look into more efficient way to do this??
+                    if(!dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
+                    .stream().anyMatch(ground -> 
+                        player.comp3().collider.collision_correction(player.comp2(), ground.comp3().collider, ground.comp2()).y != 0
+                    )) {
+                        player.comp2().grounded = false;
+                    }
+
+                    //correct collisions with the ground
                     dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
                         .stream().forEach(ground -> {
                             PVector collision = player.comp3().collider.collision_correction(player.comp2(), ground.comp3().collider, ground.comp2());
@@ -90,12 +98,7 @@ public class Player_Plugin implements Plugin_Interface {
                                 player.comp2().position.x = collision.x;
                             }
                         });
-                    //loop through ground objects, if not touching any set to not grounded
-                    //look into more efficient way to do this??
-                    if(!dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
-                    .stream().anyMatch(ground -> 
-                        player.comp3().collider.collision_correction(player.comp2(), ground.comp3().collider, ground.comp2()).y != 0
-                    )) player.comp2().grounded = false;
+                    
                 });
 
         });
