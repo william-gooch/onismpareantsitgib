@@ -30,7 +30,7 @@ public class Player_Plugin implements Plugin_Interface {
                 });
         });
 
-        //check for collisions with th edge of the play area
+        //check for collisions with the edge of the play area
         game.schedule.update(() -> {
             dom.findEntitiesWith(Player.class, Position.class, Velocity.class)
                 .stream().forEach(res -> {
@@ -55,23 +55,38 @@ public class Player_Plugin implements Plugin_Interface {
                     // System.out.println(player.comp4().velocity);
                     dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
                         .stream().forEach(ground -> {
-                            //TODO: change to an x collision and a y collsion
-                            if(player.comp3().collider.isColliding(player.comp2(), ground.comp3().collider, ground.comp2())) {
-                                //move the player back until they are not colliding -- assumes that player will never be moving fast enough to make it fully into the ground before next collision calc
-                                
-                                //TODO: temp ------- change players y to be ground y + player height
-                                player.comp2().position.y = ground.comp2().position.y - player.comp1().height;
-                                
+                            PVector collision = player.comp3().collider.collision_correction(player.comp2(), ground.comp3().collider, ground.comp2());
 
-
-                                //check if they are resting on the ground
-
-                                if(player.comp2().position.y + player.comp1().height == ground.comp2().position.y) {
+                            //check if collided vertically
+                            if(collision.y != 0) {
+                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
+                                if(player.comp4().velocity.y * (collision.y - player.comp2().position.y) < 0) {
+                                    //if going downwards -- y increasing - set to be grounded
                                     if(player.comp4().velocity.y > 0) {
-                                        player.comp4().velocity.y = 0;
                                         player.comp2().grounded = true;
+                                        // System.out.println("Grounded");
                                     }
+
+                                    player.comp4().velocity.y = 0;
                                 }
+
+                                //move vertically
+                                player.comp2().position.y = collision.y;
+                            } else {
+                                //if not colliding with the floor grounded = false
+                                // System.out.println("Ungrounded");
+                                // player.comp2().grounded = false;
+                            }
+
+                            //check if collided horizontally
+                            if(collision.x != 0) {
+                                //stop velocity if going into the object
+                                if(player.comp4().velocity.x * (collision.x - player.comp2().position.x) < 0) {
+                                    player.comp4().velocity.x = 0;
+                                }
+
+                                //move horizontally
+                                player.comp2().position.x = collision.x;
                             }
                         });
                 });
@@ -146,6 +161,7 @@ public class Player_Plugin implements Plugin_Interface {
                 if (Math.abs(velocity.x) > maxSpeed) {
                     velocity.x *= 1 - (impulseDamping * deltaTime);
                 }
+
             }
 
             //slowdown done in the forces plugin - drag, gravity, etc.
@@ -157,11 +173,9 @@ public class Player_Plugin implements Plugin_Interface {
 
     static class Player {
         public int height, width;
-        public boolean grounded;
         public Player(int height, int width) {
             this.height = height;
             this.width = width;
-            this.grounded = true;
         }
     }
 }

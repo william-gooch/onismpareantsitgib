@@ -16,6 +16,7 @@ public class Object_Plugin implements Plugin_Interface {
         game.schedule.update(() -> {
             dom.findEntitiesWith(Position.class, Velocity.class)
                 .stream().forEach(entity -> {
+                    entity.comp1().previous_position = entity.comp1().position.copy();
                     entity.comp1().position.add(entity.comp2().velocity);
                 });
         });
@@ -24,11 +25,13 @@ public class Object_Plugin implements Plugin_Interface {
 
     public static class Position {
         public PVector position = new PVector(0,0);
+        public PVector previous_position = new PVector(0,0);
         public boolean grounded = false;
 
         public Position() {}
 
         public Position(PVector pos) {
+            previous_position = pos;
             position = pos;
         }
     }

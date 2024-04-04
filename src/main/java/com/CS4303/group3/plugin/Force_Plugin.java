@@ -7,7 +7,7 @@ import com.CS4303.group3.plugin.Object_Plugin.*;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
 
-public class Force_Plugin implements Plugin_Interface{
+public class Force_Plugin implements Plugin_Interface {
     Dominion dom;
 
     @Override
@@ -17,10 +17,10 @@ public class Force_Plugin implements Plugin_Interface{
         //apply gravity to all objects
         game.schedule.update(() -> {
             Gravity gravity = Resource.get(game, Gravity.class);
-            dom.findEntitiesWith(Velocity.class, Position.class)
+            dom.findEntitiesWith(Velocity.class)
                 .stream().forEach(res -> {
-                    PVector velocity = res.comp1().velocity;
-                    if(!res.comp2().grounded) velocity.add(gravity.gravity);
+                    PVector velocity = res.comp().velocity;
+                    velocity.add(gravity.gravity); //if(!res.comp2().grounded) 
                 });
         });
 

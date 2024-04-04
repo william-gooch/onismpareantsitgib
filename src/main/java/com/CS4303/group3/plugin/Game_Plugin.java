@@ -58,11 +58,23 @@ public class Game_Plugin implements Plugin_Interface {
             // Initialize the world map
             Map map = new Map(new int[25][30], cell_height, cell_width, game);
 
-            //create solid ground sections - with colliders
+            //create solid ground sections - with colliders -- TODO: Change this to create objects from the map
             dom.createEntity(
                 new Position(new PVector(0, game.displayHeight - 20)),
                 new Ground(new PVector(game.displayWidth, 20)),
                 Collider.BasicCollider(game.displayWidth, 20)
+            );
+
+            dom.createEntity(
+                new Position(new PVector(game.displayWidth/2, game.displayHeight - 100)),
+                new Ground(new PVector(game.displayWidth/10, 40)),
+                Collider.BasicCollider(game.displayWidth/10, 40)
+            );
+
+            dom.createEntity(
+                new Position(new PVector(60, game.displayHeight - 300)),
+                new Ground(new PVector(game.displayWidth/40, 200)),
+                Collider.BasicCollider(game.displayWidth/40, 200)
             );
 
             //Initialise the inputs
