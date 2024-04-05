@@ -15,6 +15,9 @@ public class Level_Creator extends PApplet {
 
     static String file_name = "./src/main/java/com/CS4303/group3/levels/default_level.json";
     static String input = "";
+
+    public int playerWidth;
+    public int playerHeight;
     
     public static void main(String[] args) {
         if(args.length > 0) file_name = "./src/main/java/com/CS4303/group3/levels/" + args[0] + ".json";
@@ -36,6 +39,9 @@ public class Level_Creator extends PApplet {
     public void setup() {
         mapper = new ObjectMapper();
 
+        playerWidth = (displayHeight+displayWidth)/60;
+        playerHeight = (displayHeight+displayWidth)/60;
+
         if(input == "") map = new Map();
         else try {map = mapper.readValue(new File(input), Map.class);} catch(IOException e) {e.printStackTrace();}
         current_pos = new PVector(0,0);
@@ -48,6 +54,7 @@ public class Level_Creator extends PApplet {
         if(started) {
             //draw a ground section to the mouse position
             rectMode(CORNERS);
+            fill(255);
             rect(current_pos.x, current_pos.y, mouseX, mouseY);
             rectMode(CORNER);
         }
@@ -70,8 +77,12 @@ public class Level_Creator extends PApplet {
             while(it.hasNext()) {
                 Ground_Tile ground_tile = it.next();
                 if(is_in(ground_tile.position, ground_tile.size)) it.remove();
-            }
-            
+            } 
+        }
+
+        if(key == 'p') {
+            //spawn the player in this position
+            map.player_position = new PVector(mouseX - playerWidth/2, mouseY - playerHeight/2);
         }
     }
 

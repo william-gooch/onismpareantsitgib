@@ -95,8 +95,8 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(new Drag());
 
             // Initialize the player
-            int playerX = game.displayWidth/2;
-            int playerY = game.displayHeight/2;
+            int playerX = (int)map.player_position.x;
+            int playerY = (int)map.player_position.y;
             int playerWidth = (game.displayHeight+game.displayWidth)/60;
             int playerHeight = (game.displayHeight+game.displayWidth)/60;
             dom.createEntity(
