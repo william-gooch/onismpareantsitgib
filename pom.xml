@@ -112,10 +112,10 @@
             <archive>
               <manifest>
                 <!-- To compile the game -->
-                <!-- <mainClass>com.CS4303.group3.Game</mainClass> -->
+                <mainClass>com.CS4303.group3.Game</mainClass>
 
                 <!-- To compile the level creator -->
-                <mainClass>com.CS4303.group3.levels.Level_Creator</mainClass>
+                <!-- <mainClass>com.CS4303.group3.levels.Level_Creator</mainClass> -->
               </manifest>
             </archive>
             <descriptorRefs>

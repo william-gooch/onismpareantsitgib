@@ -71,6 +71,9 @@ public class Force_Plugin implements Plugin_Interface {
             //if grounded slow down more due to friction on the floor
             if(position.grounded) drag.mult(grounded_multiplier);
 
+            //if walled slow down due to friction of the wall
+            if(position.walled != 0) drag.mult(grounded_multiplier);
+
             return drag;
         }
     }

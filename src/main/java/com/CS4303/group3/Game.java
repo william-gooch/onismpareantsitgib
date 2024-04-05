@@ -21,7 +21,7 @@ public class Game extends PApplet {
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
-    private int cell_width, cell_height;
+    public static String level_name = "./src/main/java/com/CS4303/group3/levels/default_level.json";
 
     static {
         System.setProperty("dominion.show-banner", "false");
@@ -29,6 +29,7 @@ public class Game extends PApplet {
 
     //Main method
     public static void main(String[] args) {
+        if(args.length > 0) level_name = "./src/main/java/com/CS4303/group3/levels/" + args[0] + ".json";
         main(Game.class.getName());
     }
 
@@ -46,9 +47,6 @@ public class Game extends PApplet {
         int[][] test_map = new int[25][30];
         for(int i = 0; i < 30; i++) test_map[24][i] = 1;
 
-        cell_width = displayWidth/30;
-        cell_height = displayHeight/25;
-
         //start Dominion
         dom = Dominion.create();
 
@@ -62,6 +60,7 @@ public class Game extends PApplet {
         addPlugin(new Object_Plugin());
         addPlugin(new Player_Plugin());
         addPlugin(new Force_Plugin());
+        
 
         // schedule._setup.tick();
     }
