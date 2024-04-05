@@ -18,6 +18,7 @@ public class Game_Plugin implements Plugin_Interface {
         game.dom.createEntity(new WorldManager(game, game.displayHeight/25, game.displayWidth/30));
 
         var wm = Resource.get(game, WorldManager.class);
+            
         wm.startGame();
     }
 
@@ -47,6 +48,14 @@ public class Game_Plugin implements Plugin_Interface {
             }
         }
 
+        public void create_level() {
+            //initialise input system
+            game.dom.createEntity(new InputSystem());
+
+            //initialise map
+            game.dom.createEntity(new Map());
+        }
+
         public void newLevel() {
             if(state == WorldState.PLAYING) {
                 createScene(game, game.dom);
@@ -56,7 +65,7 @@ public class Game_Plugin implements Plugin_Interface {
 
         public void createScene(Game game, Dominion dom) {
             // Initialize the world map
-            Map map = new Map(new int[25][30], cell_height, cell_width, game);
+            // Map map = new Map(new int[25][30], cell_height, cell_width, game);
 
             //create solid ground sections - with colliders -- TODO: Change this to create objects from the map
             dom.createEntity(

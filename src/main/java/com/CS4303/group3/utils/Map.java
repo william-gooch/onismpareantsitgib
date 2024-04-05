@@ -1,48 +1,44 @@
 package com.CS4303.group3.utils;
 
-import com.CS4303.group3.Game;
+import java.util.List;
 
-import processing.core.PGraphics;
+import com.CS4303.group3.levels.Level_Creator;
+
+import java.util.ArrayList;
+
+import processing.core.PVector;
 
 public class Map {
-    private int[][] map;
-    private PGraphics buffer;
-
-    private int cell_width, cell_height;
+    public List<Ground_Tile> ground_tiles;
 
 
-    public Map(int[][] layout, int cell_width, int cell_height, Game game) {
-        this.map = layout;
-        this.cell_width = cell_width;
-        this.cell_height = cell_height;
-        //draw to the buffer
-        //draw floor for the time being
-        for(int i = 0; i < map[0].length; i++) map[24][i] = 1;
-        //change textures that are draw here
-        buffer = game.createGraphics(game.displayWidth, game.displayHeight);
-        buffer.beginDraw();
-        buffer.background(0);
-        for(int i = 0; i < map.length; i++) {
-            for(int j = 0; j < map[0].length; j++) {
-                if(map[i][j] == 1) {
-                    buffer.rect(j*cell_width, i*cell_height, cell_width, cell_height);
-                }
-            }
-        }
-        buffer.endDraw();
+    public Map() {
+        ground_tiles = new ArrayList<>();
     }
 
-    public void draw(Game drawing) {
-        //render normally
-        // drawing.background(0);
-        // for(int i = 0; i < map.length; i++) {
-        //     for(int j = 0; j < map[0].length; j++) {
-        //         if(map[i][j] == 1) {
-        //             drawing.rect(j*cell_width, i*cell_height, cell_width, cell_height);
-        //         }
-        //     }
-        // }
-        //render from the buffer
-        drawing.image(buffer,0,0);
+    public void add_ground_tile(PVector position, PVector size) {
+        ground_tiles.add(new Ground_Tile(position, size));
+    }
+
+    public void add_ground_tile(Ground_Tile tile) {
+        ground_tiles.add(tile);
+    }
+
+    public void draw(Level_Creator lc) {
+        //draw all the ground tiles
+        lc.background(0);
+        for(Ground_Tile gt : ground_tiles) {
+            lc.rect(gt.position.x, gt.position.y, gt.size.x, gt.size.y);
+        }
+    }
+
+
+    public static class Ground_Tile {
+        public PVector position, size;
+
+        public Ground_Tile(PVector position, PVector size) {
+            this.position = position;
+            this.size = size;
+        }
     }
 }
