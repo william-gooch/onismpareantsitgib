@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import processing.core.PVector;
 
 public class Map {
+    //variables need to be public for jackson to convert to JSON correctly
     public List<Ground_Tile> ground_tiles;
 
 
@@ -40,5 +41,7 @@ public class Map {
             this.position = position;
             this.size = size;
         }
+
+        public Ground_Tile() {}
     }
 }

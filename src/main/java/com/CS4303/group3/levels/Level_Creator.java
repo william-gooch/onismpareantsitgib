@@ -2,6 +2,7 @@ package com.CS4303.group3.levels;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import com.CS4303.group3.utils.Map;
@@ -12,9 +13,12 @@ import com.fasterxml.jackson.databind.*;
 
 public class Level_Creator extends PApplet {
 
-    String file_name = "./src/main/java/com/CS4303/group3/levels/test_level.json";
+    static String file_name = "./src/main/java/com/CS4303/group3/levels/default_level.json";
+    static String input = "";
     
     public static void main(String[] args) {
+        if(args.length > 0) file_name = "./src/main/java/com/CS4303/group3/levels/" + args[0] + ".json";
+        if(args.length > 1) input = "./src/main/java/com/CS4303/group3/levels/" + args[1] + ".json";
         main(Level_Creator.class.getName());
     }
 
@@ -30,10 +34,11 @@ public class Level_Creator extends PApplet {
     ObjectMapper mapper;
 
     public void setup() {
-        map = new Map();
-        current_pos = new PVector(0,0);
         mapper = new ObjectMapper();
-        // mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+        if(input == "") map = new Map();
+        else try {map = mapper.readValue(new File(input), Map.class);} catch(IOException e) {e.printStackTrace();}
+        current_pos = new PVector(0,0);
     }
 
     public void draw() {
@@ -57,6 +62,25 @@ public class Level_Creator extends PApplet {
                 e.printStackTrace();
             }
         }
+
+        if(key == 'd') {
+            //find the object that is hovered over
+            //and delete it
+            Iterator<Ground_Tile> it = map.ground_tiles.iterator();
+            while(it.hasNext()) {
+                Ground_Tile ground_tile = it.next();
+                if(is_in(ground_tile.position, ground_tile.size)) it.remove();
+            }
+            
+        }
+    }
+
+    //checks if the mouse is over the object
+    private boolean is_in(PVector object, PVector size) {
+        return mouseX >= object.x
+                && mouseX <= object.x + size.x
+                && mouseY >= object.y
+                && mouseY <= object.y + size.y;
     }
 
     public void mousePressed() {
