@@ -69,6 +69,8 @@ public class Collision {
             boolean top = false, bottom = false, left = false, right = false;
 
             //check for basic (2 corner collisions)
+            //TODO: Check for collisions that are with object that can fit between both corners
+
             //check vertical
             if(is_in(object, object_size, bottom_left) && is_in(object, object_size, bottom_right)) {
                 collision.y = object.y - size.y;
@@ -87,7 +89,7 @@ public class Collision {
                 right = true;
             }
 
-            //handle single corner collisions -- use previous position
+            //handle single corner collisions
             //calc entry point move back to there -- use intersection of line between two points and ground edges
             if(is_in(object, object_size, top_left) && !(top || left)) {
                 //if it intersected with the bottom edge of the ground move down
