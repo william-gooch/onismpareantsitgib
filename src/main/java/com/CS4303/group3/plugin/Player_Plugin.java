@@ -1,14 +1,17 @@
 package com.CS4303.group3.plugin;
 
+
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
+import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Collision;
 
 import dev.dominion.ecs.api.Dominion;
+import dev.dominion.ecs.api.Entity;
 import processing.core.PVector;
 
 public class Player_Plugin implements Plugin_Interface {
@@ -28,69 +31,60 @@ public class Player_Plugin implements Plugin_Interface {
                 .stream().forEach(res -> {
                     res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass));
                 });
+
+            //if input is pickup, pick up box in the vicinity -- have a way to check this only every so often
+            if(input.isKeyDown((int) 'E')) {
+                //get the player
+                dom.findEntitiesWith(Velocity.class, Player.class, Position.class, Collider.class)
+                    .stream().forEach(player -> {
+                        if(player.comp2().box == null) {
+                            player.entity().setEnabled(false);
+                            //find a nearby box to pickup and pick it up
+                            dom.findEntitiesWith(Collider.class, Position.class, Box.class)
+                                .stream().forEach(box -> {
+                                    //if colliding with box pick it up
+                                    PVector collision = player.comp4().collider.collision_correction(player.comp3(), box.comp1().collider, box.comp2());
+
+                                    if(collision.mag() > 0) {
+                                    //check collision zone above head
+                                    
+                                        if(!dom.findEntitiesWith(Collider.class, Position.class)
+                                            .stream().anyMatch(object -> 
+                                                box.comp1().collider.collision_correction(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - player.comp4().collider.getSize().y)), object.comp1().collider, object.comp2()).mag() > 0 && object.comp2().position != box.comp2().position
+                                            )) {
+                                            
+                                                player.comp2().box = box.entity();
+                                                box.comp3().player = player.entity();
+                                                input.keysDown.remove((int) 'E');
+            
+                                                //move the box to above the player
+                                                box.comp2().previous_position = box.comp2().position;
+                                                box.comp2().position.x = player.comp3().position.x;
+                                                box.entity().removeType(Velocity.class); //until collisions are fixed
+                                                box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
+            
+                                            }
+                                    }
+                                    
+                                });
+                            player.entity().setEnabled(true);
+                        } else {
+                            //throw the box
+                            if(player.comp1().velocity.x > 0) { //throw to the right
+                                //give the players box a velocity and chuck it
+                                player.comp2().box.add(new Velocity(new PVector(12f, -4f)));
+                            } else { //throw to the left
+                                player.comp2().box.add(new Velocity(new PVector(-12f, -4f)));
+                            }
+                            input.keysDown.remove((int) 'E');
+                            player.comp2().box.get(Box.class).player = null;
+                            player.comp2().box = null;
+                        }
+                    });
+            }
         });      
         
-        //check collisions with ground
-        game.schedule.update(() -> {
-
-            dom.findEntitiesWith(Position.class, Collider.class, Velocity.class, Player.class)
-                .stream().forEach(player -> {
-                    //loop through ground objects, if not touching any set to not grounded
-                    //look into more efficient way to do this??
-                    if(!dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
-                    .stream().anyMatch(ground -> 
-                        player.comp2().collider.collision_correction(player.comp1(), ground.comp3().collider, ground.comp2()).y != 0
-                    )) {
-                        player.comp1().grounded = false;
-                    }
-
-                    if(!dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
-                    .stream().anyMatch(ground -> 
-                        player.comp2().collider.collision_correction(player.comp1(), ground.comp3().collider, ground.comp2()).x != 0
-                    )) {
-                        player.comp1().walled = 0;
-                    }
-
-                    //correct collisions with the ground
-                    dom.findEntitiesWith(Ground.class, Position.class, Collider.class)
-                        .stream().forEach(ground -> {
-                            PVector collision = player.comp2().collider.collision_correction(player.comp1(), ground.comp3().collider, ground.comp2());
-
-                            //check if collided vertically
-                            if(collision.y != 0) {
-                                // System.out.println("Moved y");
-                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
-                                if(player.comp3().velocity.y * (collision.y - player.comp1().position.y) < 0) {
-                                    //if going downwards -- y increasing - set to be grounded
-                                    if(player.comp3().velocity.y > 0) {
-                                        player.comp1().grounded = true;
-                                        player.comp1().prev_walled = 0;
-                                        player.comp1().walled = 0;
-                                        // System.out.println("Grounded");
-                                    }
-
-                                    player.comp3().velocity.y = 0;
-                                }
-
-                                //move vertically
-                                player.comp1().position.y = collision.y;
-                            }
-
-                            //check if collided horizontally
-                            if(collision.x != 0) {
-                                //stop velocity if going into the object
-                                if(player.comp3().velocity.x * (collision.x - player.comp1().position.x) < 0) {
-                                    player.comp1().walled = (int)((collision.x - player.comp1().position.x) / Math.abs(collision.x - player.comp1().position.x)); //opposite direction of collision
-                                    player.comp3().velocity.x = 0;
-                                }
-
-                                //move horizontally
-                                player.comp1().position.x = collision.x;
-                            }
-                        });
-                    
-                });
-        });
+        
 
 
         //draw the player
@@ -142,6 +136,7 @@ public class Player_Plugin implements Plugin_Interface {
             }
             if (input.isKeyDown((int) 'W')) {
                 //jump if grounded
+                // input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
                 pressDirection.y = -1;
             }
             if (input.isKeyDown((int) 'S')) {
@@ -183,6 +178,7 @@ public class Player_Plugin implements Plugin_Interface {
 
     static class Player {
         public int height, width;
+        public Entity box = null;
 
         public Player(int height, int width) {
             this.height = height;

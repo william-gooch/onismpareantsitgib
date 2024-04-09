@@ -10,6 +10,7 @@ import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
+import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
@@ -86,6 +87,18 @@ public class Game_Plugin implements Plugin_Interface {
                 );
             }
 
+            
+            int playerWidth = (game.displayHeight+game.displayWidth)/60;
+            int playerHeight = (game.displayHeight+game.displayWidth)/60;
+
+            //create block for testing
+            dom.createEntity(
+                new Position(new PVector(100,100)),
+                new Velocity(0.5f),
+                Collider.BasicCollider(playerWidth, playerHeight),
+                new Box()
+            );
+
 
             //Initialise the inputs
             dom.createEntity(new InputSystem());
@@ -97,8 +110,8 @@ public class Game_Plugin implements Plugin_Interface {
             // Initialize the player
             int playerX = game.displayWidth/2;
             int playerY = game.displayHeight/2;
-            int playerWidth = (game.displayHeight+game.displayWidth)/60;
-            int playerHeight = (game.displayHeight+game.displayWidth)/60;
+            // int playerWidth = (game.displayHeight+game.displayWidth)/60;
+            // int playerHeight = (game.displayHeight+game.displayWidth)/60;
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
