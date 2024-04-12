@@ -37,7 +37,7 @@ public class Game extends PApplet {
     //Settings --Does not run this for some reason -- ask how william got this bit to run
     public void settings() {
         fullScreen();
-        size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
+        // size((int)Math.floor(displayWidth * 0.5), (int)Math.floor(displayHeight * 0.5));
     }
 
     //Setup

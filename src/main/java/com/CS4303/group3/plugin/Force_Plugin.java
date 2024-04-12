@@ -2,6 +2,7 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Input_Plugin.InputSystem;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
 import dev.dominion.ecs.api.Dominion;
@@ -13,6 +14,23 @@ public class Force_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
         dom = game.dom;
+
+        game.schedule.update(() -> {
+            InputSystem input = Resource.get(game, InputSystem.class);
+            Gravity gravity = Resource.get(game, Gravity.class);
+            if(input.isKeyDown(39)) { //gravity goes right
+                gravity.changeGravity(new PVector(1,0));
+            }
+            if(input.isKeyDown(37)) { //gravity goes left
+                gravity.changeGravity(new PVector(-1,0));
+            }
+            if(input.isKeyDown(40)) { //gravity goes down
+                gravity.changeGravity(new PVector(0,1));
+            }
+            if(input.isKeyDown(38)) { //gravity goes up
+                gravity.changeGravity(new PVector(0,-1));
+            }
+        });
 
         //apply gravity to all objects
         game.schedule.update(() -> {
