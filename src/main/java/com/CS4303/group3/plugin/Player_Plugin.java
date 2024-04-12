@@ -9,6 +9,7 @@ import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Collision;
+import com.CS4303.group3.utils.Collision.Contact;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
@@ -42,29 +43,30 @@ public class Player_Plugin implements Plugin_Interface {
                             //find a nearby box to pickup and pick it up
                             dom.findEntitiesWith(Collider.class, Position.class, Box.class)
                                 .stream().forEach(box -> {
-                                    //if colliding with box pick it up
-                                    PVector collision = player.comp4().collider.collision_correction(player.comp3(), box.comp1().collider, box.comp2());
+                                    // //if colliding with box pick it up
+                                    // Contact collision = player.comp4().collider.collide(player.comp3(), box.comp1().collider, box.comp2());
 
-                                    if(collision.mag() > 0) {
-                                    //check collision zone above head
+                                    // if(collision != null) {
+                                    // //check collision zone above head
                                     
-                                        if(!dom.findEntitiesWith(Collider.class, Position.class)
-                                            .stream().anyMatch(object -> 
-                                                box.comp1().collider.collision_correction(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - player.comp4().collider.getSize().y)), object.comp1().collider, object.comp2()).mag() > 0 && object.comp2().position != box.comp2().position
-                                            )) {
+                                    //     if(!dom.findEntitiesWith(Collider.class, Position.class)
+                                    //         .stream().anyMatch(object -> {
+                                    //             Contact c = box.comp1().collider.collide(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - player.comp4().collider.getSize().y)), object.comp1().collider, object.comp2());
+                                    //             return c != null && object.comp2().position != box.comp2().position;
+                                    //         })) {
                                             
-                                                player.comp2().box = box.entity();
-                                                box.comp3().player = player.entity();
-                                                input.keysDown.remove((int) 'E');
+                                    //             player.comp2().box = box.entity();
+                                    //             box.comp3().player = player.entity();
+                                    //             input.keysDown.remove((int) 'E');
             
-                                                //move the box to above the player
-                                                box.comp2().previous_position = box.comp2().position;
-                                                box.comp2().position.x = player.comp3().position.x;
-                                                box.entity().removeType(Velocity.class); //until collisions are fixed
-                                                box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
+                                    //             //move the box to above the player
+                                    //             box.comp2().previous_position = box.comp2().position;
+                                    //             box.comp2().position.x = player.comp3().position.x;
+                                    //             box.entity().removeType(Velocity.class); //until collisions are fixed
+                                    //             // box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
             
-                                            }
-                                    }
+                                    //         }
+                                    // }
                                     
                                 });
                             player.entity().setEnabled(true);

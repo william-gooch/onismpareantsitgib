@@ -38,8 +38,8 @@ public class Object_Plugin implements Plugin_Interface {
                         if(entity.entity().get(Player.class).box != null) {
                             entity.entity().get(Player.class).box.get(Position.class).previous_position = entity.entity().get(Player.class).box.get(Position.class).position;
                             
-                            entity.entity().get(Player.class).box.get(Position.class).position.y = entity.comp1().position.y-entity.comp3().collider.getSize().y;
-                            entity.entity().get(Player.class).box.get(Position.class).position.x = entity.comp1().position.x;
+                            // entity.entity().get(Player.class).box.get(Position.class).position.y = entity.comp1().position.y-entity.comp3().collider.getSize().y;
+                            // entity.entity().get(Player.class).box.get(Position.class).position.x = entity.comp1().position.x;
                         }
                     }
                 });
@@ -55,9 +55,9 @@ public class Object_Plugin implements Plugin_Interface {
                     if(position.x < 0) {
                         position.x = 0;
                         velocity.x = 0;
-                    } else if(position.x + res.comp1().collider.getSize().x > game.displayWidth) {
-                        velocity.x = 0;
-                        position.x = game.displayWidth - res.comp1().collider.getSize().x;
+                    // } else if(position.x + res.comp1().collider.getSize().x > game.displayWidth) {
+                    //     velocity.x = 0;
+                    //     position.x = game.displayWidth - res.comp1().collider.getSize().x;
                     }
                 });
         });
@@ -85,14 +85,14 @@ public class Object_Plugin implements Plugin_Interface {
                     //loop through ground objects, if not touching any set to not grounded
                     if(!dom.findEntitiesWith(Position.class, Collider.class)
                     .stream().anyMatch(ground -> 
-                        player.comp2().collider.collision_correction(player.comp1(), ground.comp2().collider, ground.comp1()).y != 0
+                        player.comp2().collider.collide(player.comp1(), ground.comp2().collider, ground.comp1()) != null
                     )) {
                         player.comp1().grounded = false;
                     }
 
                     if(!dom.findEntitiesWith(Position.class, Collider.class, Ground.class)
                     .stream().anyMatch(ground -> 
-                        player.comp2().collider.collision_correction(player.comp1(), ground.comp2().collider, ground.comp1()).x != 0
+                        player.comp2().collider.collide(player.comp1(), ground.comp2().collider, ground.comp1()) != null
                     )) {
                         player.comp1().walled = 0;
                     }
@@ -102,15 +102,16 @@ public class Object_Plugin implements Plugin_Interface {
                         .stream().forEach(ground -> {
                             //check that it isn't looking at itself
                             if(ground.entity().isEnabled() && !deleted_entity) {
-                                PVector collision = player.comp2().collider.collision_correction(player.comp1(), ground.comp2().collider, ground.comp1());
+                                Contact collision = player.comp2().collider.collide(player.comp1(), ground.comp2().collider, ground.comp1());
+                                if(collision == null) return;
 
                                 //check if collided vertically
-                                if(collision.y != 0) {
+                                if(collision.cNormal().y != 0) {
                                     // System.out.println("Moved y");
                                     //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
                                     
                                     if(player.entity().has(Velocity.class)) {
-                                        if(player.entity().get(Velocity.class).velocity.y * (collision.y - player.comp1().position.y) < 0) {
+                                        if(player.entity().get(Velocity.class).velocity.y * collision.cNormal().y < 0) {
                                             //if going downwards -- y increasing - set to be grounded
                                             if(player.entity().get(Velocity.class).velocity.y > 0) {
                                                 player.comp1().grounded = true;
@@ -120,8 +121,9 @@ public class Object_Plugin implements Plugin_Interface {
                                             }
 
                                             player.entity().get(Velocity.class).velocity.y = 0;
+                                            player.entity().get(Position.class).position.y += collision.cNormal().y;
                                         }
-                                        player.comp1().position.y = collision.y;
+                                        // player.comp1().position.y = collision.y;
                                     } else {
                                         //stop the block being carried
                                         // player.entity().add(new Velocity());
@@ -134,34 +136,35 @@ public class Object_Plugin implements Plugin_Interface {
                                         // deleted_entity = true;
 
                                         //stop the block and player
-                                        player.comp1().position.y = collision.y+1;
-                                        player.entity().get(Box.class).player.get(Position.class).position.y = player.comp1().position.y + player.comp2().collider.getSize().y;
-                                        player.entity().get(Box.class).player.get(Velocity.class).velocity.y = 0;
+                                        // player.comp1().position.y = collision.y+1;
+                                        // player.entity().get(Box.class).player.get(Position.class).position.y = player.comp1().position.y + player.comp2().collider.getSize().y;
+                                        // player.entity().get(Box.class).player.get(Velocity.class).velocity.y = 0;
                                     }
                                 }
 
                                 //check if collided horizontally
                                 //issue with setting enabled to false
-                                if(collision.x != 0 && !deleted_entity) {
+                                if(collision.cNormal().x != 0 && !deleted_entity) {
                                     if(ground.entity().has(Ground.class)) {
                                         //stop velocity if going into the object
                                         if(player.entity().has(Velocity.class)) {
-                                            if(player.entity().get(Velocity.class).velocity.x * (collision.x - player.comp1().position.x) < 0) {
-                                                player.comp1().walled = (int)((collision.x - player.comp1().position.x) / Math.abs(collision.x - player.comp1().position.x)); //opposite direction of collision
+                                            if(player.entity().get(Velocity.class).velocity.x * collision.cNormal().x < 0) {
+                                                player.comp1().walled = collision.cNormal().x > 0 ? 1 : -1;
+
                                                 player.entity().get(Velocity.class).velocity.x = 0;
+                                                player.entity().get(Position.class).position.x += collision.cNormal().x;
                                             }
-                                            player.comp1().position.x = collision.x;
                                         } else {
                                             //stop the block being carried if the player is still moving (This allows for wall jumping with the blocks - discuss if we want this)
-                                            if(player.entity().get(Box.class).player.get(Velocity.class).velocity.x != 0) {
-                                                player.entity().get(Box.class).player.setEnabled(true);
-                                                player.entity().get(Box.class).player.get(Player.class).box = null;
-                                                player.entity().get(Box.class).player = null;
-                                                player.entity().setEnabled(true);
-                                                dom.createEntityAs(player.entity(), new Velocity(0.5f));
-                                                dom.deleteEntity(player.entity());
-                                                deleted_entity = true;
-                                            }
+                                            // if(player.entity().get(Box.class).player.get(Velocity.class).velocity.x != 0) {
+                                            //     player.entity().get(Box.class).player.setEnabled(true);
+                                            //     player.entity().get(Box.class).player.get(Player.class).box = null;
+                                            //     player.entity().get(Box.class).player = null;
+                                            //     player.entity().setEnabled(true);
+                                            //     dom.createEntityAs(player.entity(), new Velocity(0.5f));
+                                            //     dom.deleteEntity(player.entity());
+                                            //     deleted_entity = true;
+                                            // }
 
                                             //stop the player
                                             // player.comp1().position.x = collision.x;
@@ -173,7 +176,7 @@ public class Object_Plugin implements Plugin_Interface {
                                         //maybe add realistic momentum calculations here
 
                                         //move player out of the object
-                                        player.comp1().position.x = collision.x;
+                                        player.comp1().position.x += collision.cNormal().x;
 
                                         //calculate the new velocity for both objects
                                         if(player.entity().has(Velocity.class)) {

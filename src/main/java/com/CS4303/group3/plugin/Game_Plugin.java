@@ -109,7 +109,7 @@ public class Game_Plugin implements Plugin_Interface {
 
             // Initialize the player
             int playerX = game.displayWidth/2;
-            int playerY = game.displayHeight/2;
+            int playerY = game.displayHeight/2 - 100;
             // int playerWidth = (game.displayHeight+game.displayWidth)/60;
             // int playerHeight = (game.displayHeight+game.displayWidth)/60;
             dom.createEntity(
