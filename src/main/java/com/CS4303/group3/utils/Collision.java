@@ -16,7 +16,7 @@ public class Collision {
     public static class BasicCollider implements Collider_Interface {
         public PVector size;
 
-        public BasicCollider(int width, int height) {
+        public BasicCollider(float width, float height) {
             size = new PVector(width, height);
         }
 

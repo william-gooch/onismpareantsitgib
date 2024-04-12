@@ -18,12 +18,9 @@ import processing.core.PVector;
 public class Player_Plugin implements Plugin_Interface {
     Dominion dom;
 
-    int playerSize = 10;
-
     @Override
     public void build(Game game) {
         this.dom = game.dom;
-        playerSize = (game.displayHeight+game.displayWidth)/60;
 
         //set the players velocity
         game.schedule.update(() -> {
@@ -105,7 +102,7 @@ public class Player_Plugin implements Plugin_Interface {
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(128);
-                        drawing.rect(pos.x, pos.y, playerSize, playerSize);
+                        drawing.rect(pos.x, pos.y, res.comp2().width, res.comp2().height);
                     });
                 });
         });
@@ -221,10 +218,10 @@ public class Player_Plugin implements Plugin_Interface {
     }
 
     static class Player {
-        public int height, width;
+        public float height, width;
         public Entity box = null;
 
-        public Player(int height, int width) {
+        public Player(float height, float width) {
             this.height = height;
             this.width = width;
         }

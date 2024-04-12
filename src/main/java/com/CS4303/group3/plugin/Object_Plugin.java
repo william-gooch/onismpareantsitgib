@@ -52,7 +52,7 @@ public class Object_Plugin implements Plugin_Interface {
                 });
         });
 
-        //check for collsions
+        //check for collisions
         //check for collisions with the edge of the play area
         game.schedule.update(() -> {
             dom.findEntitiesWith(Collider.class, Position.class, Velocity.class)
@@ -311,7 +311,7 @@ public class Object_Plugin implements Plugin_Interface {
             this.collider = collider;
         }
 
-        public static Collider BasicCollider(int width, int height) {
+        public static Collider BasicCollider(float width, float height) {
             return new Collider(new BasicCollider(width, height));
         }
     }

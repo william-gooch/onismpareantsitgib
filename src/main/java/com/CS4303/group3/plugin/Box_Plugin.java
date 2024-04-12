@@ -2,6 +2,7 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.plugin.Object_Plugin.Collider;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
 
 import dev.dominion.ecs.api.Dominion;
@@ -15,21 +16,15 @@ public class Box_Plugin implements Plugin_Interface {
     public void build(Game game) {
         dom = game.dom;
 
-        float box_size = (game.displayHeight+game.displayWidth)/60;
-
-        
-        //hadle object collisions
-
-
         //draw the object
         game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Position.class, Box.class)
+            dom.findEntitiesWith(Position.class, Box.class, Collider.class)
                 .stream().forEach(res -> {
                     var pos = res.comp1().position;
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(128,128,0);
-                        drawing.rect(pos.x, pos.y, box_size, box_size);
+                        drawing.rect(pos.x, pos.y, res.comp3().collider.getSize().x, res.comp3().collider.getSize().y);
                     });
                 });
         });

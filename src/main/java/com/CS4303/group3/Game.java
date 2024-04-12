@@ -19,6 +19,7 @@ public class Game extends PApplet {
     //Global Variables
     public Dominion dom;
     public GameSchedule schedule;
+    public float scale;
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
@@ -36,8 +37,14 @@ public class Game extends PApplet {
 
     //Settings --Does not run this for some reason -- ask how william got this bit to run
     public void settings() {
-        fullScreen();
+//        fullScreen();
         // size((int)Math.floor(displayWidth * 0.5), (int)Math.floor(displayHeight * 0.5));
+
+        if(displayHeight > displayWidth) {
+            scale = displayWidth;
+        } else scale = displayHeight;
+
+        size((int)scale, (int)scale);
     }
 
     //Setup

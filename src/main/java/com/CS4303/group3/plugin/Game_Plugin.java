@@ -80,22 +80,22 @@ public class Game_Plugin implements Plugin_Interface {
 
             //create solid ground sections
             for(Ground_Tile ground_tile : map.ground_tiles) {
+                PVector size = ground_tile.size.copy().mult(game.scale);
                 dom.createEntity(
-                    new Position(ground_tile.position.copy()),
-                    new Ground(ground_tile.size.copy()),
-                    Collider.BasicCollider((int)ground_tile.size.x, (int)ground_tile.size.y)
+                    new Position(ground_tile.position.copy().mult(game.scale)),
+                    new Ground(size),
+                    Collider.BasicCollider(size.x, size.y)
                 );
             }
 
             
-            int playerWidth = (game.displayHeight+game.displayWidth)/60;
-            int playerHeight = (game.displayHeight+game.displayWidth)/60;
+            float player_size = game.scale/25;
 
             //create block for testing
             dom.createEntity(
                 new Position(new PVector(100,100)),
                 new Velocity(0.5f),
-                Collider.BasicCollider(playerWidth, playerHeight),
+                Collider.BasicCollider(player_size, player_size),
                 new Box()
             );
 
@@ -108,21 +108,14 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(new Drag());
 
             // Initialize the player
-            int playerX = game.displayWidth/2;
-            int playerY = game.displayHeight/2;
-            // int playerWidth = (game.displayHeight+game.displayWidth)/60;
-            // int playerHeight = (game.displayHeight+game.displayWidth)/60;
+            float playerX = map.player_position.x * game.scale;
+            float playerY = map.player_position.y * game.scale;
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
-                new Player(playerWidth, playerHeight),
+                new Player(player_size, player_size),
                 new PlayerMovement(),
-                Collider.BasicCollider(playerWidth, playerHeight)
-                // Collider.circle(PlayerPlugin.PLAYER_RADIUS),
-                // new Shoot(),
-                // new PlayerSpawnAnimation(),
-                // new PowerupContainer(),
-                // new PlayerLives()
+                Collider.BasicCollider(player_size, player_size)
             );
         }
     }

@@ -15,6 +15,8 @@ public class Level_Creator extends PApplet {
 
     static String file_name = "./src/main/java/com/CS4303/group3/levels/default_level.json";
     static String input = "";
+    public float scale;
+    public float player_size;
     
     public static void main(String[] args) {
         if(args.length > 0) file_name = "./src/main/java/com/CS4303/group3/levels/" + args[0] + ".json";
@@ -23,17 +25,27 @@ public class Level_Creator extends PApplet {
     }
 
     public void settings() {
-        fullScreen();
+//        fullScreen();
+        if(displayHeight > displayWidth) {
+            scale = displayWidth;
+        } else scale = displayHeight;
+
+        size((int)scale, (int)scale);
     }
 
     Map map;
     PVector current_pos;
     PVector size;
+    float square_size;
     boolean started = false;
+
+    int cube_with = 50, cube_height = 50;
 
     ObjectMapper mapper;
 
     public void setup() {
+        player_size = scale/50f;
+        square_size = scale/50f;
         mapper = new ObjectMapper();
 
         if(input == "") map = new Map();
@@ -43,6 +55,16 @@ public class Level_Creator extends PApplet {
 
     public void draw() {
         //draw everything in the Map class
+        background(0);
+        stroke(50);
+        fill(0);
+        for(int i = 0; i < cube_height; i++) {
+            for(int j = 0; j < cube_with; j++) {
+                rect(i*square_size, j*square_size, square_size, square_size);
+            }
+        }
+        fill(255);
+        stroke(255);
         map.draw(this);
 
         if(started) {
@@ -73,6 +95,11 @@ public class Level_Creator extends PApplet {
             }
             
         }
+
+        if(key == 'p') {
+            //spawn the player in this position
+            map.player_position = new PVector((mouseX - player_size/2)/scale, (mouseY - player_size/2)/scale);
+        }
     }
 
     //checks if the mouse is over the object
@@ -85,12 +112,14 @@ public class Level_Creator extends PApplet {
 
     public void mousePressed() {
         started = true;
-        current_pos.set(mouseX, mouseY);
+        //Snap to the grid (divide by 50) round to int and times by 50
+        current_pos.set((int)(mouseX/square_size)*square_size, (int)(mouseY/square_size)*square_size);
     }
 
     public void mouseReleased() {
         //calc the top left position and sizes
         started = false;
-        map.add_ground_tile(new PVector(min(current_pos.x, mouseX), min(current_pos.y, mouseY)), new PVector(max(current_pos.x, mouseX) - min(current_pos.x, mouseX), max(current_pos.y, mouseY) - min(current_pos.y, mouseY)));
+        PVector end = new PVector((float) (Math.ceil(mouseX/square_size)*square_size), (float) (Math.ceil(mouseY/square_size)*square_size));
+        map.add_ground_tile(new PVector(min(current_pos.x, end.x)/scale, min(current_pos.y, end.y)/scale), new PVector((max(current_pos.x, end.x) - min(current_pos.x, end.x))/scale, (max(current_pos.y, end.y) - min(current_pos.y, end.y))/scale));
     }
 }

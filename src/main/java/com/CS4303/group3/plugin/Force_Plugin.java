@@ -61,7 +61,7 @@ public class Force_Plugin implements Plugin_Interface {
         public PVector gravity;
 
         public Gravity() {
-            gravity = new PVector(0,1);
+            gravity = new PVector(0,0);
         }
 
         public void changeGravity(PVector new_gravity) {
