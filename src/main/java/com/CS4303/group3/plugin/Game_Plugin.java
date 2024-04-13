@@ -11,6 +11,7 @@ import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
+import com.CS4303.group3.plugin.Button_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
@@ -97,6 +98,19 @@ public class Game_Plugin implements Plugin_Interface {
                 new Velocity(0.5f),
                 Collider.BasicCollider(playerWidth, playerHeight),
                 new Box()
+            );
+
+
+        
+            float loweringSpeed = 0.2f;
+            
+            //create button for testing
+            dom.createEntity(
+                new Position(new PVector(150,600)),
+                new Button(playerWidth, playerHeight, loweringSpeed),
+                Collider.BasicCollider(playerWidth, playerHeight),
+                new Velocity()
+               
             );
 
 
