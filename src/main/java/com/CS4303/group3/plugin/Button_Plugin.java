@@ -14,11 +14,17 @@ public class Button_Plugin implements Plugin_Interface {
     public void build(Game game) {
         dom = game.dom;
 
-        
-
-        
-        //handle object collisions
-
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Button.class)
+                .stream().forEach(res -> {
+                    if(res.comp().pushed) {
+                        res.comp().lastPushed += game.schedule.dt();
+                        if(res.comp().lastPushed > 0.3) {
+                            res.comp().pushed = false;
+                        }
+                    }
+                });
+        });
 
         //draw the object
         game.schedule.draw(draw -> {
@@ -29,7 +35,11 @@ public class Button_Plugin implements Plugin_Interface {
                     var width = res.comp2().width;
                     draw.call(drawing -> {
                         //draw the player character
-                        drawing.fill(255, 165, 0);
+                        if(res.comp2().pushed) {
+                            drawing.fill(255, 0, 0);
+                        } else {
+                            drawing.fill(255, 165, 0);
+                        }
                         drawing.rect(pos.x, pos.y, height, width);
                     });
                 });
@@ -41,6 +51,7 @@ public class Button_Plugin implements Plugin_Interface {
         public Entity object = null;
         public int height, width;
         public boolean pushed;
+        public float lastPushed;
         public float loweringSpeed;
 
         public Button(int height, int width, float loweringSpeed) {

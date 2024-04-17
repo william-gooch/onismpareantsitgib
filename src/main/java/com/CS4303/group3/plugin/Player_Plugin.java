@@ -9,6 +9,9 @@ import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Collision;
+import com.CS4303.group3.utils.Collision.BasicCollider;
+import com.CS4303.group3.utils.Collision.Collider_Interface;
+import com.CS4303.group3.utils.Collision.Contact;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
@@ -24,6 +27,27 @@ public class Player_Plugin implements Plugin_Interface {
         this.dom = game.dom;
         playerSize = (game.displayHeight+game.displayWidth)/60;
 
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class, Grab.class)
+                .stream().forEach(grabber -> {
+                    if(grabber.comp2().grabObj != null) {
+                        var grabPos = grabber.comp2().grabObj.get(Position.class);
+                        grabPos.previous_position = grabPos.position;
+                        grabPos.position = PVector.add(grabber.comp1().position, new PVector(0, -40, 0));
+                    }
+                });
+        });
+
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Grab.class)
+                .stream().forEach(grab -> {
+                    if(grab.comp().grabObj != null) { //ensures that doesn't count collisions with box that it is carrying
+                        grab.comp().grabObj
+                            .get(Body.class).disableCollision();
+                    }
+                });
+        });
+
         //set the players velocity
         game.schedule.update(() -> {
             InputSystem input = Resource.get(game, InputSystem.class);
@@ -37,23 +61,24 @@ public class Player_Plugin implements Plugin_Interface {
                 //get the player
                 dom.findEntitiesWith(Velocity.class, Player.class, Position.class, Collider.class)
                     .stream().forEach(player -> {
-                        if(player.comp2().box == null) {
-                            player.entity().setEnabled(false);
+                        var grab = player.entity().get(Grab.class);
+                        if(grab.grabObj == null) {
                             //find a nearby box to pickup and pick it up
-                            dom.findEntitiesWith(Collider.class, Position.class, Box.class)
+                            dom.findEntitiesWith(Collider.class, Position.class, Grabbable.class)
                                 .stream().forEach(box -> {
-                                    //if colliding with box pick it up
-                                    PVector collision = player.comp4().collider.collision_correction(player.comp3(), box.comp1().collider, box.comp2());
+                                    // //if colliding with box pick it up
+                                    Contact collision = player.comp4().collider.collide(player.comp3(), box.comp1().collider, box.comp2());
 
-                                    if(collision.mag() > 0) {
+                                    if(collision != null) {
                                     //check collision zone above head
                                     
                                         if(!dom.findEntitiesWith(Collider.class, Position.class)
-                                            .stream().anyMatch(object -> 
-                                                box.comp1().collider.collision_correction(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - player.comp4().collider.getSize().y)), object.comp1().collider, object.comp2()).mag() > 0 && object.comp2().position != box.comp2().position
-                                            )) {
+                                            .stream().anyMatch(object -> {
+                                                Contact c = box.comp1().collider.collide(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - 100)), object.comp1().collider, object.comp2());
+                                                return c != null && object.comp2().position != box.comp2().position;
+                                            })) {
                                             
-                                                player.comp2().box = box.entity();
+                                                grab.grabObj = box.entity();
                                                 box.comp3().player = player.entity();
                                                 input.keysDown.remove((int) 'E');
             
@@ -61,24 +86,24 @@ public class Player_Plugin implements Plugin_Interface {
                                                 box.comp2().previous_position = box.comp2().position;
                                                 box.comp2().position.x = player.comp3().position.x;
                                                 box.entity().removeType(Velocity.class); //until collisions are fixed
-                                                box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
+                                                // box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
             
                                             }
                                     }
                                     
                                 });
-                            player.entity().setEnabled(true);
                         } else {
+                            grab.grabObj.get(Body.class).enableCollision();
                             //throw the box
                             if(player.comp1().velocity.x > 0) { //throw to the right
                                 //give the players box a velocity and chuck it
-                                player.comp2().box.add(new Velocity(new PVector(12f, -4f)));
+                                grab.grabObj.add(new Velocity(new PVector(12f, -4f)));
                             } else { //throw to the left
-                                player.comp2().box.add(new Velocity(new PVector(-12f, -4f)));
+                                grab.grabObj.add(new Velocity(new PVector(-12f, -4f)));
                             }
                             input.keysDown.remove((int) 'E');
-                            player.comp2().box.get(Box.class).player = null;
-                            player.comp2().box = null;
+                            grab.grabObj.get(Grabbable.class).player = null;
+                            grab.grabObj = null;
                         }
                     });
             }
@@ -178,11 +203,22 @@ public class Player_Plugin implements Plugin_Interface {
 
     static class Player {
         public int height, width;
-        public Entity box = null;
 
         public Player(int height, int width) {
             this.height = height;
             this.width = width;
+        }
+    }
+
+    static class Grab {
+        public Entity grabObj = null;
+
+        public Position aboveHead;
+        public Collider_Interface aboveHeadCollider;
+
+        public Grab(float spaceSize) {
+            this.aboveHead = new Position();
+            this.aboveHeadCollider = new BasicCollider(spaceSize, spaceSize);
         }
     }
 }

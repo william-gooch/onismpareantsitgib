@@ -2,7 +2,6 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
-import com.CS4303.group3.plugin.Player_Plugin.Player;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
@@ -20,7 +19,6 @@ public class Box_Plugin implements Plugin_Interface {
         
         //hadle object collisions
 
-
         //draw the object
         game.schedule.draw(draw -> {
             dom.findEntitiesWith(Position.class, Box.class)
@@ -35,11 +33,13 @@ public class Box_Plugin implements Plugin_Interface {
         });
     }
 
-    static class Box {
+    static class Box {}
+
+    static class Grabbable {
         //store some rules associated with the block
         //strore the player object that is picking it up
         public Entity player = null;
 
-        public Box() {}
+        public Grabbable() {}
     }
 }
