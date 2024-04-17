@@ -4,7 +4,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
+import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Map_Plugin.Ground;
+import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Grab;
 import com.CS4303.group3.utils.Collision.*;
 
@@ -87,6 +89,8 @@ public class Object_Plugin implements Plugin_Interface {
                         return;
                     }
 
+                    PVector gravity = Resource.get(game, Force_Plugin.Gravity.class).gravity;
+
                     obj.comp1().walled = 0;
                     obj.comp1().grounded = false;
 
@@ -114,32 +118,61 @@ public class Object_Plugin implements Plugin_Interface {
                             }
 
                             if(collision.cNormal().y != 0) { // check if collided vertically
-                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
-                                if(obj.entity().has(Velocity.class)) {
-                                    Velocity objVel = obj.entity().get(Velocity.class);
-                                    if(objVel.velocity.y * collision.cNormal().y < 0) {
-                                        //if going downwards -- y increasing - set to be grounded
-                                        if(objVel.velocity.y > 0) {
-                                            obj.comp1().grounded = true;
-                                            obj.comp1().prev_walled = 0;
-                                            obj.comp1().walled = 0;
-                                        }
-
-                                        objVel.velocity.y = 0;
-                                        obj.comp1().position.y += collision.cNormal().y;
-                                    }
-                                }
-                            }
-
-                            //check if collided horizontally
-                            //issue with setting enabled to false
-                            if(collision.cNormal().x != 0) {
-                                if(other.entity().has(Ground.class)) {
+                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && other.entity().has(Box.class))) {
                                     //stop velocity if going into the object
                                     if(obj.entity().has(Velocity.class)) {
                                         Velocity objVel = obj.entity().get(Velocity.class);
-                                        if(objVel.velocity.x * collision.cNormal().x < 0) {
-                                            obj.comp1().walled = collision.cNormal().x > 0 ? 1 : -1;
+                                        if(objVel.velocity.y * collision.cNormal().y < 0) { //if moving against the normal - moving into the collision
+                                            //if going downwards -- y increasing - set to be grounded
+                                            if(gravity.y != 0) {
+                                                //set to grounded if travelling the same direction as gravity
+                                                if (objVel.velocity.y * gravity.y > 0) {
+                                                    obj.comp1().grounded = true;
+                                                    obj.comp1().prev_walled = 0;
+                                                    obj.comp1().walled = 0;
+                                                }
+                                            } else if(gravity.x != 0) {
+                                                //set to walled
+                                                obj.comp1().walled = objVel.velocity.y > 0 ? 1 : -1;
+                                            }
+
+                                            objVel.velocity.y = 0;
+                                            obj.comp1().position.y += collision.cNormal().y;
+                                        }
+                                    }
+                                } else if(other.entity().has(Velocity.class)) {
+                                    // move player out of the object
+                                    obj.comp1().position.y += collision.cNormal().y;
+
+                                    // calculate the new velocity for both objects
+                                    if (obj.entity().has(Velocity.class)) {
+                                        obj.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y * 0.75f;
+                                        other.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y;
+                                    }
+                                }
+                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
+
+                            }
+
+                            //check if collided horizontally
+                            if(collision.cNormal().x != 0) { // check if collided vertically
+                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && other.entity().has(Box.class))) {
+                                    //stop velocity if going into the object
+                                    if(obj.entity().has(Velocity.class)) {
+                                        Velocity objVel = obj.entity().get(Velocity.class);
+                                        if(objVel.velocity.x * collision.cNormal().x < 0) { //if moving against the normal - moving into the collision
+                                            //if going downwards -- y increasing - set to be grounded
+                                            if(gravity.x != 0) {
+                                                //set to grounded if travelling the same direction as gravity
+                                                if (objVel.velocity.x * gravity.x > 0) {
+                                                    obj.comp1().grounded = true;
+                                                    obj.comp1().prev_walled = 0;
+                                                    obj.comp1().walled = 0;
+                                                }
+                                            } else if(gravity.y != 0) {
+                                                //set to walled
+                                                obj.comp1().walled = objVel.velocity.x > 0 ? 1 : -1;
+                                            }
 
                                             objVel.velocity.x = 0;
                                             obj.comp1().position.x += collision.cNormal().x;
@@ -148,16 +181,14 @@ public class Object_Plugin implements Plugin_Interface {
                                 } else if(other.entity().has(Velocity.class)) {
                                     // move player out of the object
                                     obj.comp1().position.x += collision.cNormal().x;
-
                                     // calculate the new velocity for both objects
-                                    if(obj.entity().has(Velocity.class)) {
-                                        obj.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x*0.75f;
+                                    if (obj.entity().has(Velocity.class)) {
+                                        obj.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x * 0.75f;
                                         other.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x;
                                     }
                                 }
-                            //}
+                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
 
-                           
                             }
                         });
                 });

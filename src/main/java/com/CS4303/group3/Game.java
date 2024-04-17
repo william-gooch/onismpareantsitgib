@@ -43,7 +43,7 @@ public class Game extends PApplet {
 
         if(displayHeight > displayWidth) {
             scale = displayWidth;
-        } else scale = displayHeight;
+        } else scale = (float) (displayHeight * 0.5);
 
         size((int)scale, (int)scale);
     }
@@ -89,6 +89,21 @@ public class Game extends PApplet {
         schedule._draw.tick();
         ArrayList<PriorityDrawOperation<?>> ops = new ArrayList<>(drawQueue.size());
         drawQueue.drainTo(ops);
+
+        //rotate view with the gravity
+        PVector gravity = Resource.get(this, Force_Plugin.Gravity.class).gravity;
+        if(gravity.y < 0) {
+            rotate(PI);
+            translate(-scale,-scale);
+        }
+        if(gravity.x > 0) {
+            rotate(HALF_PI);
+            translate(0,-scale);
+        }
+        if(gravity.x < 0) {
+            rotate(-HALF_PI);
+            translate(-scale,0);
+        }
         ops.stream()
             .forEach(op -> {
                 op.operation.perform(this);

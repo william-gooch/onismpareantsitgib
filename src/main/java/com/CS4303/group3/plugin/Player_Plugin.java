@@ -7,6 +7,7 @@ import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
+import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
@@ -25,7 +26,7 @@ public class Player_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
         this.dom = game.dom;
-        playerSize = (game.displayHeight+game.displayWidth)/60;
+        playerSize = (int) (game.scale/30);
 
         game.schedule.update(() -> {
             dom.findEntitiesWith(Position.class, Grab.class)
@@ -51,9 +52,10 @@ public class Player_Plugin implements Plugin_Interface {
         //set the players velocity
         game.schedule.update(() -> {
             InputSystem input = Resource.get(game, InputSystem.class);
+            Gravity gravity = Resource.get(game, Gravity.class);
             dom.findEntitiesWith(Velocity.class, Player.class, PlayerMovement.class, Position.class)
                 .stream().forEach(res -> {
-                    res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass));
+                    res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass, gravity.gravity));
                 });
 
             //if input is pickup, pick up box in the vicinity -- have a way to check this only every so often
@@ -149,7 +151,7 @@ public class Player_Plugin implements Plugin_Interface {
             this(150f, 12f, 15f, 6f, 20f, 0.3f, 0.7f);
         }
 
-        public PVector newVelocity(float deltaTime, PVector velocity, InputSystem input, Position position, float mass) {
+        public PVector newVelocity(float deltaTime, PVector velocity, InputSystem input, Position position, float mass, PVector gravity) {
             PVector pressDirection = new PVector(0, 0);
             if (input.isKeyDown((int) 'A')) {
                 //move left
@@ -170,24 +172,34 @@ public class Player_Plugin implements Plugin_Interface {
 
             //if grounded player is grounded can jump and accelerate  faster left and right
             if(position.grounded) {
-                velocity.x += pressDirection.x * acceleration * deltaTime * mass;
-                if (Math.abs(velocity.x) > maxSpeed) {
-                    velocity.x *= 1 - (impulseDamping * deltaTime);
-                }
+                velocity.x += pressDirection.x * acceleration * deltaTime * mass * gravity.y;
+                velocity.y += pressDirection.x * acceleration * deltaTime * mass * -gravity.x;
+
+                if (Math.abs(velocity.x) > maxSpeed && gravity.y != 0) velocity.x *= 1 - (impulseDamping * deltaTime);
+                if (Math.abs(velocity.y) > maxSpeed && gravity.x != 0) velocity.y *= 1 - (impulseDamping * deltaTime);
 
                 if(pressDirection.y == -1) {
                     position.grounded = false;
-                    velocity.y = -jumpSpeed;
+                    if(gravity.y != 0) velocity.y = -jumpSpeed * gravity.y;
+                    if(gravity.x != 0) velocity.x = -jumpSpeed * gravity.x;
                 }
             } else {
-                velocity.x += pressDirection.x * acceleration * deltaTime * airSlowdown;
-                if (Math.abs(velocity.x) > maxSpeed) {
-                    velocity.x *= 1 - (impulseDamping * deltaTime);
-                }
+                velocity.x += pressDirection.x * acceleration * deltaTime * airSlowdown * gravity.y;
+                velocity.y += pressDirection.x * acceleration * deltaTime * airSlowdown * -gravity.x;
+
+                if (Math.abs(velocity.x) > maxSpeed && gravity.y != 0) velocity.x *= 1 - (impulseDamping * deltaTime);
+                if (Math.abs(velocity.y) > maxSpeed && gravity.x != 0) velocity.y *= 1 - (impulseDamping * deltaTime);
 
                 if(position.walled != 0 && position.walled != position.prev_walled && pressDirection.y == -1) {
-                    velocity.y = -jumpSpeed * wallJumpPower;
-                    velocity.x = position.walled * jumpSpeed * wallJumpPower;
+
+                    if(gravity.y != 0) {
+                        velocity.y = -jumpSpeed * wallJumpPower * gravity.y;
+                        velocity.x = -position.walled * jumpSpeed * wallJumpPower;
+                    } else if(gravity.x != 0) {
+                        velocity.x = -jumpSpeed * wallJumpPower * gravity.x;
+                        velocity.y = -position.walled * jumpSpeed * wallJumpPower;
+                    }
+
                     position.prev_walled = position.walled;
                     position.walled = 0;
                 }
