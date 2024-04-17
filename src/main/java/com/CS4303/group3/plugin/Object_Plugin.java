@@ -1,5 +1,8 @@
 package com.CS4303.group3.plugin;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Map_Plugin.Ground;
 import com.CS4303.group3.plugin.Player_Plugin.Grab;
@@ -78,8 +81,8 @@ public class Object_Plugin implements Plugin_Interface {
 
         //check collisions with anything with position and collider
         game.schedule.update(() -> {
-            dom.findEntitiesWith(Position.class, Collider.class, Body.class)
-                .stream().forEach(obj -> {
+            dom.findEntitiesWith(Position.class, Collider.class, Body.class).stream()
+                .forEach(obj -> {
                     if(!obj.comp3().canCollide) {
                         return;
                     }
@@ -98,6 +101,16 @@ public class Object_Plugin implements Plugin_Interface {
 
                             Contact collision = obj.comp2().collider.collide(obj.comp1(), other.comp2().collider, other.comp1());
                             if(collision == null) return;
+
+                            // some objects may have custom collision callbacks (e.g. buttons)
+                            obj.comp2().triggerCollision(obj.entity(), other.entity());
+                            other.comp2().triggerCollision(other.entity(), obj.entity());
+
+                            // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
+                            // if so, skip over handling the collision after this point
+                            if (obj.comp2().isTrigger || other.comp2().isTrigger) {
+                                return;
+                            }
 
                             if(collision.cNormal().y != 0) { // check if collided vertically
                                 //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
@@ -315,12 +328,32 @@ public class Object_Plugin implements Plugin_Interface {
     public static class Collider {
         Collider_Interface collider;
 
-        private Collider(Collider_Interface collider) {
+        BiConsumer<Entity, Entity> onCollide = null;
+        boolean isTrigger = false;
+
+        public Collider(Collider_Interface collider) {
             this.collider = collider;
+        }
+
+        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide) {
+            this.collider = collider;
+            this.onCollide = onCollide;
+            this.isTrigger = true;
+        }
+
+        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide, boolean isTrigger) {
+            this.collider = collider;
+            this.onCollide = onCollide;
         }
 
         public static Collider BasicCollider(int width, int height) {
             return new Collider(new BasicCollider(width, height));
+        }
+
+        public void triggerCollision(Entity self, Entity other) {
+            if(onCollide != null) {
+                onCollide.accept(self, other);
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Button_Plugin.*;
+import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
@@ -110,9 +111,10 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(
                 new Position(new PVector(150,600)),
                 new Button(playerWidth, playerHeight, loweringSpeed),
-                Collider.BasicCollider(playerWidth, playerHeight),
-                new Body(),
-                new Velocity()
+                new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                    self.get(Button.class).pushed = true;
+                    self.get(Button.class).lastPushed = 0;
+                })
             );
 
 
@@ -126,8 +128,6 @@ public class Game_Plugin implements Plugin_Interface {
             // Initialize the player
             int playerX = game.displayWidth/2;
             int playerY = game.displayHeight/2 - 100;
-            // int playerWidth = (game.displayHeight+game.displayWidth)/60;
-            // int playerHeight = (game.displayHeight+game.displayWidth)/60;
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
@@ -136,11 +136,6 @@ public class Game_Plugin implements Plugin_Interface {
                 new PlayerMovement(),
                 new Body(),
                 Collider.BasicCollider(playerWidth, playerHeight)
-                // Collider.circle(PlayerPlugin.PLAYER_RADIUS),
-                // new Shoot(),
-                // new PlayerSpawnAnimation(),
-                // new PowerupContainer(),
-                // new PlayerLives()
             );
         }
     }
