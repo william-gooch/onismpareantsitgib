@@ -97,6 +97,8 @@ public class Game_Plugin implements Plugin_Interface {
                 new Position(new PVector(100,100)),
                 new Velocity(0.5f),
                 Collider.BasicCollider(playerWidth, playerHeight),
+                new Body(),
+                new Grabbable(),
                 new Box()
             );
 
@@ -109,8 +111,8 @@ public class Game_Plugin implements Plugin_Interface {
                 new Position(new PVector(150,600)),
                 new Button(playerWidth, playerHeight, loweringSpeed),
                 Collider.BasicCollider(playerWidth, playerHeight),
+                new Body(),
                 new Velocity()
-               
             );
 
 
@@ -130,7 +132,9 @@ public class Game_Plugin implements Plugin_Interface {
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
                 new Player(playerWidth, playerHeight),
+                new Grab(40),
                 new PlayerMovement(),
+                new Body(),
                 Collider.BasicCollider(playerWidth, playerHeight)
                 // Collider.circle(PlayerPlugin.PLAYER_RADIUS),
                 // new Shoot(),

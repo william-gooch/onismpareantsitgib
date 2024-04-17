@@ -26,7 +26,7 @@ public class Collision {
     public static class BasicCollider implements Collider_Interface {
         public PVector size;
 
-        public BasicCollider(int width, int height) {
+        public BasicCollider(float width, float height) {
             size = new PVector(width, height);
         }
 
@@ -51,7 +51,6 @@ public class Collision {
                     rightDist = (pThis.position.x + this.size.x) - pOther.position.x,
                     topDist = (pOther.position.y + other.size.y) - pThis.position.y,
                     bottomDist = (pThis.position.y + this.size.y) - pOther.position.y;
-                System.out.println(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
                 float minDist = Collections.min(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
 
                 PVector normal = new PVector();
