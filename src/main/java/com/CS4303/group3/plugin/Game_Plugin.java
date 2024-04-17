@@ -11,6 +11,8 @@ import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
+import com.CS4303.group3.plugin.Button_Plugin.*;
+import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
@@ -80,23 +82,39 @@ public class Game_Plugin implements Plugin_Interface {
 
             //create solid ground sections
             for(Ground_Tile ground_tile : map.ground_tiles) {
-                PVector size = ground_tile.size.copy().mult(game.scale);
                 dom.createEntity(
-                    new Position(ground_tile.position.copy().mult(game.scale)),
-                    new Ground(size),
-                    Collider.BasicCollider(size.x, size.y)
+                    new Position(ground_tile.position.copy()),
+                    new Ground(ground_tile.size.copy()),
+                    Collider.BasicCollider((int)ground_tile.size.x, (int)ground_tile.size.y)
                 );
             }
 
             
-            float player_size = game.scale/25;
+            int playerWidth = (game.displayHeight+game.displayWidth)/60;
+            int playerHeight = (game.displayHeight+game.displayWidth)/60;
 
             //create block for testing
             dom.createEntity(
                 new Position(new PVector(100,100)),
                 new Velocity(0.5f),
-                Collider.BasicCollider(player_size, player_size),
+                Collider.BasicCollider(playerWidth, playerHeight),
+                new Body(),
+                new Grabbable(),
                 new Box()
+            );
+
+
+        
+            float loweringSpeed = 0.2f;
+            
+            //create button for testing
+            dom.createEntity(
+                new Position(new PVector(150,600)),
+                new Button(playerWidth, playerHeight, loweringSpeed),
+                new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                    self.get(Button.class).pushed = true;
+                    self.get(Button.class).lastPushed = 0;
+                })
             );
 
 
@@ -108,14 +126,16 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(new Drag());
 
             // Initialize the player
-            float playerX = map.player_position.x * game.scale;
-            float playerY = map.player_position.y * game.scale;
+            int playerX = game.displayWidth/2;
+            int playerY = game.displayHeight/2 - 100;
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
-                new Player(player_size, player_size),
+                new Player(playerWidth, playerHeight),
+                new Grab(40),
                 new PlayerMovement(),
-                Collider.BasicCollider(player_size, player_size)
+                new Body(),
+                Collider.BasicCollider(playerWidth, playerHeight)
             );
         }
     }
