@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import com.CS4303.group3.plugin.Box_Plugin;
+import com.CS4303.group3.plugin.Button_Plugin;
 import com.CS4303.group3.plugin.Force_Plugin;
 import com.CS4303.group3.plugin.Game_Plugin;
 import com.CS4303.group3.plugin.Input_Plugin;
@@ -62,6 +63,7 @@ public class Game extends PApplet {
         addPlugin(new Player_Plugin());
         addPlugin(new Force_Plugin());
         addPlugin(new Box_Plugin());
+        addPlugin(new Button_Plugin());
         
 
         // schedule._setup.tick();

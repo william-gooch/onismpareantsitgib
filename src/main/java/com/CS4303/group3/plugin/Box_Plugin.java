@@ -2,8 +2,6 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
-import com.CS4303.group3.plugin.Player_Plugin.Player;
-
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 

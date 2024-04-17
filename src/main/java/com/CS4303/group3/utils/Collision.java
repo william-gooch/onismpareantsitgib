@@ -10,6 +10,7 @@ public class Collision {
     //Interfaces
     public interface Collider_Interface {
         public Contact collide(Position pThis, Collider_Interface other, Position pOther);
+        public PVector getSize();
     }
 
     public record Contact(
@@ -28,6 +29,10 @@ public class Collision {
 
         public BasicCollider(int width, int height) {
             size = new PVector(width, height);
+        }
+
+        public PVector getSize() {
+            return size;
         }
 
         @Override
@@ -51,7 +56,7 @@ public class Collision {
                     rightDist = (pThis.position.x + this.size.x) - pOther.position.x,
                     topDist = (pOther.position.y + other.size.y) - pThis.position.y,
                     bottomDist = (pThis.position.y + this.size.y) - pOther.position.y;
-                System.out.println(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
+              //  System.out.println(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
                 float minDist = Collections.min(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
 
                 PVector normal = new PVector();

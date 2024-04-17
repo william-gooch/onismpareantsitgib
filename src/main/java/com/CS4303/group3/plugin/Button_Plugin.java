@@ -30,7 +30,7 @@ public class Button_Plugin implements Plugin_Interface {
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(255, 165, 0);
-                        drawing.rect(pos.x, pos.y, height, width);
+                        drawing.rect(pos.x, pos.y,  width, height);
                     });
                 });
         });
@@ -39,13 +39,14 @@ public class Button_Plugin implements Plugin_Interface {
     static class Button {
         //store the entity on top of the button
         public Entity object = null;
-        public int height, width;
+        public int height, width, maxHeight;
         public boolean pushed;
         public float loweringSpeed;
 
         public Button(int height, int width, float loweringSpeed) {
             this.height = height;
             this.width = width;
+            this.maxHeight = height;
             this.pushed = false;
             this.loweringSpeed = loweringSpeed;
         }
