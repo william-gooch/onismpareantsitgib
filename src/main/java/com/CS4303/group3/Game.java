@@ -20,6 +20,7 @@ public class Game extends PApplet {
     //Global Variables
     public Dominion dom;
     public GameSchedule schedule;
+    public float scale;
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
@@ -37,8 +38,14 @@ public class Game extends PApplet {
 
     //Settings --Does not run this for some reason -- ask how william got this bit to run
     public void settings() {
-        fullScreen();
-        size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
+//        fullScreen();
+        // size((int)Math.floor(displayWidth * 0.5), (int)Math.floor(displayHeight * 0.5));
+
+        if(displayHeight > displayWidth) {
+            scale = displayWidth;
+        } else scale = (float) (displayHeight * 0.5);
+
+        size((int)scale, (int)scale);
     }
 
     //Setup
@@ -82,6 +89,21 @@ public class Game extends PApplet {
         schedule._draw.tick();
         ArrayList<PriorityDrawOperation<?>> ops = new ArrayList<>(drawQueue.size());
         drawQueue.drainTo(ops);
+
+        //rotate view with the gravity
+        PVector gravity = Resource.get(this, Force_Plugin.Gravity.class).gravity;
+        if(gravity.y < 0) {
+            rotate(PI);
+            translate(-scale,-scale);
+        }
+        if(gravity.x > 0) {
+            rotate(HALF_PI);
+            translate(0,-scale);
+        }
+        if(gravity.x < 0) {
+            rotate(-HALF_PI);
+            translate(-scale,0);
+        }
         ops.stream()
             .forEach(op -> {
                 op.operation.perform(this);

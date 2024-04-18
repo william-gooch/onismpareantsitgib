@@ -83,15 +83,15 @@ public class Game_Plugin implements Plugin_Interface {
             //create solid ground sections
             for(Ground_Tile ground_tile : map.ground_tiles) {
                 dom.createEntity(
-                    new Position(ground_tile.position.copy()),
-                    new Ground(ground_tile.size.copy()),
-                    Collider.BasicCollider((int)ground_tile.size.x, (int)ground_tile.size.y)
+                    new Position(ground_tile.position.copy().mult(game.scale)),
+                    new Ground(ground_tile.size.copy().mult(game.scale)),
+                    Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
                 );
             }
 
             
-            int playerWidth = (game.displayHeight+game.displayWidth)/60;
-            int playerHeight = (game.displayHeight+game.displayWidth)/60;
+            int playerWidth = (int) (game.scale/30);
+            int playerHeight = (int) (game.scale/30);
 
             //create block for testing
             dom.createEntity(
@@ -126,8 +126,8 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(new Drag());
 
             // Initialize the player
-            int playerX = game.displayWidth/2;
-            int playerY = game.displayHeight/2 - 100;
+            int playerX = (int) (map.player_position.x * game.scale);
+            int playerY = (int) (map.player_position.x * game.scale);
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
