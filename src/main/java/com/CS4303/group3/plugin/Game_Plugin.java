@@ -109,7 +109,7 @@ public class Game_Plugin implements Plugin_Interface {
             
             //create button for testing
             dom.createEntity(
-                new Position(new PVector(150,600)),
+                new Position(new PVector(150,100)),
                 new Button(playerWidth, playerHeight, loweringSpeed),
                 new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
                     self.get(Button.class).pushed = true;

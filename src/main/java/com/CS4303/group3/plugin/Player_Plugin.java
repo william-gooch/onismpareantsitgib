@@ -99,11 +99,20 @@ public class Player_Plugin implements Plugin_Interface {
                         } else {
                             grab.grabObj.get(Body.class).enableCollision();
                             //throw the box
-                            if(player.comp1().velocity.x > 0) { //throw to the right
-                                //give the players box a velocity and chuck it
-                                grab.grabObj.add(new Velocity(new PVector(12f, -4f)));
-                            } else { //throw to the left
-                                grab.grabObj.add(new Velocity(new PVector(-12f, -4f)));
+                            if(gravity.gravity.y != 0) {
+                                if (player.comp1().velocity.x > 0) { //throw to the right
+                                    //give the players box a velocity and chuck it
+                                    grab.grabObj.add(new Velocity(new PVector(12f, -4f * gravity.gravity.y)));
+                                } else { //throw to the left
+                                    grab.grabObj.add(new Velocity(new PVector(-12f, -4f * gravity.gravity.y)));
+                                }
+                            } else if(gravity.gravity.x != 0) {
+                                if (player.comp1().velocity.y > 0) { //throw to the right
+                                    //give the players box a velocity and chuck it
+                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity.x, 12f)));
+                                } else { //throw to the left
+                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity.x, -12f)));
+                                }
                             }
                             input.keysDown.remove((int) 'E');
                             grab.grabObj.get(Grabbable.class).player = null;
