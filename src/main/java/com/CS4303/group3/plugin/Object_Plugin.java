@@ -7,7 +7,7 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Map_Plugin.Ground;
 import com.CS4303.group3.plugin.Box_Plugin.*;
-import com.CS4303.group3.plugin.Player_Plugin.Grab;
+import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.utils.Collision.*;
 
 
@@ -118,7 +118,7 @@ public class Object_Plugin implements Plugin_Interface {
                             }
 
                             if(collision.cNormal().y != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && other.entity().has(Box.class))) {
+                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class)))) {
                                     //stop velocity if going into the object
                                     if(obj.entity().has(Velocity.class)) {
                                         Velocity objVel = obj.entity().get(Velocity.class);
@@ -156,7 +156,7 @@ public class Object_Plugin implements Plugin_Interface {
 
                             //check if collided horizontally
                             if(collision.cNormal().x != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && other.entity().has(Box.class))) {
+                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class)))) {
                                     //stop velocity if going into the object
                                     if(obj.entity().has(Velocity.class)) {
                                         Velocity objVel = obj.entity().get(Velocity.class);

@@ -8,13 +8,13 @@ import dev.dominion.ecs.api.Entity;
 
 public class Box_Plugin implements Plugin_Interface {
     Dominion dom;
+    int playerSize = 10;
 
 
     @Override
     public void build(Game game) {
         dom = game.dom;
-
-        float box_size = (game.displayHeight+game.displayWidth)/60;
+        playerSize = (int) (game.scale/30);
 
         
         //hadle object collisions
@@ -27,7 +27,7 @@ public class Box_Plugin implements Plugin_Interface {
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(128,128,0);
-                        drawing.rect(pos.x, pos.y, box_size, box_size);
+                        drawing.rect(pos.x, pos.y, playerSize, playerSize);
                     });
                 });
         });

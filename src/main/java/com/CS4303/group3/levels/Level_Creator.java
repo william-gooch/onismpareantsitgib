@@ -27,8 +27,8 @@ public class Level_Creator extends PApplet {
     public void settings() {
 //        fullScreen();
         if(displayHeight > displayWidth) {
-            scale = displayWidth;
-        } else scale = displayHeight;
+            scale = displayWidth/2;
+        } else scale = displayHeight/2;
 
         size((int)scale, (int)scale);
     }
@@ -39,13 +39,13 @@ public class Level_Creator extends PApplet {
     float square_size;
     boolean started = false;
 
-    int cube_with = 50, cube_height = 50;
+    int cube_with = 30, cube_height = 30;
 
     ObjectMapper mapper;
 
     public void setup() {
         player_size = scale/50f;
-        square_size = scale/50f;
+        square_size = scale/30f;
         mapper = new ObjectMapper();
 
         if(input == "") map = new Map();
