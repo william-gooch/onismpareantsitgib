@@ -8,7 +8,6 @@ import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
-import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
@@ -17,6 +16,9 @@ import com.CS4303.group3.utils.Collision.Contact;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import processing.core.PVector;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Player_Plugin implements Plugin_Interface {
     Dominion dom;
@@ -61,7 +63,7 @@ public class Player_Plugin implements Plugin_Interface {
                 });
 
             //if input is pickup, pick up box in the vicinity -- have a way to check this only every so often
-            if(input.isKeyDown((int) 'E')) {
+            if(input.isKeyDown(input.keybinds.get(InputSystem.keys.THROW))) {
                 //get the player
                 dom.findEntitiesWith(Velocity.class, Player.class, Position.class, Collider.class)
                     .stream().forEach(player -> {
@@ -84,7 +86,7 @@ public class Player_Plugin implements Plugin_Interface {
                                             
                                                 grab.grabObj = box.entity();
                                                 box.comp3().player = player.entity();
-                                                input.keysDown.remove((int) 'E');
+                                                input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));
             
                                                 //move the box to above the player
                                                 box.comp2().previous_position = box.comp2().position;
@@ -114,7 +116,7 @@ public class Player_Plugin implements Plugin_Interface {
                                     grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity.x, -12f)));
                                 }
                             }
-                            input.keysDown.remove((int) 'E');
+                            input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));
                             grab.grabObj.get(Grabbable.class).player = null;
                             grab.grabObj = null;
                         }
@@ -164,21 +166,18 @@ public class Player_Plugin implements Plugin_Interface {
 
         public PVector newVelocity(float deltaTime, PVector velocity, InputSystem input, Position position, float mass, PVector gravity) {
             PVector pressDirection = new PVector(0, 0);
-            if (input.isKeyDown((int) 'A')) {
+            if (input.isKeyDown(input.keybinds.get(InputSystem.keys.MOVE_LEFT))) {
                 //move left
                 pressDirection.x = -1;
             }
-            if (input.isKeyDown((int) 'D')) {
+            if (input.isKeyDown(input.keybinds.get(InputSystem.keys.MOVE_RIGHT))) {
                 //move right
                 pressDirection.x = 1;
             }
-            if (input.isKeyDown((int) 'W')) {
+            if (input.isKeyDown(input.keybinds.get(InputSystem.keys.JUMP))) {
                 //jump if grounded
                 // input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
                 pressDirection.y = -1;
-            }
-            if (input.isKeyDown((int) 'S')) {
-                //do nothing, maybe add a crouch or slide
             }
 
             //if grounded player is grounded can jump and accelerate  faster left and right
