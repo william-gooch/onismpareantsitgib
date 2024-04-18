@@ -1,6 +1,8 @@
 package com.CS4303.group3.plugin;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -32,8 +34,24 @@ public class Input_Plugin implements Plugin_Interface {
         protected int lastKeyDown;
         protected HashSet<Integer> keysDown;
 
+        public enum keys {
+            JUMP,
+            MOVE_LEFT,
+            MOVE_RIGHT,
+            THROW
+        }
+
+        public Map<keys, Integer> keybinds;
+
         public InputSystem() {
             this.keysDown = new HashSet<>();
+
+            //setup the default keybinds
+            keybinds = new HashMap<keys, Integer>();
+            keybinds.put(keys.JUMP, (int) 'W');
+            keybinds.put(keys.MOVE_LEFT, (int) 'A');
+            keybinds.put(keys.MOVE_RIGHT, (int) 'D');
+            keybinds.put(keys.THROW, (int) 'E');
         }
 
         boolean isKeyDown(int key) {
