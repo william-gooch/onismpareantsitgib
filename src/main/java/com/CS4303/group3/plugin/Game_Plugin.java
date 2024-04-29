@@ -12,6 +12,7 @@ import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Button_Plugin.*;
+import com.CS4303.group3.plugin.Door_Plugin.*;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
@@ -92,6 +93,7 @@ public class Game_Plugin implements Plugin_Interface {
             
             int playerWidth = (int) (game.scale/30);
             int playerHeight = (int) (game.scale/30);
+            
 
             //create block for testing
             dom.createEntity(
@@ -110,12 +112,37 @@ public class Game_Plugin implements Plugin_Interface {
             //create button for testing
             dom.createEntity(
                 new Position(new PVector(150,100)),
-                new Button(playerWidth, playerHeight, loweringSpeed),
+                new Button( playerWidth, playerHeight, loweringSpeed),
                 new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
                     self.get(Button.class).pushed = true;
                     self.get(Button.class).lastPushed = 0;
                 })
             );
+
+            int doorWidth = playerWidth/2;
+            int doorHeight = playerHeight;
+
+              //create Door for testing
+            dom.createEntity(
+                new Position(new PVector(100, 100)),
+                new Door(doorWidth, doorHeight, null),
+                new Collider(new BasicCollider(playerWidth, playerHeight))
+            );
+
+            //assigns a button to the associated door - will need to change this so that this is encoded in the JSON rather
+            game.schedule.update(() -> {
+                dom.findEntitiesWith(Position.class, Door.class)
+                        .stream().forEach(door -> {
+    
+                            dom.findEntitiesWith(Button.class)
+                                    .stream().forEach(but -> {
+                                        Button btn = but.comp();
+                                        door.comp2().button = btn;
+                                        
+                                    
+                                    });
+                        });
+            });
 
 
             //Initialise the inputs
