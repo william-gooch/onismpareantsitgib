@@ -3,7 +3,6 @@ package com.CS4303.group3.plugin;
 import java.util.HashSet;
 
 import com.CS4303.group3.Game;
-import com.CS4303.group3.plugin.Door_Plugin.Door;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
 
 import dev.dominion.ecs.api.Dominion;
@@ -13,11 +12,6 @@ public class Button_Plugin implements Plugin_Interface {
     Dominion dom;
 
     public interface ButtonEventListener{
-        // public void onPush();
-        // public void onRelease();
-        // public void onPush(Entity e);
-        // public void onRelease(Entity e);
-
         public void onPush();
         public void onRelease();
     }
@@ -81,15 +75,12 @@ public class Button_Plugin implements Plugin_Interface {
         }
 
         public void push(){
-            //System.out.println("Btn_Plugin: push");
             for(ButtonEventListener e: listeners){
                 e.onPush();
             }
         }
 
         public void release(){
-
-            //System.out.println("Btn_Plugin: release");
             for(ButtonEventListener e: listeners){
                 e.onRelease();
             }

@@ -5,10 +5,8 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
-import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
-import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
 import com.CS4303.group3.utils.Collision.Contact;
@@ -16,9 +14,6 @@ import com.CS4303.group3.utils.Collision.Contact;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import processing.core.PVector;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Player_Plugin implements Plugin_Interface {
     Dominion dom;

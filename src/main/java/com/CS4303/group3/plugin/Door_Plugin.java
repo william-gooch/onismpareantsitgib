@@ -51,7 +51,6 @@ public class Door_Plugin implements Plugin_Interface {
         public float timeElapsed;
         public boolean open;
         public final float UPDATE_DELAY = 0.01f;
-        // public Button button;
         public final float LOWERING_INCREMENT = 1f;
 
         public Door(int height, int width, Button button) {
@@ -60,7 +59,6 @@ public class Door_Plugin implements Plugin_Interface {
             this.maxWidth = width;
             this.timeElapsed = 0;
             this.width = width;
-            // this.button = button;
 
         }
 
