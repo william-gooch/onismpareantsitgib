@@ -12,7 +12,7 @@ import processing.core.PVector;
 public class Door_Plugin implements Plugin_Interface {
 
     Dominion dom;
-    float updateDelay = 0.05f;
+    
 
     @Override
     public void build(Game game) {
@@ -23,24 +23,6 @@ public class Door_Plugin implements Plugin_Interface {
         // wrong direction right now
 
         // TO DO: need to deal with collider for the door
-
-        game.schedule.update(() -> {
-            dom.findEntitiesWith(Position.class, Door.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        res.comp2().timeElapsed += game.schedule.dt();
-
-                        if (res.comp2().timeElapsed >= updateDelay) {
-                            if (res.comp2().isOpen()) {
-                                res.comp2().lower(game, pos);
-                            } else {
-                                res.comp2().raise(pos, game);
-                            }
-                            res.comp2().timeElapsed = 0;
-                        }
-
-                    });
-        });
 
         game.schedule.draw(draw -> {
             dom.findEntitiesWith(Position.class, Door.class)
@@ -56,10 +38,8 @@ public class Door_Plugin implements Plugin_Interface {
                                 drawing.fill(151, 204, 4);
                             }
 
-                           
-                                drawing.rect(pos.x, pos.y, width, height);
-                          
-                            
+                            drawing.rect(pos.x, pos.y, width, height);
+
                         });
                     });
         });
@@ -70,7 +50,8 @@ public class Door_Plugin implements Plugin_Interface {
         public int height, width, maxHeight, maxWidth;
         public float timeElapsed;
         public boolean open;
-        public Button button;
+        public final float UPDATE_DELAY = 0.01f;
+        // public Button button;
         public final float LOWERING_INCREMENT = 1f;
 
         public Door(int height, int width, Button button) {
@@ -79,13 +60,28 @@ public class Door_Plugin implements Plugin_Interface {
             this.maxWidth = width;
             this.timeElapsed = 0;
             this.width = width;
-            this.button = button;
+            // this.button = button;
 
         }
 
-        public boolean isOpen() {
-            open = button != null && button.pushed ? true : false;
+        public boolean isOpen(Button btn) {
+            open = btn.pushed ? true : false;
             return open;
+        }
+
+        public void moveDoor(Game game, PVector pos, Button btn) {
+
+            timeElapsed += game.schedule.dt();
+
+            if (timeElapsed >= UPDATE_DELAY) {
+                if (isOpen(btn)) {
+                    lower(game, pos);
+                } else {
+                    raise(pos, game);
+                }
+                timeElapsed = 0;
+            }
+
         }
 
         public void lower(Game game, PVector pos) {

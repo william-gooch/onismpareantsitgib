@@ -18,16 +18,17 @@ import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
 import dev.dominion.ecs.api.*;
+import dev.dominion.ecs.api.Results.With2;
 import processing.core.*;
 import com.fasterxml.jackson.databind.*;
 
 public class Game_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
-        game.dom.createEntity(new WorldManager(game, game.displayHeight/25, game.displayWidth/30));
+        game.dom.createEntity(new WorldManager(game, game.displayHeight / 25, game.displayWidth / 30));
 
         var wm = Resource.get(game, WorldManager.class);
-            
+
         wm.startGame();
     }
 
@@ -51,104 +52,106 @@ public class Game_Plugin implements Plugin_Interface {
             mapper = new ObjectMapper();
         }
 
-
         public void startGame() {
-            if(state != WorldState.PLAYING) {
+            if (state != WorldState.PLAYING) {
                 createScene(game, game.dom);
                 state = WorldState.PLAYING;
             }
         }
 
         public void create_level() {
-            //initialise input system
+            // initialise input system
             game.dom.createEntity(new InputSystem());
 
-            //initialise map
+            // initialise map
             game.dom.createEntity(new Map());
         }
 
         public void newLevel() {
-            if(state == WorldState.PLAYING) {
+            if (state == WorldState.PLAYING) {
                 createScene(game, game.dom);
             }
         }
-
 
         public void createScene(Game game, Dominion dom) {
             // Initialize the world map
             Map map;
             try {
                 map = mapper.readValue(new File(game.level_name), Map.class);
-            } catch(IOException e) {return;}
-
-            //create solid ground sections
-            for(Ground_Tile ground_tile : map.ground_tiles) {
-                dom.createEntity(
-                    new Position(ground_tile.position.copy().mult(game.scale)),
-                    new Ground(ground_tile.size.copy().mult(game.scale)),
-                    Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
-                );
+            } catch (IOException e) {
+                return;
             }
 
-            
-            int playerWidth = (int) (game.scale/30);
-            int playerHeight = (int) (game.scale/30);
-            
+            // create solid ground sections
+            for (Ground_Tile ground_tile : map.ground_tiles) {
+                dom.createEntity(
+                        new Position(ground_tile.position.copy().mult(game.scale)),
+                        new Ground(ground_tile.size.copy().mult(game.scale)),
+                        Collider.BasicCollider((int) (ground_tile.size.x * game.scale),
+                                (int) (ground_tile.size.y * game.scale)));
+            }
 
-            //create block for testing
+            int playerWidth = (int) (game.scale / 30);
+            int playerHeight = (int) (game.scale / 30);
+
+            // create block for testing
             dom.createEntity(
-                new Position(new PVector(100,100)),
-                new Velocity(0.5f),
-                Collider.BasicCollider(playerWidth, playerHeight),
-                new Body(),
-                new Grabbable(),
-                new Box()
-            );
+                    new Position(new PVector(100, 100)),
+                    new Velocity(0.5f),
+                    Collider.BasicCollider(playerWidth, playerHeight),
+                    new Body(),
+                    new Grabbable(),
+                    new Box());
 
-
-        
             float loweringSpeed = 0.2f;
-            
-            //create button for testing
-            dom.createEntity(
-                new Position(new PVector(150,100)),
-                new Button( playerWidth, playerHeight, loweringSpeed),
-                new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
-                    self.get(Button.class).pushed = true;
-                    self.get(Button.class).lastPushed = 0;
-                })
-            );
 
-            int doorWidth = playerWidth/2;
+            // create button for testing
+            dom.createEntity(
+                    new Position(new PVector(150, 100)),
+                    new Button(playerWidth, playerHeight, loweringSpeed),
+                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                        self.get(Button.class).pushed = true;
+                        self.get(Button.class).lastPushed = 0;
+                    }));
+
+            int doorWidth = playerWidth / 2;
             int doorHeight = playerHeight;
 
-              //create Door for testing
+            // create Door for testing
             dom.createEntity(
-                new Position(new PVector(100, 100)),
-                new Door(doorWidth, doorHeight, null),
-                new Collider(new BasicCollider(doorWidth, doorHeight))
-            );
+                    new Position(new PVector(100, 100)),
+                    new Door(doorWidth, doorHeight, null),
+                    new Collider(new BasicCollider(doorWidth, doorHeight)));
 
-            //assigns a button to the associated door - will need to change this so that this is encoded in the JSON rather
-            game.schedule.update(() -> {
-                dom.findEntitiesWith(Position.class, Door.class)
-                        .stream().forEach(door -> {
-    
-                            dom.findEntitiesWith(Button.class)
-                                    .stream().forEach(but -> {
-                                        Button btn = but.comp();
-                                        door.comp2().button = btn;
-                                        
-                                    
-                                    });
+            // assigns a button to the associated door - will need to change this so that
+            // this is encoded in the JSON rather
+        
+        
+            dom.findEntitiesWith(Button.class)
+                    .stream().forEach(btn -> {
+                        With2<Door, Position> door = dom.findEntitiesWith(Door.class, Position.class)
+                                .stream().findFirst().get();
+                        btn.comp().addEventListener(new ButtonEventListener() {
+                            @Override
+                            public void onPush() {
+                                door.comp1().moveDoor(game, door.comp2().position, btn.comp());
+                            }
+
+                            @Override
+                            public void onRelease() {
+                                door.comp1().moveDoor(game, door.comp2().position, btn.comp());
+                            }
+
                         });
-            });
 
+                    });
 
-            //Initialise the inputs
+        
+
+            // Initialise the inputs
             dom.createEntity(new InputSystem());
 
-            //initialise forces
+            // initialise forces
             dom.createEntity(new Gravity());
             dom.createEntity(new Drag());
 
@@ -156,14 +159,13 @@ public class Game_Plugin implements Plugin_Interface {
             int playerX = (int) (map.player_position.x * game.scale);
             int playerY = (int) (map.player_position.x * game.scale);
             dom.createEntity(
-                new Position(new PVector(playerX, playerY)),
-                new Velocity(),
-                new Player(playerWidth, playerHeight),
-                new Grab(40),
-                new PlayerMovement(),
-                new Body(),
-                Collider.BasicCollider(playerWidth, playerHeight)
-            );
+                    new Position(new PVector(playerX, playerY)),
+                    new Velocity(),
+                    new Player(playerWidth, playerHeight),
+                    new Grab(40),
+                    new PlayerMovement(),
+                    new Body(),
+                    Collider.BasicCollider(playerWidth, playerHeight));
         }
     }
 }
