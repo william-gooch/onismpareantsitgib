@@ -19,6 +19,7 @@ import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
 import dev.dominion.ecs.api.*;
+import dev.dominion.ecs.api.Results.With1;
 import dev.dominion.ecs.api.Results.With2;
 import processing.core.*;
 import com.fasterxml.jackson.databind.*;
@@ -129,48 +130,7 @@ public class Game_Plugin implements Plugin_Interface {
                         new Door(doorWidth, doorHeight, null),
                         new Collider(new BasicCollider(doorWidth, doorHeight)));
 
-            // assigns a button to the associated door - will need to change this so that
-            // this is encoded in the JSON rather
-        
-                    
-            Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
-            With2<Door, Position> door1 = doors.next();
-            With2<Door, Position> door2 = doors.next();
-
-            //Testing event listener behaviours for two doors that share the same button
-            dom.findEntitiesWith(Button.class)
-                    .stream().forEach(btn -> {
-                 
-                        btn.comp().addEventListener(new ButtonEventListener() {
-                            @Override
-                            public void onPush() {
-                                door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
-                            }
-
-                            @Override
-                            public void onRelease() {
-                                door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
-                            }
-
-                        });
-
-
-                        btn.comp().addEventListener(new ButtonEventListener() {
-                            @Override
-                            public void onPush() {
-                                door2.comp1().moveDoor(game, door2.comp2().position, btn.comp());
-                            }
-
-                            @Override
-                            public void onRelease() {
-                                door2.comp1().moveDoor(game, door2.comp2().position, btn.comp());
-                            }
-
-                        });
-
-
-                    });
-
+           
         
 
             PVector[] test_path = new PVector[4];
@@ -209,6 +169,70 @@ public class Game_Plugin implements Plugin_Interface {
                     new PlayerMovement(),
                     new Body(),
                     Collider.BasicCollider(playerWidth, playerHeight));
+
+
+
+
+            //Initialise button chained
+
+            // assigns a button to the associated door or changes direction of gravity on push - will need to change this so that
+            // this is encoded in the JSON rather 
+                    
+            Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
+            With2<Door, Position> door1 = doors.next();
+            With2<Door, Position> door2 = doors.next();
+
+            Button button = dom.findEntitiesWith(Button.class).iterator().next().comp();
+
+            //Testing event listener behaviours for door that is opened by button / changes gravity
+            button.addEventListener(new ButtonEventListener() {
+                            
+                @Override
+                public void onPush() {
+                    door1.comp1().moveDoor(game, door1.comp2().position, button); //this is for a singular door but could be changed to deal with all doors
+                }
+
+                @Override
+                public void onRelease() {
+                    door1.comp1().moveDoor(game, door1.comp2().position, button);
+                }
+
+            });
+
+            //This works for changing the direction of gravity
+            // button.addEventListener(new ButtonEventListener() {
+            //     @Override
+            //     public void onPush() {
+            //         Gravity gravity = Resource.get(game, Gravity.class);
+            //         gravity.changeGravity(new PVector(0,1));
+            //         //door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
+            //     }
+            
+            //     @Override
+            //     public void onRelease() {
+            //         Gravity gravity = Resource.get(game, Gravity.class);
+            //         gravity.changeGravity(new PVector(1,0));
+            //         //door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
+            //     }
+
+            // });
+
+
+            button.addEventListener(new ButtonEventListener() {
+                @Override
+                public void onPush() {
+                    door2.comp1().moveDoor(game, door2.comp2().position, button);
+                }
+
+                @Override
+                public void onRelease() {
+                    door2.comp1().moveDoor(game, door2.comp2().position, button);
+                }
+
+            });
+
+
         }
+        
     }
 }
