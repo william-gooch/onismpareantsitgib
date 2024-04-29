@@ -13,6 +13,7 @@ public class Game extends PApplet {
     public Dominion dom;
     public GameSchedule schedule;
     public float scale;
+    public boolean paused = false;
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
@@ -66,7 +67,7 @@ public class Game extends PApplet {
         addPlugin(new Enemy_Plugin());
         
 
-        // schedule._setup.tick();
+         schedule._setup.tick();
     }
 
     private void addPlugin(Plugin_Interface plugin) {
@@ -77,25 +78,28 @@ public class Game extends PApplet {
     public void draw() {
         background(0);
 
-        schedule._update.tick();
+        if(!paused) schedule._update.tick();
 
         schedule._draw.tick();
         ArrayList<PriorityDrawOperation<?>> ops = new ArrayList<>(drawQueue.size());
         drawQueue.drainTo(ops);
 
         //rotate view with the gravity
-        PVector gravity = Resource.get(this, Force_Plugin.Gravity.class).gravity;
-        if(gravity.y < 0) {
-            rotate(PI);
-            translate(-scale,-scale);
-        }
-        if(gravity.x > 0) {
-            rotate(HALF_PI);
-            translate(0,-scale);
-        }
-        if(gravity.x < 0) {
-            rotate(-HALF_PI);
-            translate(-scale,0);
+        Force_Plugin.Gravity gravity_entity = Resource.get(this, Force_Plugin.Gravity.class);
+        if(gravity_entity != null) {
+            PVector gravity = gravity_entity.gravity;
+            if (gravity.y < 0) {
+                rotate(PI);
+                translate(-scale, -scale);
+            }
+            if (gravity.x > 0) {
+                rotate(HALF_PI);
+                translate(0, -scale);
+            }
+            if (gravity.x < 0) {
+                rotate(-HALF_PI);
+                translate(-scale, 0);
+            }
         }
         ops.stream()
             .forEach(op -> {

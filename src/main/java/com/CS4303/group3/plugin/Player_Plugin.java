@@ -35,7 +35,9 @@ public class Player_Plugin implements Plugin_Interface {
                 .stream().forEach(grabber -> {
                     if(grabber.comp2().grabObj != null) {
                         var grabPos = grabber.comp2().grabObj.get(Position.class);
-                        PVector gravity = Resource.get(game, Gravity.class).gravity;
+                        Gravity gravity_entity = Resource.get(game, Gravity.class);
+                        if(gravity_entity == null) return;
+                        PVector gravity = gravity_entity.gravity;
                         grabPos.previous_position = grabPos.position;
                         //set to be above head dependent on gravity
                         grabPos.position = PVector.add(grabber.comp1().position, new PVector(-playerSize * 1.2f * gravity.x, -playerSize * 1.2f * gravity.y, 0));
@@ -57,6 +59,7 @@ public class Player_Plugin implements Plugin_Interface {
         game.schedule.update(() -> {
             InputSystem input = Resource.get(game, InputSystem.class);
             Gravity gravity = Resource.get(game, Gravity.class);
+            if(input == null || gravity == null) return;
             dom.findEntitiesWith(Velocity.class, Player.class, PlayerMovement.class, Position.class)
                 .stream().forEach(res -> {
                     res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass, gravity.gravity));
@@ -127,10 +130,12 @@ public class Player_Plugin implements Plugin_Interface {
         //reduce the invulnerability of the player
         game.schedule.update(() -> {
             Player player = Resource.get(game, Player.class);
-            if(player.invulnerability > 0) player.invulnerability -= game.schedule.dt();
-            if(player.invulnerability < 0) {
-                player.invulnerability = 0f;
-                System.out.println("Player has lost invulnerability");
+            if(player != null) {
+                if (player.invulnerability > 0) player.invulnerability -= game.schedule.dt();
+                if (player.invulnerability < 0) {
+                    player.invulnerability = 0f;
+                    System.out.println("Player has lost invulnerability");
+                }
             }
         });
         
@@ -234,12 +239,13 @@ public class Player_Plugin implements Plugin_Interface {
     }
 
     static class Player {
-        public int height, width;
+        public int height, width, lives;
         public float invulnerability = 0f;
 
         public Player(int height, int width) {
             this.height = height;
             this.width = width;
+            this.lives = 3;
         }
     }
 

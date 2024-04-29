@@ -20,12 +20,14 @@ public class Input_Plugin implements Plugin_Interface {
 
         game.schedule.keyDown(() -> {
             var input = Resource.get(game, InputSystem.class);
+            if(input == null) return;
             input.keysDown.add(game.keyCode);
             input.lastKeyDown = game.keyCode;
         });
 
         game.schedule.keyUp(() -> {
             var input = Resource.get(game, InputSystem.class);
+            if(input == null) return;
             input.keysDown.remove(game.keyCode);
         });
     }
@@ -38,7 +40,8 @@ public class Input_Plugin implements Plugin_Interface {
             JUMP,
             MOVE_LEFT,
             MOVE_RIGHT,
-            THROW
+            THROW,
+            SETTINGS
         }
 
         public Map<keys, Integer> keybinds;
@@ -52,6 +55,7 @@ public class Input_Plugin implements Plugin_Interface {
             keybinds.put(keys.MOVE_LEFT, (int) 'A');
             keybinds.put(keys.MOVE_RIGHT, (int) 'D');
             keybinds.put(keys.THROW, (int) 'E');
+            keybinds.put(keys.SETTINGS, (int) 'S');
         }
 
         boolean isKeyDown(int key) {

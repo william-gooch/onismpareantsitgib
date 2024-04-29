@@ -18,6 +18,7 @@ public class Force_Plugin implements Plugin_Interface {
         game.schedule.update(() -> {
             InputSystem input = Resource.get(game, InputSystem.class);
             Gravity gravity = Resource.get(game, Gravity.class);
+            if(input == null || gravity == null) return;
             if(input.isKeyDown(39)) { //gravity goes right
                 gravity.changeGravity(new PVector(1,0));
             }
@@ -35,6 +36,7 @@ public class Force_Plugin implements Plugin_Interface {
         //apply gravity to all objects
         game.schedule.update(() -> {
             Gravity gravity = Resource.get(game, Gravity.class);
+            if(gravity == null) return;
             dom.findEntitiesWith(Velocity.class)
                 .stream().forEach(res -> {
                     PVector velocity = res.comp().velocity;
@@ -45,6 +47,7 @@ public class Force_Plugin implements Plugin_Interface {
         //apply drag to all objects
         game.schedule.update(() -> {
             Drag drag = Resource.get(game, Drag.class);
+            if(drag == null) return;
             dom.findEntitiesWith(Velocity.class, Position.class)
                 .stream().forEach(res -> {
                     PVector velocity = res.comp1().velocity;
