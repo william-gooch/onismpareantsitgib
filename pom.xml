@@ -45,6 +45,11 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.9.8</version>
     </dependency>
+    <dependency>
+      <groupId>org.tiledreader</groupId>
+      <artifactId>TiledReader</artifactId>
+      <version>1.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>

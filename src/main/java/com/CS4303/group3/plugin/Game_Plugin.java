@@ -7,9 +7,11 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.*;
+import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
+import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Button_Plugin.*;
 import com.CS4303.group3.utils.Collision.BasicCollider;
@@ -90,8 +92,10 @@ public class Game_Plugin implements Plugin_Interface {
             }
 
             
-            int playerWidth = (int) (game.scale/30);
-            int playerHeight = (int) (game.scale/30);
+            // int playerWidth = (int) (game.scale/30);
+            // int playerHeight = (int) (game.scale/30);
+            int playerWidth = 26;
+            int playerHeight = 36;
 
             //create block for testing
             dom.createEntity(
@@ -128,9 +132,11 @@ public class Game_Plugin implements Plugin_Interface {
             // Initialize the player
             int playerX = (int) (map.player_position.x * game.scale);
             int playerY = (int) (map.player_position.x * game.scale);
+            PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
             dom.createEntity(
                 new Position(new PVector(playerX, playerY)),
                 new Velocity(),
+                new Sprite(playerImage),
                 new Player(playerWidth, playerHeight),
                 new Grab(40),
                 new PlayerMovement(),
