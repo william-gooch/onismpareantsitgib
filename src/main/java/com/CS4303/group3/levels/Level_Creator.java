@@ -3,8 +3,6 @@ package com.CS4303.group3.levels;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
-
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
 
