@@ -46,6 +46,8 @@ public class Door_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Position.class, Door.class)
                     .stream().forEach(res -> {
                         var pos = res.comp1().position;
+                        var height = res.comp2().height;
+                        var width = res.comp2().width;
                         draw.call(drawing -> {
 
                             if (res.comp2().open) {
@@ -54,7 +56,10 @@ public class Door_Plugin implements Plugin_Interface {
                                 drawing.fill(151, 204, 4);
                             }
 
-                            drawing.rect(pos.x, pos.y, res.comp2().height, res.comp2().width);
+                           
+                                drawing.rect(pos.x, pos.y, width, height);
+                          
+                            
                         });
                     });
         });

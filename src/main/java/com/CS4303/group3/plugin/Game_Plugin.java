@@ -126,7 +126,7 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(
                 new Position(new PVector(100, 100)),
                 new Door(doorWidth, doorHeight, null),
-                new Collider(new BasicCollider(playerWidth, playerHeight))
+                new Collider(new BasicCollider(doorWidth, doorHeight))
             );
 
             //assigns a button to the associated door - will need to change this so that this is encoded in the JSON rather
