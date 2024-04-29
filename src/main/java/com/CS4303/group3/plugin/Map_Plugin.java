@@ -3,15 +3,16 @@ package com.CS4303.group3.plugin;
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
+import com.CS4303.group3.plugin.Box_Plugin.Box;
+import com.CS4303.group3.plugin.Box_Plugin.Grabbable;
+import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
+import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.utils.Collision;
 
 import dev.dominion.ecs.api.Dominion;
+import dev.dominion.ecs.api.Entity;
 import processing.core.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import org.tiledreader.*;
 
@@ -28,28 +29,28 @@ public class Map_Plugin implements Plugin_Interface {
             TiledMap m = am.getResource(TiledMap.class, "test.tmx");
         
             dom.createEntity(
-                new TileMap(m)
+                new TileMap(game, m)
             );
         });
 
-        game.schedule.draw(-5, draw -> {
-            dom.findEntitiesWith(Ground.class, Position.class)
-                .stream().forEach(entity -> {
-                    Ground ground = entity.comp1();
-                    PVector position = entity.comp2().position;
-                    draw.call(drawing -> {
-                        drawing.push();
-                        ground.draw(drawing, position);
-                        drawing.pop();
-                    });
-                });
-        });
+        // game.schedule.draw(-5, draw -> {
+        //     dom.findEntitiesWith(Ground.class, Position.class)
+        //         .stream().forEach(entity -> {
+        //             Ground ground = entity.comp1();
+        //             PVector position = entity.comp2().position;
+        //             draw.call(drawing -> {
+        //                 drawing.push();
+        //                 ground.draw(drawing, position);
+        //                 drawing.pop();
+        //             });
+        //         });
+        // });
 
         game.schedule.draw(-10, draw -> {
-            dom.findEntitiesWith(TileMap.class)
+            dom.findEntitiesWith(Position.class, RenderTile.class)
                 .stream().forEach(entity -> {
                     draw.call(drawing -> {
-                        entity.comp().draw(drawing);
+                        drawing.image(entity.comp2().tileImage(), entity.comp1().position.x, entity.comp1().position.y, entity.comp2().width(), entity.comp2().height());
                     });
                 });
         });
@@ -78,24 +79,80 @@ public class Map_Plugin implements Plugin_Interface {
         }
     }
 
+    static record RenderTile(
+        PImage tileImage,
+        float width,
+        float height
+    ) { }
+
     static class TileMap {
+        float tileScale = 1;
         TiledMap map;
 
-        static record RenderTile(
-            PImage tileImage,
-            float x,
-            float y,
-            float width,
-            float height
-        ) {}
+        private Game game;
 
-        public TileMap(TiledMap map) {
+        public TileMap(Game game, TiledMap map, float tileScale) {
+            this.game = game;
+            this.tileScale = tileScale;
             this.map = map;
+            this.generateRenderTiles();
+            this.generateObjects();
         }
 
-        public List<RenderTile> getRenderTiles(AssetManager assets) {
-            ArrayList<RenderTile> renderTiles = new ArrayList<>();
-            for(var layer : map.getTopLevelLayers()) {
+        public TileMap(Game game, TiledMap map) {
+            this(game, map, (float)game.width / ((map.getWidth()) * map.getTileWidth()));
+        }
+
+        private Entity createRenderTileFromTile(TiledTile tile, float x, float y) {
+            AssetManager assets = Resource.get(game, AssetManager.class);
+
+            // asset manager caches the image so it's not a worry if it gets the same image a bunch of times
+            PImage image = assets.getAsset(PImage.class, tile.getTileset().getImage().getSource());
+            PImage tileImage = image.get(
+                tile.getTilesetX() * map.getTileWidth(),
+                tile.getTilesetY() * map.getTileHeight(),
+                map.getTileWidth(),
+                map.getTileHeight()
+            );
+
+            // return next.getImage().getSource();
+            var e = game.dom.createEntity(
+                new Position(new PVector(x * tileScale, y * tileScale)),
+                new RenderTile(tileImage, map.getTileWidth() * tileScale, map.getTileHeight() * tileScale)
+            );
+
+            if(!tile.getCollisionObjects().isEmpty()) {
+                var o = tile.getCollisionObjects().get(0);
+                e.add(Collider.BasicCollider(o.getWidth() * tileScale, o.getHeight() * tileScale, o.getX() * tileScale, o.getY() * tileScale));
+                e.add(new Ground(new PVector(o.getWidth() * tileScale, o.getHeight() * tileScale)));
+            }
+
+            return e;
+        }
+
+        private Entity createSpriteFromTile(TiledTile tile, float width, float height, float x, float y) {
+            AssetManager assets = Resource.get(game, AssetManager.class);
+
+            // asset manager caches the image so it's not a worry if it gets the same image a bunch of times
+            PImage image = assets.getAsset(PImage.class, tile.getTileset().getImage().getSource());
+            PImage tileImage = image.get(
+                tile.getTilesetX() * map.getTileWidth(),
+                tile.getTilesetY() * map.getTileHeight(),
+                map.getTileWidth(),
+                map.getTileHeight()
+            );
+
+            // return next.getImage().getSource();
+            var e = game.dom.createEntity(
+                new Position(new PVector(x * tileScale, y * tileScale)),
+                new Sprite(tileImage, width * tileScale, height * tileScale)
+            );
+
+            return e;
+        }
+
+        public void generateRenderTiles() {
+            for(var layer : map.getNonGroupLayers()) {
                 if(TiledTileLayer.class.isInstance(layer)) {
                     TiledTileLayer tileLayer = (TiledTileLayer) layer;
                     for (int x = tileLayer.getX1(); x <= tileLayer.getX2(); x++) {
@@ -103,42 +160,34 @@ public class Map_Plugin implements Plugin_Interface {
                             var tile = tileLayer.getTile(x, y);
 
                             if(tile != null) {
-                                // asset manager caches the image so it's not a worry if it gets the same image a bunch of times
-                                PImage image = assets.getAsset(PImage.class, tile.getTileset().getImage().getSource());
-                                PImage tileImage = image.get(
-                                    tile.getTilesetX() * map.getTileWidth(),
-                                    tile.getTilesetY() * map.getTileHeight(),
-                                    map.getTileWidth(),
-                                    map.getTileHeight()
-                                );
-
-                                // return next.getImage().getSource();
-                                renderTiles.add(new RenderTile(
-                                    tileImage,
-                                    x * map.getTileWidth(),
-                                    y * map.getTileHeight(),
-                                    map.getTileWidth(),
-                                    map.getTileHeight()
-                                ));
+                                createRenderTileFromTile(tile, x * map.getTileWidth(), y * map.getTileHeight());
                             }
                         }
                     }
                 }
             }
-
-            return renderTiles;
         }
 
-        public void draw(Game game) {
-            AssetManager assets = Resource.get(game, AssetManager.class);
-            var renderTiles = this.getRenderTiles(assets);
-            game.push();
-            game.scale(2);
-            game.translate(50, 50);
-            for(var tile : getRenderTiles(assets)) {
-                game.image(tile.tileImage(), tile.x(), tile.y(), tile.width(), tile.height());
+        public void generateObjects() {
+            for(var layer : map.getNonGroupLayers()) {
+                if(TiledObjectLayer.class.isInstance(layer)) {
+                    TiledObjectLayer objectLayer = (TiledObjectLayer) layer;
+                    for(var obj : objectLayer.getObjects()) {
+                        Entity e;
+                        if(obj.getType().equals("block") && obj.getTile() != null) {
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY());
+                            e.add(new Velocity(0.5f));
+                            e.add(new Body());
+                            e.add(new Grabbable());
+                            e.add(new Box());
+                            e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                        } else if(obj.getType().equals("player_spawn")) {
+                            WorldManager wm = Resource.get(game, WorldManager.class);
+                            wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale);
+                        }
+                    }
+                }
             }
-            game.pop();
         }
     }
 }

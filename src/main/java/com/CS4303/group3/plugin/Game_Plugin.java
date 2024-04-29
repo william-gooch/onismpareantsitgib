@@ -76,20 +76,20 @@ public class Game_Plugin implements Plugin_Interface {
 
 
         public void createScene(Game game, Dominion dom) {
-            // Initialize the world map
-            Map map;
-            try {
-                map = mapper.readValue(new File(game.level_name), Map.class);
-            } catch(IOException e) {return;}
+            // // Initialize the world map
+            // Map map;
+            // try {
+            //     map = mapper.readValue(new File(game.level_name), Map.class);
+            // } catch(IOException e) {return;}
 
-            //create solid ground sections
-            for(Ground_Tile ground_tile : map.ground_tiles) {
-                dom.createEntity(
-                    new Position(ground_tile.position.copy().mult(game.scale)),
-                    new Ground(ground_tile.size.copy().mult(game.scale)),
-                    Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
-                );
-            }
+            // //create solid ground sections
+            // for(Ground_Tile ground_tile : map.ground_tiles) {
+            //     dom.createEntity(
+            //         new Position(ground_tile.position.copy().mult(game.scale)),
+            //         new Ground(ground_tile.size.copy().mult(game.scale)),
+            //         Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
+            //     );
+            // }
 
             
             // int playerWidth = (int) (game.scale/30);
@@ -128,15 +128,24 @@ public class Game_Plugin implements Plugin_Interface {
             //initialise forces
             dom.createEntity(new Gravity());
             dom.createEntity(new Drag());
+        }
 
+        public void createPlayer(Game game, float x, float y) {
             // Initialize the player
-            int playerX = (int) (map.player_position.x * game.scale);
-            int playerY = (int) (map.player_position.x * game.scale);
+            // int playerX = (int) (map.player_position.x * game.scale);
+            // int playerY = (int) (map.player_position.x * game.scale);
+            int playerWidth = 26;
+            int playerHeight = 36;
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
-            dom.createEntity(
-                new Position(new PVector(playerX, playerY)),
+            game.dom.createEntity(
+                new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
                 new Velocity(),
-                new Sprite(playerImage),
+                new Sprite(
+                    playerImage,
+                    playerWidth,
+                    playerHeight,
+                    new PVector(9, 18)
+                ),
                 new Player(playerWidth, playerHeight),
                 new Grab(40),
                 new PlayerMovement(),

@@ -381,8 +381,12 @@ public class Object_Plugin implements Plugin_Interface {
             this.onCollide = onCollide;
         }
 
-        public static Collider BasicCollider(int width, int height) {
+        public static Collider BasicCollider(float width, float height) {
             return new Collider(new BasicCollider(width, height));
+        }
+
+        public static Collider BasicCollider(float width, float height, float x, float y) {
+            return new Collider(new BasicCollider(width, height, x, y));
         }
 
         public void triggerCollision(Entity self, Entity other) {

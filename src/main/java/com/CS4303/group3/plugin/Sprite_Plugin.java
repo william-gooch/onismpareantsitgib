@@ -28,8 +28,8 @@ public class Sprite_Plugin implements Plugin_Interface {
                         drawing.translate(sprite.comp1().position.x, sprite.comp1().position.y);
                         drawing.scale(flipX ? -1 : 1, flipY ? -1 : 1);
                         drawing.translate(-sprite.comp2().anchorPoint.x, -sprite.comp2().anchorPoint.y);
-                        drawing.translate((flipX ? -1 : 1) * 26 / 2, (flipY ? -1 : 1) * 36 / 2);
-                        drawing.image(sprite.comp2().image, 0, 0, sprite.comp2().image.width, sprite.comp2().image.height);
+                        drawing.translate((flipX ? -1 : 1) * sprite.comp2().width / 2, (flipY ? -1 : 1) * sprite.comp2().height / 2);
+                        drawing.image(sprite.comp2().image, 0, 0, sprite.comp2().width, sprite.comp2().height);
                         drawing.pop();
                     });
                 });
@@ -38,12 +38,31 @@ public class Sprite_Plugin implements Plugin_Interface {
 
     static class Sprite {
         PImage image;
-        PVector anchorPoint = new PVector(9, 18);
+        float width;
+        float height;
+        PVector anchorPoint;
         boolean flipX = false;
         boolean flipY = false;
 
         Sprite(PImage image) {
             this.image = image;
+            this.width = image.width;
+            this.height = image.height;
+            this.anchorPoint = new PVector(width / 2, height / 2);
+        }
+
+        Sprite(PImage image, float width, float height) {
+            this.image = image;
+            this.width = width;
+            this.height = height;
+            this.anchorPoint = new PVector(width / 2, height / 2);
+        }
+
+        Sprite(PImage image, float width, float height, PVector anchorPoint) {
+            this.image = image;
+            this.width = width;
+            this.height = height;
+            this.anchorPoint = anchorPoint;
         }
     }
 

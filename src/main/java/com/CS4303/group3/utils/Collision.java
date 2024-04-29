@@ -25,32 +25,38 @@ public class Collision {
     //basic collider -- need to update if dealing with non box collisions
     public static class BasicCollider implements Collider_Interface {
         public PVector size;
+        public PVector offset;
+
+        public BasicCollider(float width, float height, float x, float y) {
+            size = new PVector(width, height);
+            offset = new PVector(x, y);
+        }
 
         public BasicCollider(float width, float height) {
-            size = new PVector(width, height);
+            this(width, height, 0, 0);
         }
 
         @Override
         public Contact collide(Position pThis, Collider_Interface other, Position pOther) {
             if(other instanceof BasicCollider) {
-                return collideBasic(pThis, (BasicCollider) other, pOther);
+                return collideBasic(PVector.add(pThis.position, this.offset), (BasicCollider) other, PVector.add(pOther.position, ((BasicCollider) other).offset));
             }
             return null;
         }
 
-        private Contact collideBasic(Position pThis, BasicCollider other, Position pOther) {
+        private Contact collideBasic(PVector pThis, BasicCollider other, PVector pOther) {
             boolean colliding =
-                   pThis.position.x + size.x >= pOther.position.x
-                && pThis.position.x             <= pOther.position.x + other.size.x
-                && pThis.position.y + size.y >= pOther.position.y
-                && pThis.position.y             <= pOther.position.y + other.size.y;
+                   pThis.x + size.x >= pOther.x
+                && pThis.x             <= pOther.x + other.size.x
+                && pThis.y + size.y >= pOther.y
+                && pThis.y             <= pOther.y + other.size.y;
             
             if (colliding) {
                 float
-                    leftDist = (pOther.position.x + other.size.x) - pThis.position.x,
-                    rightDist = (pThis.position.x + this.size.x) - pOther.position.x,
-                    topDist = (pOther.position.y + other.size.y) - pThis.position.y,
-                    bottomDist = (pThis.position.y + this.size.y) - pOther.position.y;
+                    leftDist = (pOther.x + other.size.x) - pThis.x,
+                    rightDist = (pThis.x + this.size.x) - pOther.x,
+                    topDist = (pOther.y + other.size.y) - pThis.y,
+                    bottomDist = (pThis.y + this.size.y) - pOther.y;
                 float minDist = Collections.min(Arrays.asList(leftDist, rightDist, topDist, bottomDist));
 
                 PVector normal = new PVector();
@@ -64,7 +70,7 @@ public class Collision {
                     normal = new PVector(0, -bottomDist);
                 }
 
-                return new Contact(pThis.position, pOther.position, this, other, normal);
+                return new Contact(pThis, pOther, this, other, normal);
             } else {
                 return null;
             }
