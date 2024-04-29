@@ -3,15 +3,7 @@ package com.CS4303.group3;
 import java.util.ArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import com.CS4303.group3.plugin.Box_Plugin;
-import com.CS4303.group3.plugin.Button_Plugin;
-import com.CS4303.group3.plugin.Force_Plugin;
-import com.CS4303.group3.plugin.Game_Plugin;
-import com.CS4303.group3.plugin.Input_Plugin;
-import com.CS4303.group3.plugin.Map_Plugin;
-import com.CS4303.group3.plugin.Object_Plugin;
-import com.CS4303.group3.plugin.Player_Plugin;
-import com.CS4303.group3.plugin.Plugin_Interface;
+import com.CS4303.group3.plugin.*;
 
 import dev.dominion.ecs.api.Dominion;
 import processing.core.*;
@@ -71,6 +63,7 @@ public class Game extends PApplet {
         addPlugin(new Force_Plugin());
         addPlugin(new Box_Plugin());
         addPlugin(new Button_Plugin());
+        addPlugin(new Enemy_Plugin());
         
 
         // schedule._setup.tick();

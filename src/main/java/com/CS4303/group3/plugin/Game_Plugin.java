@@ -117,6 +117,23 @@ public class Game_Plugin implements Plugin_Interface {
                 })
             );
 
+            PVector[] test_path = new PVector[4];
+            test_path[0] = new PVector(100,100);
+            test_path[1] = new PVector(100,300);
+            test_path[2] = new PVector(300,300);
+            test_path[3] = new PVector(300,100);
+
+            dom.createEntity(
+                    new Position(new PVector(100,100)),
+                    new Enemy_Plugin.Basic_AI(test_path),
+                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                        if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
+                            System.out.println("Damaged Player, player is now invulnerable");
+                            other.get(Player.class).invulnerability = 1f;
+                        }
+                    }, false)
+            );
+
 
             //Initialise the inputs
             dom.createEntity(new InputSystem());

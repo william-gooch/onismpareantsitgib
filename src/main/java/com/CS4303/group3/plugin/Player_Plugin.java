@@ -122,8 +122,17 @@ public class Player_Plugin implements Plugin_Interface {
                         }
                     });
             }
-        });      
-        
+        });
+
+        //reduce the invulnerability of the player
+        game.schedule.update(() -> {
+            Player player = Resource.get(game, Player.class);
+            if(player.invulnerability > 0) player.invulnerability -= game.schedule.dt();
+            if(player.invulnerability < 0) {
+                player.invulnerability = 0f;
+                System.out.println("Player has lost invulnerability");
+            }
+        });
         
 
 
@@ -135,6 +144,7 @@ public class Player_Plugin implements Plugin_Interface {
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(128);
+                        if(res.comp2().invulnerability > 0f) drawing.fill(128,128);
                         drawing.rect(pos.x, pos.y, playerSize, playerSize);
                     });
                 });
@@ -225,6 +235,7 @@ public class Player_Plugin implements Plugin_Interface {
 
     static class Player {
         public int height, width;
+        public float invulnerability = 0f;
 
         public Player(int height, int width) {
             this.height = height;

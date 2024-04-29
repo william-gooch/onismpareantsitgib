@@ -107,9 +107,10 @@ public class Object_Plugin implements Plugin_Interface {
                             Contact collision = obj.comp2().collider.collide(obj.comp1(), other.comp2().collider, other.comp1());
                             if(collision == null) return;
 
+
                             // some objects may have custom collision callbacks (e.g. buttons)
                             obj.comp2().triggerCollision(obj.entity(), other.entity());
-                            other.comp2().triggerCollision(other.entity(), obj.entity());
+                            if(!other.entity().has(Enemy_Plugin.Basic_AI.class)) other.comp2().triggerCollision(other.entity(), obj.entity());
 
                             // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
                             // if so, skip over handling the collision after this point
@@ -117,8 +118,17 @@ public class Object_Plugin implements Plugin_Interface {
                                 return;
                             }
 
+                            //don't do collisions with enemies if the player is invulnerable
+                            if(obj.entity().has(Player.class) && other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+                                if(obj.entity().get(Player.class).invulnerability > 0f) {
+                                    System.out.println("Player is invulnerable cannot take damage");
+                                    return;
+                                }
+                            }
+
+
                             if(collision.cNormal().y != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class)))) {
+                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
                                     //stop velocity if going into the object
                                     if(obj.entity().has(Velocity.class)) {
                                         Velocity objVel = obj.entity().get(Velocity.class);
@@ -139,6 +149,15 @@ public class Object_Plugin implements Plugin_Interface {
                                             objVel.velocity.y = 0;
                                             obj.comp1().position.y += collision.cNormal().y;
                                         }
+
+                                        if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
+                                            //kill the ai if anything lands on it - by starting the death animation
+                                            //resets the collider method so cannot damage a player
+                                            if(collision.cNormal().y * gravity.y < 0){
+                                                other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                                                other.entity().get(Collider.class).onCollide = null;
+                                            } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
+                                        }
                                     }
                                 } else if(other.entity().has(Velocity.class)) {
                                     // move player out of the object
@@ -149,6 +168,9 @@ public class Object_Plugin implements Plugin_Interface {
                                         obj.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y * 0.75f;
                                         other.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y;
                                     }
+                                } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+                                    //damage the player using the collision method
+                                    other.comp2().triggerCollision(other.entity(), obj.entity());
                                 }
                                 //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
 
@@ -156,7 +178,7 @@ public class Object_Plugin implements Plugin_Interface {
 
                             //check if collided horizontally
                             if(collision.cNormal().x != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class)))) {
+                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
                                     //stop velocity if going into the object
                                     if(obj.entity().has(Velocity.class)) {
                                         Velocity objVel = obj.entity().get(Velocity.class);
@@ -177,6 +199,15 @@ public class Object_Plugin implements Plugin_Interface {
                                             objVel.velocity.x = 0;
                                             obj.comp1().position.x += collision.cNormal().x;
                                         }
+
+                                        if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
+                                            //kill the ai if anything lands on it - by starting the death animation
+                                            //resets the collider method so cannot damage a player
+                                            if(collision.cNormal().x * gravity.x < 0){
+                                                other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                                                other.entity().get(Collider.class).onCollide = null;
+                                            } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
+                                        }
                                     }
                                 } else if(other.entity().has(Velocity.class)) {
                                     // move player out of the object
@@ -186,6 +217,9 @@ public class Object_Plugin implements Plugin_Interface {
                                         obj.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x * 0.75f;
                                         other.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x;
                                     }
+                                } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+                                    //damage the player using the collision method
+                                    other.comp2().triggerCollision(other.entity(), obj.entity());
                                 }
                                 //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
 
