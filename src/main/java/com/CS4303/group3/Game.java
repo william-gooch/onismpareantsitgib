@@ -64,6 +64,7 @@ public class Game extends PApplet {
         addPlugin(new Box_Plugin());
         addPlugin(new Button_Plugin());
         addPlugin(new Enemy_Plugin());
+        addPlugin(new Door_Plugin());
         
 
         // schedule._setup.tick();
