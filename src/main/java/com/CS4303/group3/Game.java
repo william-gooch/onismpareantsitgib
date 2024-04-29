@@ -7,6 +7,7 @@ import com.CS4303.group3.plugin.*;
 
 import dev.dominion.ecs.api.Dominion;
 import processing.core.*;
+import processing.opengl.PGraphicsOpenGL;
 
 public class Game extends PApplet {
     //Global Variables
@@ -37,12 +38,14 @@ public class Game extends PApplet {
             scale = displayWidth;
         } else scale = (float) (displayHeight * 0.5);
 
-        size((int)scale, (int)scale);
+        noSmooth();
+        size((int)scale, (int)scale, P2D);
     }
 
     //Setup
     public void setup() {
         // size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
+        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
 
         //draw to the background render buffer
         int[][] test_map = new int[25][30];
@@ -55,9 +58,9 @@ public class Game extends PApplet {
         schedule = new GameSchedule(this);
 
         //
-        addPlugin(new Game_Plugin());
         addPlugin(new Map_Plugin());
         addPlugin(new Input_Plugin());
+        addPlugin(new Assets_Plugin());
         addPlugin(new Object_Plugin());
         addPlugin(new Player_Plugin());
         addPlugin(new Force_Plugin());
@@ -65,9 +68,11 @@ public class Game extends PApplet {
         addPlugin(new Button_Plugin());
         addPlugin(new Enemy_Plugin());
         addPlugin(new Door_Plugin());
+        addPlugin(new Sprite_Plugin());
+        addPlugin(new Game_Plugin());
         
 
-        // schedule._setup.tick();
+        schedule._setup.tick();
     }
 
     private void addPlugin(Plugin_Interface plugin) {

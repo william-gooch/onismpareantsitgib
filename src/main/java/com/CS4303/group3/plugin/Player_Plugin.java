@@ -5,6 +5,8 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
+import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.utils.Collision.BasicCollider;
@@ -55,6 +57,8 @@ public class Player_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Velocity.class, Player.class, PlayerMovement.class, Position.class)
                 .stream().forEach(res -> {
                     res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass, gravity.gravity));
+
+                    res.entity().get(Sprite.class).flipX = res.comp1().velocity.x < 0;
                 });
 
             //if input is pickup, pick up box in the vicinity -- have a way to check this only every so often
@@ -132,7 +136,7 @@ public class Player_Plugin implements Plugin_Interface {
 
 
         //draw the player
-        game.schedule.draw(draw -> {
+        game.schedule.draw(-1, draw -> {
             dom.findEntitiesWith(Position.class, Player.class)
                 .stream().forEach(res -> {
                     var pos = res.comp1().position;

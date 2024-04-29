@@ -8,12 +8,14 @@ public class Resource {
         try {
             var composition = game.dom.composition().of(componentType)
                 .withValue(componentType.getConstructor().newInstance());
-            game.schedule.setup(() -> {
-                game.dom.createPreparedEntity(composition);
-            });
+            game.dom.createPreparedEntity(composition);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static <C> void add(Game game, C component) {
+        game.dom.createEntity(component);
     }
 
     public static <C> C get(Game game, Class<C> componentType) {
