@@ -2,6 +2,7 @@ package com.CS4303.group3.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -117,32 +118,56 @@ public class Game_Plugin implements Plugin_Interface {
             int doorWidth = playerWidth / 2;
             int doorHeight = playerHeight;
 
-            // create Door for testing
+            // create two Door for testing
             dom.createEntity(
                     new Position(new PVector(100, 100)),
                     new Door(doorWidth, doorHeight, null),
                     new Collider(new BasicCollider(doorWidth, doorHeight)));
 
+            dom.createEntity(
+                        new Position(new PVector(100, 50)),
+                        new Door(doorWidth, doorHeight, null),
+                        new Collider(new BasicCollider(doorWidth, doorHeight)));
+
             // assigns a button to the associated door - will need to change this so that
             // this is encoded in the JSON rather
         
-        
+                    
+            Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
+            With2<Door, Position> door1 = doors.next();
+            With2<Door, Position> door2 = doors.next();
+
+            //Testing event listener behaviours for two doors that share the same button
             dom.findEntitiesWith(Button.class)
                     .stream().forEach(btn -> {
-                        With2<Door, Position> door = dom.findEntitiesWith(Door.class, Position.class)
-                                .stream().findFirst().get();
+                 
                         btn.comp().addEventListener(new ButtonEventListener() {
                             @Override
                             public void onPush() {
-                                door.comp1().moveDoor(game, door.comp2().position, btn.comp());
+                                door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
                             }
 
                             @Override
                             public void onRelease() {
-                                door.comp1().moveDoor(game, door.comp2().position, btn.comp());
+                                door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
                             }
 
                         });
+
+
+                        btn.comp().addEventListener(new ButtonEventListener() {
+                            @Override
+                            public void onPush() {
+                                door2.comp1().moveDoor(game, door2.comp2().position, btn.comp());
+                            }
+
+                            @Override
+                            public void onRelease() {
+                                door2.comp1().moveDoor(game, door2.comp2().position, btn.comp());
+                            }
+
+                        });
+
 
                     });
 
