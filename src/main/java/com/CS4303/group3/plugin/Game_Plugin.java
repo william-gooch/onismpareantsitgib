@@ -3,6 +3,7 @@ package com.CS4303.group3.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -16,6 +17,7 @@ import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Button_Plugin.*;
 import com.CS4303.group3.plugin.Door_Plugin.*;
+import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Map;
 import com.CS4303.group3.utils.Map.Ground_Tile;
@@ -190,25 +192,39 @@ public class Game_Plugin implements Plugin_Interface {
 
         public void createScene(Game game, Dominion dom, String level_name) {
             // // Initialize the world map
-            // Map map;
-            // try {
-            //     map = mapper.readValue(new File(level_name), Map.class);
-            // } catch(IOException e) {return;}
+             Map map;
+             try {
+                 map = mapper.readValue(new File(level_name), Map.class);
+             } catch(IOException e) {return;}
 
-            // //create solid ground sections
-            // for(Ground_Tile ground_tile : map.ground_tiles) {
-            //     dom.createEntity(
-            //         new Position(ground_tile.position.copy().mult(game.scale)),
-            //         new Ground(ground_tile.size.copy().mult(game.scale)),
-            //         Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
-            //     );
-            // }
+             //create solid ground sections
+             for(Ground_Tile ground_tile : map.ground_tiles) {
+                 dom.createEntity(
+                     new Position(ground_tile.position.copy().mult(game.scale)),
+                     new Ground(ground_tile.size.copy().mult(game.scale)),
+                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
+                 );
+             }
 
             
-            // int playerWidth = (int) (game.scale/30);
-            // int playerHeight = (int) (game.scale/30);
-            int playerWidth = 26;
-            int playerHeight = 36;
+             int playerWidth = (int) (game.scale/30);
+             int playerHeight = (int) (game.scale/30);
+//            int playerWidth = 26;
+//            int playerHeight = 36;
+
+            // create button for testing
+            float loweringSpeed = 0.2f;
+            dom.createEntity(
+                    new Position(new PVector(150, 100)),
+                    new Button(playerWidth, playerHeight, loweringSpeed),
+                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                        self.get(Button.class).pushed = true;
+                        self.get(Button.class).lastPushed = 0;
+                    }));
+
+            //initialise forces
+            dom.createEntity(new Gravity());
+            dom.createEntity(new Drag());
 
             // create block for testing
             dom.createEntity(
@@ -217,18 +233,39 @@ public class Game_Plugin implements Plugin_Interface {
                     Collider.BasicCollider(playerWidth, playerHeight),
                     new Body(),
                     new Grabbable(),
-                    new Box());
+                    new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerHeight), rule_types.OPERATIONAL, Box.directions.DOWN));
 
-            float loweringSpeed = 0.2f;
-
-            // create button for testing
             dom.createEntity(
-                    new Position(new PVector(150, 100)),
-                    new Button(playerWidth, playerHeight, loweringSpeed),
-                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
-                        self.get(Button.class).pushed = true;
-                        self.get(Button.class).lastPushed = 0;
-                    }));
+                    new Position(new PVector(100, 200)),
+                    new Velocity(0.5f),
+                    Collider.BasicCollider(playerWidth, playerHeight),
+                    new Body(),
+                    new Grabbable(),
+                    new Box(Box_Plugin.change_direction_left, new PVector(playerWidth, playerHeight), rule_types.OPERATIONAL, Box.directions.LEFT));
+
+
+            dom.createEntity(
+                    new Position(new PVector(110, game.scale * 0.9f)),
+                    new Docking_Plugin.Docking(new PVector(playerWidth, playerHeight), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
+                            new Docking_Plugin.Docking.Text("Gravity goes ", new PVector(10, game.scale * 0.9f), new PVector(100, playerHeight)))
+            );
+
+            Entity dock = dom.findEntitiesWith(Docking_Plugin.Docking.class).stream().findFirst().get().entity();
+            Entity box = dom.findEntitiesWith(Box.class).stream().findFirst().get().entity();
+            box.removeType(Velocity.class);
+            box.get(Body.class).disableCollision();
+            dock.get(Docking_Plugin.Docking.class).insert_new_rule(box, dock.get(Position.class).position, game);
+
+
+            dom.createEntity(
+                    new Position(new PVector(100 - playerWidth/2, 100 - playerHeight/2)),
+                    new Velocity(),
+                    new Player(playerWidth, playerHeight),
+                    new Grab(40),
+                    new PlayerMovement(),
+                    new Body(),
+                    Collider.BasicCollider(playerWidth, playerHeight)
+            );
 
             int doorWidth = playerWidth / 2;
             int doorHeight = playerHeight;
@@ -268,11 +305,6 @@ public class Game_Plugin implements Plugin_Interface {
                         }
                     }, false)
             );
-
-
-            //initialise forces
-            dom.createEntity(new Gravity());
-            dom.createEntity(new Drag());
 
             //Initialise button chained
 

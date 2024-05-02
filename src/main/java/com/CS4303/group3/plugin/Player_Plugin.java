@@ -34,7 +34,7 @@ public class Player_Plugin implements Plugin_Interface {
                         var grabPos = grabber.comp2().grabObj.get(Position.class);
                         Gravity gravity_entity = Resource.get(game, Gravity.class);
                         if(gravity_entity == null) return;
-                        PVector gravity = gravity_entity.gravity;
+                        PVector gravity = gravity_entity.gravity();
                         grabPos.previous_position = grabPos.position;
                         //set to be above head dependent on gravity
                         grabPos.position = PVector.add(grabber.comp1().position, new PVector(-playerSize * 1.2f * gravity.x, -playerSize * 1.2f * gravity.y, 0));
@@ -59,9 +59,9 @@ public class Player_Plugin implements Plugin_Interface {
             if(input == null || gravity == null) return;
             dom.findEntitiesWith(Velocity.class, Player.class, PlayerMovement.class, Position.class)
                 .stream().forEach(res -> {
-                    res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass, gravity.gravity));
+                    res.comp1().velocity.set(res.comp3().newVelocity((float)game.schedule.dt(), res.comp1().velocity, input, res.comp4(), res.comp1().mass, gravity.gravity()));
 
-                    res.entity().get(Sprite.class).flipX = res.comp1().velocity.x < 0;
+//                    res.entity().get(Sprite.class).flipX = res.comp1().velocity.x < 0;
                 });
 
             //if input is pickup, pick up box in the vicinity -- have a way to check this only every so often
@@ -73,49 +73,67 @@ public class Player_Plugin implements Plugin_Interface {
                         if(grab.grabObj == null) {
                             //find a nearby box to pickup and pick it up
                             dom.findEntitiesWith(Collider.class, Position.class, Grabbable.class)
-                                .stream().forEach(box -> {
-                                    // //if colliding with box pick it up
-                                    Contact collision = player.comp4().collider.collide(player.comp3(), box.comp1().collider, box.comp2());
+                                    .stream().forEach(box -> {
+                                        // //if colliding with box pick it up
+                                        Contact collision = player.comp4().collider.collide(player.comp3(), box.comp1().collider, box.comp2());
 
-                                    if(collision != null) {
-                                    //check collision zone above head
-                                    
-                                        if(!dom.findEntitiesWith(Collider.class, Position.class)
-                                            .stream().anyMatch(object -> {
-                                                Contact c = box.comp1().collider.collide(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - 100)), object.comp1().collider, object.comp2());
-                                                return c != null && object.comp2().position != box.comp2().position;
-                                            })) {
-                                            
+                                        if (collision != null) {
+                                            //check collision zone above head
+
+                                            if (!dom.findEntitiesWith(Collider.class, Position.class)
+                                                    .stream().anyMatch(object -> {
+                                                        Contact c = box.comp1().collider.collide(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - 100)), object.comp1().collider, object.comp2());
+                                                        return c != null && object.comp2().position != box.comp2().position;
+                                                    })) {
+
                                                 grab.grabObj = box.entity();
                                                 box.comp3().player = player.entity();
                                                 input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));
-            
+
                                                 //move the box to above the player
                                                 box.comp2().previous_position = box.comp2().position;
                                                 box.comp2().position.x = player.comp3().position.x;
                                                 box.entity().removeType(Velocity.class); //until collisions are fixed
                                                 // box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
-            
+
                                             }
-                                    }
-                                    
-                                });
+                                        }
+
+                                    });
+                        } else if(dom.findEntitiesWith(Docking_Plugin.Docking.class, Position.class)
+                                .stream().anyMatch(dock -> {
+                                    return dock.comp1().is_close(grab.grabObj.get(Position.class).position, grab.grabObj.get(Box.class).size, dock.comp2().position, grab.grabObj.get(Box.class).rule_type);
+                                })) {
+                            //insert the box into the dock and pick up the block from the dock
+                            Entity dock_object = dom.findEntitiesWith(Docking_Plugin.Docking.class, Position.class)
+                                    .stream().filter(dock -> {
+                                        return dock.comp1().is_close(grab.grabObj.get(Position.class).position, grab.grabObj.get(Box.class).size, dock.comp2().position, grab.grabObj.get(Box.class).rule_type);
+                                    }).findFirst().get().entity();
+
+                            Entity docked_box = dock_object.get(Docking_Plugin.Docking.class).rule;
+                            dock_object.get(Docking_Plugin.Docking.class).insert_new_rule(grab.grabObj, dock_object.get(Position.class).position, game);
+
+                            //pick up the new object
+                            grab.grabObj = docked_box;
+                            docked_box.get(Grabbable.class).player = player.entity();
+                            input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));
+
                         } else {
                             grab.grabObj.get(Body.class).enableCollision();
                             //throw the box
-                            if(gravity.gravity.y != 0) {
+                            if(gravity.gravity().y != 0) {
                                 if (player.comp1().velocity.x > 0) { //throw to the right
                                     //give the players box a velocity and chuck it
-                                    grab.grabObj.add(new Velocity(new PVector(12f, -4f * gravity.gravity.y)));
+                                    grab.grabObj.add(new Velocity(new PVector(12f, -4f * gravity.gravity().y)));
                                 } else { //throw to the left
-                                    grab.grabObj.add(new Velocity(new PVector(-12f, -4f * gravity.gravity.y)));
+                                    grab.grabObj.add(new Velocity(new PVector(-12f, -4f * gravity.gravity().y)));
                                 }
-                            } else if(gravity.gravity.x != 0) {
+                            } else if(gravity.gravity().x != 0) {
                                 if (player.comp1().velocity.y > 0) { //throw to the right
                                     //give the players box a velocity and chuck it
-                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity.x, 12f)));
+                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity().x, 12f)));
                                 } else { //throw to the left
-                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity.x, -12f)));
+                                    grab.grabObj.add(new Velocity(new PVector(-4f * gravity.gravity().x, -12f)));
                                 }
                             }
                             input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));

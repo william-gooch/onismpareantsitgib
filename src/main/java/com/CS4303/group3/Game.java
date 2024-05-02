@@ -37,20 +37,17 @@ public class Game extends PApplet {
 
         if(displayHeight > displayWidth) {
             scale = displayWidth;
-        } else scale = (float) (displayHeight * 0.5);
+        } else scale = displayHeight * 0.5f;
 
-        noSmooth();
-        size((int)scale, (int)scale, P2D);
+//        noSmooth();
+//        size((int)scale, (int)scale, P2D);
+        size((int)scale, (int)scale);
     }
 
     //Setup
     public void setup() {
         // size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
-        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
-
-        //draw to the background render buffer
-        int[][] test_map = new int[25][30];
-        for(int i = 0; i < 30; i++) test_map[24][i] = 1;
+//        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
 
         //start Dominion
         dom = Dominion.create();
@@ -61,7 +58,7 @@ public class Game extends PApplet {
         //
         addPlugin(new Map_Plugin());
         addPlugin(new Input_Plugin());
-        addPlugin(new Assets_Plugin());
+//        addPlugin(new Assets_Plugin());
         addPlugin(new Object_Plugin());
         addPlugin(new Player_Plugin());
         addPlugin(new Force_Plugin());
@@ -69,8 +66,9 @@ public class Game extends PApplet {
         addPlugin(new Button_Plugin());
         addPlugin(new Enemy_Plugin());
         addPlugin(new Door_Plugin());
-        addPlugin(new Sprite_Plugin());
+//        addPlugin(new Sprite_Plugin());
         addPlugin(new Game_Plugin());
+        addPlugin(new Docking_Plugin());
 
 
         schedule._setup.tick();
@@ -93,7 +91,7 @@ public class Game extends PApplet {
         //rotate view with the gravity
         Force_Plugin.Gravity gravity_entity = Resource.get(this, Force_Plugin.Gravity.class);
         if(gravity_entity != null) {
-            PVector gravity = gravity_entity.gravity;
+            PVector gravity = gravity_entity.gravity();
             if (gravity.y < 0) {
                 rotate(PI);
                 translate(-scale, -scale);
