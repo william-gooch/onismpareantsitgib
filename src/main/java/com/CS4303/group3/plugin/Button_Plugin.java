@@ -5,6 +5,7 @@ import java.util.HashSet;
 import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
 
+import com.CS4303.group3.utils.Changeable;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 
@@ -57,7 +58,7 @@ public class Button_Plugin implements Plugin_Interface {
         });
     }
 
-    static class Button {
+    static class Button extends Changeable.Changeable_Boolean {
         //store the entity on top of the button
         public Entity object = null;
         public int height, width;
@@ -67,6 +68,7 @@ public class Button_Plugin implements Plugin_Interface {
         public HashSet<ButtonEventListener> listeners;
 
         public Button(int height, int width, float loweringSpeed) {
+            super(true); //val is whether button opens or closes
             this.height = height;
             this.width = width;
             this.pushed = false;
@@ -76,15 +78,17 @@ public class Button_Plugin implements Plugin_Interface {
 
         public void push(){
             for(ButtonEventListener e: listeners){
-                e.onPush();
+                if(get()) e.onPush();
             }
         }
 
         public void release(){
             for(ButtonEventListener e: listeners){
-                e.onRelease();
+                if(get()) e.onRelease();
             }
         }
+
+
 
         public void addEventListener(ButtonEventListener e){
             listeners.add(e);

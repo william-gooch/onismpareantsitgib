@@ -24,36 +24,36 @@ public class Map_Plugin implements Plugin_Interface {
         this.dom = game.dom;
 
         // test loading a map from file
-        game.schedule.setup(() -> {
-            AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
-        
-            dom.createEntity(
-                new TileMap(game, m)
-            );
-        });
+//        game.schedule.setup(() -> {
+//            AssetManager am = Resource.get(game, AssetManager.class);
+//            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
+//
+//            dom.createEntity(
+//                new TileMap(game, m)
+//            );
+//        });
 
-        // game.schedule.draw(-5, draw -> {
-        //     dom.findEntitiesWith(Ground.class, Position.class)
-        //         .stream().forEach(entity -> {
-        //             Ground ground = entity.comp1();
-        //             PVector position = entity.comp2().position;
-        //             draw.call(drawing -> {
-        //                 drawing.push();
-        //                 ground.draw(drawing, position);
-        //                 drawing.pop();
-        //             });
-        //         });
-        // });
+         game.schedule.draw(-5, draw -> {
+             dom.findEntitiesWith(Ground.class, Position.class)
+                 .stream().forEach(entity -> {
+                     Ground ground = entity.comp1();
+                     PVector position = entity.comp2().position;
+                     draw.call(drawing -> {
+                         drawing.push();
+                         ground.draw(drawing, position);
+                         drawing.pop();
+                     });
+                 });
+         });
 
-        game.schedule.draw(-10, draw -> {
-            dom.findEntitiesWith(Position.class, RenderTile.class)
-                .stream().forEach(entity -> {
-                    draw.call(drawing -> {
-                        drawing.image(entity.comp2().tileImage(), entity.comp1().position.x, entity.comp1().position.y, entity.comp2().width(), entity.comp2().height());
-                    });
-                });
-        });
+//        game.schedule.draw(-10, draw -> {
+//            dom.findEntitiesWith(Position.class, RenderTile.class)
+//                .stream().forEach(entity -> {
+//                    draw.call(drawing -> {
+//                        drawing.image(entity.comp2().tileImage(), entity.comp1().position.x, entity.comp1().position.y, entity.comp2().width(), entity.comp2().height());
+//                    });
+//                });
+//        });
     }
 
     public static class Ground {

@@ -5,6 +5,7 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.InputSystem;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
+import com.CS4303.group3.utils.Changeable;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
 
@@ -40,7 +41,7 @@ public class Force_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Velocity.class)
                 .stream().forEach(res -> {
                     PVector velocity = res.comp().velocity;
-                    velocity.add(gravity.gravity); //if(!res.comp2().grounded) 
+                    velocity.add(gravity.gravity()); //if(!res.comp2().grounded)
                 });
         });
 
@@ -60,16 +61,17 @@ public class Force_Plugin implements Plugin_Interface {
         });
     }
 
-    public static class Gravity {
-        public PVector gravity;
+    public static class Gravity extends Changeable.Changeable_Direction {
 
         public Gravity() {
-            gravity = new PVector(0,0);
+            super(new PVector(0,0));
         }
 
         public void changeGravity(PVector new_gravity) {
-            gravity = new_gravity;
+            change(new_gravity);
         }
+
+        public PVector gravity() {return get();}
     }
 
     public static class Drag {

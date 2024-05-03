@@ -89,7 +89,10 @@ public class Object_Plugin implements Plugin_Interface {
                         return;
                     }
 
-                    PVector gravity = Resource.get(game, Force_Plugin.Gravity.class).gravity;
+                    Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
+                    PVector gravity;
+                    if(gravity_object != null) gravity = gravity_object.gravity();
+                    else gravity = new PVector(0,0);
 
                     obj.comp1().walled = 0;
                     obj.comp1().grounded = false;

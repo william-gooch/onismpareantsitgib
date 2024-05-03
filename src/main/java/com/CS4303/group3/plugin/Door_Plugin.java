@@ -86,22 +86,22 @@ public class Door_Plugin implements Plugin_Interface {
             if (height > 0 && width > 0) {
                 Gravity gravity = Resource.get(game, Gravity.class);
 
-                if (gravity.gravity.y > 0) {
+                if (gravity.gravity().y > 0) {
 
                     height -= LOWERING_INCREMENT;
                     pos.y += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.y < 0) {
+                } else if (gravity.gravity().y < 0) {
 
                     height -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.x > 0) {
+                } else if (gravity.gravity().x > 0) {
 
                     width -= LOWERING_INCREMENT;
 
                     pos.x += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.x < 0) {
+                } else if (gravity.gravity().x < 0) {
 
                     width -= LOWERING_INCREMENT;
 
@@ -122,22 +122,22 @@ public class Door_Plugin implements Plugin_Interface {
 
             Gravity gravity = Resource.get(game, Gravity.class);
             if (height < maxHeight || width < maxWidth) {
-                if (gravity.gravity.y > 0) {
+                if (gravity.gravity().y > 0) {
 
                     height += LOWERING_INCREMENT;
                     pos.y -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.y < 0) {
+                } else if (gravity.gravity().y < 0) {
 
                     height += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.x > 0) {
+                } else if (gravity.gravity().x > 0) {
 
                     width += LOWERING_INCREMENT;
 
                     pos.x -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity.x < 0) {
+                } else if (gravity.gravity().x < 0) {
 
                     width += LOWERING_INCREMENT;
 
