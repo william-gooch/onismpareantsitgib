@@ -15,6 +15,7 @@ public class Game extends PApplet {
     public GameSchedule schedule;
     public float scale;
     public boolean paused = false;
+    public float playerWidth, playerHeight;
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
@@ -42,12 +43,15 @@ public class Game extends PApplet {
 //        noSmooth();
 //        size((int)scale, (int)scale, P2D);
         size((int)scale, (int)scale);
+        playerWidth = scale/25;
+        playerHeight = scale/16;
     }
 
     //Setup
     public void setup() {
         // size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
 //        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
+//        frameRate(1);
 
         //start Dominion
         dom = Dominion.create();
@@ -58,7 +62,7 @@ public class Game extends PApplet {
         //
         addPlugin(new Map_Plugin());
         addPlugin(new Input_Plugin());
-//        addPlugin(new Assets_Plugin());
+        addPlugin(new Assets_Plugin());
         addPlugin(new Object_Plugin());
         addPlugin(new Player_Plugin());
         addPlugin(new Force_Plugin());
@@ -66,7 +70,7 @@ public class Game extends PApplet {
         addPlugin(new Button_Plugin());
         addPlugin(new Enemy_Plugin());
         addPlugin(new Door_Plugin());
-//        addPlugin(new Sprite_Plugin());
+        addPlugin(new Sprite_Plugin());
         addPlugin(new Game_Plugin());
         addPlugin(new Docking_Plugin());
 

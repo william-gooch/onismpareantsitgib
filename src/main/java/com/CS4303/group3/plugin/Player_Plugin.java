@@ -20,12 +20,13 @@ import processing.core.PVector;
 public class Player_Plugin implements Plugin_Interface {
     Dominion dom;
 
-    int playerSize = 10;
+    int playerHeight, playerWidth = 10;
 
     @Override
     public void build(Game game) {
         this.dom = game.dom;
-        playerSize = (int) (game.scale/30);
+        playerHeight = (int) game.playerHeight;
+        playerWidth = (int) game.playerWidth;
 
         game.schedule.update(() -> {
             dom.findEntitiesWith(Position.class, Grab.class)
@@ -37,7 +38,7 @@ public class Player_Plugin implements Plugin_Interface {
                         PVector gravity = gravity_entity.gravity();
                         grabPos.previous_position = grabPos.position;
                         //set to be above head dependent on gravity
-                        grabPos.position = PVector.add(grabber.comp1().position, new PVector(-playerSize * 1.2f * gravity.x, -playerSize * 1.2f * gravity.y, 0));
+                        grabPos.position = PVector.add(grabber.comp1().position, new PVector(-playerWidth * 1.2f * gravity.x, -playerWidth * 1.2f * gravity.y, 0));
                     }
                 });
         });
@@ -75,17 +76,17 @@ public class Player_Plugin implements Plugin_Interface {
                             dom.findEntitiesWith(Collider.class, Position.class, Grabbable.class)
                                     .stream().forEach(box -> {
                                         // //if colliding with box pick it up
-                                        PVector player_mid = new PVector(player.comp3().position.copy().x + playerSize/2, player.comp3().position.copy().y + playerSize/2);
-                                        PVector box_mid = new PVector(box.comp2().position.copy().x + playerSize/2, box.comp2().position.copy().y + playerSize/2);
+                                        PVector player_mid = new PVector(player.comp3().position.copy().x + playerWidth/2, player.comp3().position.copy().y + playerHeight/2);
+                                        PVector box_mid = new PVector(box.comp2().position.copy().x + playerWidth/2, box.comp2().position.copy().y + playerHeight/2);
 
-                                        float range = (float) (2.5f*Math.sqrt(2*(playerSize/2)*(playerSize/2)));
+                                        float range = (float) (2f*Math.sqrt(2*(playerHeight/2)*(playerHeight/2)));
 
                                         if (player_mid.copy().sub(box_mid).mag() < range) {
                                             //check collision zone above head
 
                                             if (!dom.findEntitiesWith(Collider.class, Position.class)
                                                     .stream().anyMatch(object -> {
-                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerSize)), object.comp1().collider, object.comp2());
+                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerHeight)), object.comp1().collider, object.comp2());
                                                         return c != null && object.comp2().position != box.comp2().position;
                                                     })) {
 
@@ -158,6 +159,8 @@ public class Player_Plugin implements Plugin_Interface {
                 }
             }
         });
+
+        //flip
         
 
 
@@ -166,11 +169,13 @@ public class Player_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Position.class, Player.class)
                 .stream().forEach(res -> {
                     var pos = res.comp1().position;
+                    Gravity gravity = Resource.get(game, Gravity.class);
                     draw.call(drawing -> {
                         //draw the player character
                         drawing.fill(128);
                         if(res.comp2().invulnerability > 0f) drawing.fill(128,128);
-                        drawing.rect(pos.x, pos.y, playerSize, playerSize);
+                        if(gravity == null || gravity.gravity().y != 0) drawing.rect(pos.x, pos.y, playerWidth, playerHeight);
+                        else drawing.rect(pos.x, pos.y, playerHeight, playerWidth);
                     });
                 });
         });

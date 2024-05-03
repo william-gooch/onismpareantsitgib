@@ -22,7 +22,7 @@ public class Box_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
         dom = game.dom;
-        playerSize = (int) (game.scale/30);
+        playerSize = (int) game.playerWidth;
 
         
         //hadle object collisions
@@ -41,8 +41,9 @@ public class Box_Plugin implements Plugin_Interface {
                         //draw an arrow
                         drawing.pushMatrix();
                         drawing.translate(pos.x+playerSize/2, pos.y+playerSize/2);
-                        if(res.comp2().direction == Box.directions.LEFT) drawing.rotate(PApplet.radians(180));
+                        if(res.comp2().direction == Box.directions.UP) drawing.rotate(PApplet.radians(-90));
                         if(res.comp2().direction == Box.directions.DOWN) drawing.rotate(PApplet.radians(90));
+
                         drawing.line(0,0,playerSize/2, 0);
                         drawing.line(playerSize/2, 0, playerSize/2 - 8, -8);
                         drawing.line(playerSize/2, 0, playerSize/2 - 8, 8);
@@ -54,6 +55,7 @@ public class Box_Plugin implements Plugin_Interface {
     }
 
     static class Box {
+        //this is currently used for determining the arrow on the front, better to store the sprite to be rendered when graphics are sorted
         public enum directions {
             UP,
             DOWN,

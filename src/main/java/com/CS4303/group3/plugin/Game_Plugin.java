@@ -192,32 +192,32 @@ public class Game_Plugin implements Plugin_Interface {
 
         public void createScene(Game game, Dominion dom, String level_name) {
             // // Initialize the world map
-             Map map;
-             try {
-                 map = mapper.readValue(new File(level_name), Map.class);
-             } catch(IOException e) {return;}
-
-             //create solid ground sections
-             for(Ground_Tile ground_tile : map.ground_tiles) {
-                 dom.createEntity(
-                     new Position(ground_tile.position.copy().mult(game.scale)),
-                     new Ground(ground_tile.size.copy().mult(game.scale)),
-                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
-                 );
-             }
+//             Map map;
+//             try {
+//                 map = mapper.readValue(new File(level_name), Map.class);
+//             } catch(IOException e) {return;}
+//
+//             //create solid ground sections
+//             for(Ground_Tile ground_tile : map.ground_tiles) {
+//                 dom.createEntity(
+//                     new Position(ground_tile.position.copy().mult(game.scale)),
+//                     new Ground(ground_tile.size.copy().mult(game.scale)),
+//                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
+//                 );
+//             }
 
             
-             int playerWidth = (int) (game.scale/30);
-             int playerHeight = (int) (game.scale/30);
-//            int playerWidth = 26;
-//            int playerHeight = 36;
+//             int playerWidth = (int) (game.scale/30);
+//             int playerHeight = (int) (game.scale/30);
+            int playerWidth = (int) game.playerWidth;//26;
+            int playerHeight = (int) game.playerHeight;//36;
 
             // create button for testing
             float loweringSpeed = 0.2f;
             dom.createEntity(
                     new Position(new PVector(150, 100)),
                     new Button(playerWidth, playerHeight, loweringSpeed),
-                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+                    new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
                         self.get(Button.class).pushed = true;
                         self.get(Button.class).lastPushed = 0;
                     }));
@@ -230,23 +230,23 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(
                     new Position(new PVector(100, 100)),
                     new Velocity(0.5f),
-                    Collider.BasicCollider(playerWidth, playerHeight),
+                    Collider.BasicCollider(playerWidth, playerWidth),
                     new Body(),
                     new Grabbable(),
-                    new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerHeight), rule_types.OPERATIONAL, Box.directions.DOWN));
+                    new Box(Box_Plugin.change_direction_up, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.UP));
 
             dom.createEntity(
                     new Position(new PVector(100, 200)),
                     new Velocity(0.5f),
-                    Collider.BasicCollider(playerWidth, playerHeight),
+                    Collider.BasicCollider(playerWidth, playerWidth),
                     new Body(),
                     new Grabbable(),
-                    new Box(Box_Plugin.change_direction_left, new PVector(playerWidth, playerHeight), rule_types.OPERATIONAL, Box.directions.LEFT));
+                    new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.DOWN));
 
 
             dom.createEntity(
                     new Position(new PVector(110, game.scale * 0.9f)),
-                    new Docking_Plugin.Docking(new PVector(playerWidth, playerHeight), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
+                    new Docking_Plugin.Docking(new PVector(playerWidth, playerWidth), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
                             new Docking_Plugin.Docking.Text("Gravity goes ", new PVector(10, game.scale * 0.9f), new PVector(100, playerHeight)))
             );
 
@@ -262,6 +262,7 @@ public class Game_Plugin implements Plugin_Interface {
                     new Velocity(),
                     new Player(playerWidth, playerHeight),
                     new Grab(40),
+                    new Sprite(game.loadImage("player.png"), playerWidth, playerHeight),
                     new PlayerMovement(),
                     new Body(),
                     Collider.BasicCollider(playerWidth, playerHeight)

@@ -32,7 +32,7 @@ public class Docking_Plugin implements Plugin_Interface {
 
 
         //draw the docker gap
-        game.schedule.draw(drawing -> {
+        game.schedule.draw(-5, drawing -> {
             dom.findEntitiesWith(Docking.class, Object_Plugin.Position.class)
                     .stream().forEach(dock -> {
                         drawing.call(draw -> {
@@ -55,7 +55,7 @@ public class Docking_Plugin implements Plugin_Interface {
         Text text;
 
 
-        float insert_range = 40f;
+        float insert_range = 80f;
 
         public Docking(PVector size, Entity rule, Box_Plugin.rule_types rule_type, Changeable changeable, Text text) {
             this.size = size;
