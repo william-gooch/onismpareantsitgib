@@ -68,7 +68,7 @@ public class Button_Plugin implements Plugin_Interface {
         public HashSet<ButtonEventListener> listeners;
 
         public Button(int height, int width, float loweringSpeed) {
-            super(false); //val is whether button opens or closes
+            super(true); //val is whether button opens or closes
             this.height = height;
             this.width = width;
             this.pushed = false;

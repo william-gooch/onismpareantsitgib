@@ -37,6 +37,7 @@ public class Box_Plugin implements Plugin_Interface {
                         drawing.fill(128,128,0);
                         drawing.rect(pos.x, pos.y, playerSize, playerSize);
                         drawing.fill(0);
+
                         //draw an arrow
                         drawing.pushMatrix();
                         drawing.translate(pos.x+playerSize/2, pos.y+playerSize/2);
@@ -88,6 +89,13 @@ public class Box_Plugin implements Plugin_Interface {
         public Entity player = null;
 
         public Grabbable() {}
+
+        public PVector get_above_head_position(Game game, PVector player_position, float player_size) {
+            Force_Plugin.Gravity gravity = Resource.get(game, Force_Plugin.Gravity.class);
+            if(gravity == null) return new PVector(0,0);
+
+            return PVector.add(player_position, new PVector(-player_size * 1.2f * gravity.gravity().x, -player_size * 1.2f * gravity.gravity().y, 0));
+        }
     }
 
     public enum rule_types {

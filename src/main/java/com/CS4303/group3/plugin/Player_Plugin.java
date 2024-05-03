@@ -75,14 +75,17 @@ public class Player_Plugin implements Plugin_Interface {
                             dom.findEntitiesWith(Collider.class, Position.class, Grabbable.class)
                                     .stream().forEach(box -> {
                                         // //if colliding with box pick it up
-                                        Contact collision = player.comp4().collider.collide(player.comp3(), box.comp1().collider, box.comp2());
+                                        PVector player_mid = new PVector(player.comp3().position.copy().x + playerSize/2, player.comp3().position.copy().y + playerSize/2);
+                                        PVector box_mid = new PVector(box.comp2().position.copy().x + playerSize/2, box.comp2().position.copy().y + playerSize/2);
 
-                                        if (collision != null) {
+                                        float range = (float) (2.5f*Math.sqrt(2*(playerSize/2)*(playerSize/2)));
+
+                                        if (player_mid.copy().sub(box_mid).mag() < range) {
                                             //check collision zone above head
 
                                             if (!dom.findEntitiesWith(Collider.class, Position.class)
                                                     .stream().anyMatch(object -> {
-                                                        Contact c = box.comp1().collider.collide(new Position(new PVector(player.comp3().position.x, player.comp3().position.y - 100)), object.comp1().collider, object.comp2());
+                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerSize)), object.comp1().collider, object.comp2());
                                                         return c != null && object.comp2().position != box.comp2().position;
                                                     })) {
 
