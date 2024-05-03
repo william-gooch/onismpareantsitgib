@@ -263,7 +263,7 @@ public class Game_Plugin implements Plugin_Interface {
                     new Player(playerWidth, playerHeight),
                     new Grab(40),
                     new Sprite(game.loadImage("player.png"), playerWidth, playerHeight),
-                    new PlayerMovement(),
+                    new PlayerMovement(game.scale/3f, game.scale/40f, game.scale/40f, game.scale/100f, game.scale/40f, game.scale/2000f, game.scale/800f),
                     new Body(),
                     Collider.BasicCollider(playerWidth, playerHeight)
             );
