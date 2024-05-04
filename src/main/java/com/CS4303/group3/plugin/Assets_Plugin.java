@@ -43,7 +43,7 @@ public class Assets_Plugin implements Plugin_Interface {
         }
 
         public <T> T getResource(Class<T> type, String name) {
-            String path = AssetManager.class.getClassLoader().getResource(name).getPath();
+            String path = "./assets/" + name;
             return getAsset(type, path);
         }
     }
