@@ -1,7 +1,6 @@
 package com.CS4303.group3.plugin;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -12,10 +11,12 @@ import com.CS4303.group3.utils.Collision.*;
 
 
 import dev.dominion.ecs.api.*;
+import dev.dominion.ecs.api.Results.*;
 import processing.core.PVector;
 
 public class Object_Plugin implements Plugin_Interface {
     Dominion dom;
+    static final float EPSILON = .5f;
 
     @Override
     public void build(Game game) {
@@ -89,143 +90,18 @@ public class Object_Plugin implements Plugin_Interface {
                         return;
                     }
 
-                    Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
-                    PVector gravity;
-                    if(gravity_object != null) gravity = gravity_object.gravity();
-                    else gravity = new PVector(0,0);
-
                     obj.comp1().walled = 0;
                     obj.comp1().grounded = false;
 
                     //correct collisions with the ground
-                    //dom.findEntitiesWith(Position.class, Collider.class).without(Button.class)
                     dom.findEntitiesWith(Position.class, Collider.class)
-                        .stream().forEach(other -> {
-                            //check that it isn't looking at itself
-                            if(obj.entity() == other.entity()) { return; }
-                            // if the object is a body that can't collide, then return early
-                            // static objects like the ground are always collidable.
-                            if(other.entity().has(Body.class) && !other.entity().get(Body.class).canCollide) { return; }
-
-                            Contact collision = obj.comp2().collider.collide(obj.comp1(), other.comp2().collider, other.comp1());
-                            if(collision == null) return;
-
-
-                            // some objects may have custom collision callbacks (e.g. buttons)
-                            obj.comp2().triggerCollision(obj.entity(), other.entity());
-                            if(!other.entity().has(Enemy_Plugin.Basic_AI.class)) other.comp2().triggerCollision(other.entity(), obj.entity());
-
-                            // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
-                            // if so, skip over handling the collision after this point
-                            if (obj.comp2().isTrigger || other.comp2().isTrigger) {
-                                return;
-                            }
-
-                            //don't do collisions with enemies if the player is invulnerable
-                            if(obj.entity().has(Player.class) && other.entity().has(Enemy_Plugin.Basic_AI.class)) {
-                                if(obj.entity().get(Player.class).invulnerability > 0f) {
-                                    return;
-                                }
-                            }
-
-
-                            if(collision.cNormal().y != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
-                                    //stop velocity if going into the object
-                                    if(obj.entity().has(Velocity.class)) {
-                                        Velocity objVel = obj.entity().get(Velocity.class);
-                                        if(objVel.velocity.y * collision.cNormal().y < 0) { //if moving against the normal - moving into the collision
-                                            //if going downwards -- y increasing - set to be grounded
-                                            if(gravity.y != 0) {
-                                                //set to grounded if travelling the same direction as gravity
-                                                if (objVel.velocity.y * gravity.y > 0) {
-                                                    obj.comp1().grounded = true;
-                                                    obj.comp1().prev_walled = 0;
-                                                    obj.comp1().walled = 0;
-                                                }
-                                            } else if(gravity.x != 0) {
-                                                //set to walled
-                                                obj.comp1().walled = objVel.velocity.y > 0 ? 1 : -1;
-                                            }
-
-                                            objVel.velocity.y = 0;
-                                            obj.comp1().position.y += collision.cNormal().y;
-                                        }
-
-                                        if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
-                                            //kill the ai if anything lands on it - by starting the death animation
-                                            //resets the collider method so cannot damage a player
-                                            if(collision.cNormal().y * gravity.y < 0){
-                                                other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
-                                                other.entity().get(Collider.class).onCollide = null;
-                                            } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
-                                        }
-                                    }
-                                } else if(other.entity().has(Velocity.class)) {
-                                    // move player out of the object
-                                    obj.comp1().position.y += collision.cNormal().y;
-
-                                    // calculate the new velocity for both objects
-                                    if (obj.entity().has(Velocity.class)) {
-                                        obj.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y * 0.75f;
-                                        other.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y;
-                                    }
-                                } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
-                                    //damage the player using the collision method
-                                    other.comp2().triggerCollision(other.entity(), obj.entity());
-                                }
-                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
-
-                            }
-
-                            //check if collided horizontally
-                            if(collision.cNormal().x != 0) { // check if collided vertically
-                                if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
-                                    //stop velocity if going into the object
-                                    if(obj.entity().has(Velocity.class)) {
-                                        Velocity objVel = obj.entity().get(Velocity.class);
-                                        if(objVel.velocity.x * collision.cNormal().x < 0) { //if moving against the normal - moving into the collision
-                                            //if going downwards -- y increasing - set to be grounded
-                                            if(gravity.x != 0) {
-                                                //set to grounded if travelling the same direction as gravity
-                                                if (objVel.velocity.x * gravity.x > 0) {
-                                                    obj.comp1().grounded = true;
-                                                    obj.comp1().prev_walled = 0;
-                                                    obj.comp1().walled = 0;
-                                                }
-                                            } else if(gravity.y != 0) {
-                                                //set to walled
-                                                obj.comp1().walled = objVel.velocity.x > 0 ? 1 : -1;
-                                            }
-
-                                            objVel.velocity.x = 0;
-                                            obj.comp1().position.x += collision.cNormal().x;
-                                        }
-
-                                        if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
-                                            //kill the ai if anything lands on it - by starting the death animation
-                                            //resets the collider method so cannot damage a player
-                                            if(collision.cNormal().x * gravity.x < 0){
-                                                other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
-                                                other.entity().get(Collider.class).onCollide = null;
-                                            } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
-                                        }
-                                    }
-                                } else if(other.entity().has(Velocity.class)) {
-                                    // move player out of the object
-                                    obj.comp1().position.x += collision.cNormal().x;
-                                    // calculate the new velocity for both objects
-                                    if (obj.entity().has(Velocity.class)) {
-                                        obj.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x * 0.75f;
-                                        other.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x;
-                                    }
-                                } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
-                                    //damage the player using the collision method
-                                    other.comp2().triggerCollision(other.entity(), obj.entity());
-                                }
-                                //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
-
-                            }
+                        .stream()
+                        .filter(other -> preCollision(obj, other))
+                        .forEach(other -> {
+                            // check if collided vertically
+                            yCollide(game, obj, other);
+                            // check if collided horizontally
+                            xCollide(game, obj, other);
                         });
                 });
         });
@@ -364,6 +240,156 @@ public class Object_Plugin implements Plugin_Interface {
                 
 
 
+    }
+
+    public static boolean preCollision(With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+        //check that it isn't looking at itself
+        if(obj.entity() == other.entity()) { return false; }
+        // if the object is a body that can't collide, then return early
+        // static objects like the ground are always collidable.
+        if(other.entity().has(Body.class) && !other.entity().get(Body.class).canCollide) { return false; }
+        //don't do collisions with enemies if the player is invulnerable
+        if(obj.entity().has(Player.class) && other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+            if(obj.entity().get(Player.class).invulnerability > 0f) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static Contact collision(With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+        Contact collision = obj.comp2().collider.collide(obj.comp1(), other.comp2().collider, other.comp1());
+        if(collision == null) return null;
+
+        // some objects may have custom collision callbacks (e.g. buttons)
+        obj.comp2().triggerCollision(obj.entity(), other.entity());
+        if(!other.entity().has(Enemy_Plugin.Basic_AI.class)) other.comp2().triggerCollision(other.entity(), obj.entity());
+
+        // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
+        // if so, skip over handling the collision after this point
+        if (obj.comp2().isTrigger || other.comp2().isTrigger) {
+            return null;
+        }
+        
+        return collision;
+    }
+
+    public static void yCollide(Game game, With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+        Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
+        PVector gravity;
+        if(gravity_object != null) gravity = gravity_object.gravity();
+        else gravity = new PVector(0,0);
+
+        Contact collision = collision(obj, other);
+        if(collision == null) return;
+        if(collision.cNormal().y != 0) { // check if collided vertically
+            if(other.entity().has(Ground.class) || (gravity.y != 0 && gravity.x == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
+                //stop velocity if going into the object
+                if(obj.entity().has(Velocity.class)) {
+                    Velocity objVel = obj.entity().get(Velocity.class);
+                    if(objVel.velocity.y * collision.cNormal().y < 0) { //if moving against the normal - moving into the collision
+                        //if going downwards -- y increasing - set to be grounded
+                        if(gravity.y != 0) {
+                            //set to grounded if travelling the same direction as gravity
+                            if (objVel.velocity.y * gravity.y > 0) {
+                                obj.comp1().grounded = true;
+                                obj.comp1().prev_walled = 0;
+                                obj.comp1().walled = 0;
+                            }
+                        } else if(gravity.x != 0) {
+                            //set to walled
+                            obj.comp1().walled = objVel.velocity.y > 0 ? 1 : -1;
+                        }
+
+                        objVel.velocity.y = 0;
+                        float shift = collision.cNormal().y;
+                        shift += EPSILON * Math.signum(shift);
+                        obj.comp1().position.y += shift;
+                    }
+
+                    if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
+                        //kill the ai if anything lands on it - by starting the death animation
+                        //resets the collider method so cannot damage a player
+                        if(collision.cNormal().y * gravity.y < 0){
+                            other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                            other.entity().get(Collider.class).onCollide = null;
+                        } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
+                    }
+                }
+            } else if(other.entity().has(Velocity.class)) {
+                // move player out of the object
+                obj.comp1().position.y += collision.cNormal().y;
+
+                // calculate the new velocity for both objects
+                if (obj.entity().has(Velocity.class)) {
+                    obj.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y * 0.75f;
+                    other.entity().get(Velocity.class).velocity.y = obj.entity().get(Velocity.class).velocity.y;
+                }
+            } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+                //damage the player using the collision method
+                other.comp2().triggerCollision(other.entity(), obj.entity());
+            }
+        }
+    }
+
+    public static void xCollide(Game game, With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+        Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
+        PVector gravity;
+        if(gravity_object != null) gravity = gravity_object.gravity();
+        else gravity = new PVector(0,0);
+
+        Contact collision = collision(obj, other);
+        if(collision == null) return;
+        if(collision.cNormal().x != 0) { // check if collided vertically
+            if(other.entity().has(Ground.class) || (gravity.x != 0 && gravity.y == 0 && (other.entity().has(Box.class) || other.entity().has(Player.class) || other.entity().has(Enemy_Plugin.Basic_AI.class)))) {
+                //stop velocity if going into the object
+                if(obj.entity().has(Velocity.class)) {
+                    Velocity objVel = obj.entity().get(Velocity.class);
+                    if(objVel.velocity.x * collision.cNormal().x < 0) { //if moving against the normal - moving into the collision
+                        //if going downwards -- y increasing - set to be grounded
+                        if(gravity.x != 0) {
+                            //set to grounded if travelling the same direction as gravity
+                            if (objVel.velocity.x * gravity.x > 0) {
+                                obj.comp1().grounded = true;
+                                obj.comp1().prev_walled = 0;
+                                obj.comp1().walled = 0;
+                            }
+                        } else if(gravity.y != 0) {
+                            //set to walled
+                            obj.comp1().walled = objVel.velocity.x > 0 ? 1 : -1;
+                        }
+
+                        objVel.velocity.x = 0;
+                        float shift = collision.cNormal().x;
+                        shift += EPSILON * Math.signum(shift);
+                        obj.comp1().position.x += shift;
+                    }
+
+                    if(other.entity().has(Enemy_Plugin.Basic_AI.class) && other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation == 0f) {
+                        //kill the ai if anything lands on it - by starting the death animation
+                        //resets the collider method so cannot damage a player
+                        if(collision.cNormal().x * gravity.x < 0){
+                            other.entity().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                            other.entity().get(Collider.class).onCollide = null;
+                        } else other.comp2().triggerCollision(other.entity(), obj.entity()); //damage the player
+                    }
+                }
+            } else if(other.entity().has(Velocity.class)) {
+                // move player out of the object
+                obj.comp1().position.x += collision.cNormal().x;
+                // calculate the new velocity for both objects
+                if (obj.entity().has(Velocity.class)) {
+                    obj.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x * 0.75f;
+                    other.entity().get(Velocity.class).velocity.x = obj.entity().get(Velocity.class).velocity.x;
+                }
+            } else if(other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+                //damage the player using the collision method
+                other.comp2().triggerCollision(other.entity(), obj.entity());
+            }
+            //stop velocity if going into the object -- if velocity * change in y < 0 going into the object
+
+        }
     }
 
     public static class Position {

@@ -5,9 +5,11 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Box_Plugin.Box;
 import com.CS4303.group3.plugin.Box_Plugin.Grabbable;
+import com.CS4303.group3.plugin.Box_Plugin.rule_types;
 import com.CS4303.group3.plugin.Button_Plugin.Button;
 import com.CS4303.group3.plugin.Button_Plugin.ButtonEventListener;
 import com.CS4303.group3.plugin.Door_Plugin.Door;
+import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
@@ -179,7 +181,7 @@ public class Map_Plugin implements Plugin_Interface {
                             e.add(new Velocity(0.5f));
                             e.add(new Body());
                             e.add(new Grabbable());
-                            e.add(new Box());
+                            e.add(new Box(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
                             e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                         } else if(obj.getType().equals("player_spawn")) {
                             WorldManager wm = Resource.get(game, WorldManager.class);
@@ -258,6 +260,12 @@ public class Map_Plugin implements Plugin_Interface {
                                     other.get(Player.class).invulnerability = 1f;
                                 }
                             }, false));
+                        } else if(obj.getType().equals("dock")) {
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                            e.add(new Docking_Plugin.Docking(
+                                new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
+                                null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class), null
+                            ));
                         } else if(obj.getTile() != null) { // fallback for visual-only elements
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
                         } else {

@@ -35,13 +35,15 @@ public class Docking_Plugin implements Plugin_Interface {
         game.schedule.draw(-5, drawing -> {
             dom.findEntitiesWith(Docking.class, Object_Plugin.Position.class)
                     .stream().forEach(dock -> {
-                        drawing.call(draw -> {
-                            draw.fill(255,0,255);
-                            draw.textSize(16);
-                            draw.textAlign(PConstants.LEFT, PConstants.CENTER);
-                            draw.rect(dock.comp2().position.x, dock.comp2().position.y, dock.comp1().size.x, dock.comp1().size.y);
-                            draw.text(dock.comp1().text.text, dock.comp1().text.position.x, dock.comp1().text.position.y, dock.comp1().text.size.x, dock.comp1().text.size.y);
-                        });
+                        if(dock.comp1().text != null) {
+                            drawing.call(draw -> {
+                                draw.fill(255,0,255);
+                                draw.textSize(16);
+                                draw.textAlign(PConstants.LEFT, PConstants.CENTER);
+                                draw.rect(dock.comp2().position.x, dock.comp2().position.y, dock.comp1().size.x, dock.comp1().size.y);
+                                draw.text(dock.comp1().text.text, dock.comp1().text.position.x, dock.comp1().text.position.y, dock.comp1().text.size.x, dock.comp1().text.size.y);
+                            });
+                        }
                     });
         });
     }
