@@ -6,8 +6,8 @@ package com.CS4303.group3;
 public class Resource {
     public static <C> void add(Game game, Class<C> componentType) {
         try {
-            var composition = game.dom.composition().of(componentType)
-                .withValue(componentType.getConstructor().newInstance());
+            var composition = game.dom.composition().of(componentType, ResourceEntity.class)
+                .withValue(componentType.getConstructor().newInstance(), new ResourceEntity());
             game.dom.createPreparedEntity(composition);
         } catch (Exception e) {
             e.printStackTrace();
@@ -15,7 +15,7 @@ public class Resource {
     }
 
     public static <C> void add(Game game, C component) {
-        game.dom.createEntity(component);
+        game.dom.createEntity(component, new ResourceEntity());
     }
 
     public static <C> C get(Game game, Class<C> componentType) {
@@ -25,4 +25,7 @@ public class Resource {
         else
             return null;
     }
+
+    // Tagging class for Resources (i.e. they shouldn't be destroyed when clearing the world)
+    public static final class ResourceEntity {}
 }

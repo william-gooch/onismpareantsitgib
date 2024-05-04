@@ -124,7 +124,6 @@ public class Object_Plugin implements Plugin_Interface {
                             //don't do collisions with enemies if the player is invulnerable
                             if(obj.entity().has(Player.class) && other.entity().has(Enemy_Plugin.Basic_AI.class)) {
                                 if(obj.entity().get(Player.class).invulnerability > 0f) {
-                                    System.out.println("Player is invulnerable cannot take damage");
                                     return;
                                 }
                             }

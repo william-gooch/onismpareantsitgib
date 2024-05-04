@@ -1,5 +1,7 @@
 package com.CS4303.group3.plugin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.CS4303.group3.Game;
@@ -34,6 +36,27 @@ public class Sprite_Plugin implements Plugin_Interface {
                     });
                 });
         });
+
+        game.schedule.draw(draw -> {
+            dom.findEntitiesWith(Position.class, StateSprite.class)
+                .stream().forEach(sprite -> {
+                    Sprite currentSprite = sprite.comp2().getSprite();
+                    if(currentSprite == null) {
+                        return;
+                    }
+                    boolean flipX = currentSprite.flipX;
+                    boolean flipY = currentSprite.flipY;
+                    draw.call(drawing -> {
+                        drawing.push();
+                        drawing.translate(sprite.comp1().position.x, sprite.comp1().position.y);
+                        drawing.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+                        drawing.translate(-currentSprite.anchorPoint.x, -currentSprite.anchorPoint.y);
+                        drawing.translate((flipX ? -1 : 1) * currentSprite.width / 2, (flipY ? -1 : 1) * currentSprite.height / 2);
+                        drawing.image(currentSprite.image, 0, 0, currentSprite.width, currentSprite.height);
+                        drawing.pop();
+                    });
+                });
+        });
     }
 
     static class Sprite {
@@ -63,6 +86,27 @@ public class Sprite_Plugin implements Plugin_Interface {
             this.width = width;
             this.height = height;
             this.anchorPoint = anchorPoint;
+        }
+    }
+
+    static class StateSprite {
+        String currentState;
+        HashMap<String, Sprite> states;
+
+        public StateSprite() {
+            this.states = new HashMap<>();
+        }
+
+        public void addState(String name, Sprite sprite) {
+            states.put(name, sprite);
+        }
+
+        public Sprite getSprite() {
+            return states.get(currentState);
+        }
+
+        public void setState(String state) {
+            currentState = state;
         }
     }
 

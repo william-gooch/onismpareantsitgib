@@ -5,6 +5,7 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Button_Plugin.Button;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.utils.Changeable.Changeable_Boolean;
 
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
@@ -24,55 +25,54 @@ public class Door_Plugin implements Plugin_Interface {
 
         // TO DO: need to deal with collider for the door
 
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Position.class, Door.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        var height = res.comp2().height;
-                        var width = res.comp2().width;
-                        draw.call(drawing -> {
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Door.class)
+        //             .stream().forEach(res -> {
+        //                 var pos = res.comp1().position;
+        //                 var height = res.comp2().height;
+        //                 var width = res.comp2().width;
+        //                 draw.call(drawing -> {
 
-                            if (res.comp2().open) {
-                                drawing.fill(40, 175, 176);
-                            } else {
-                                drawing.fill(151, 204, 4);
-                            }
+        //                     if (res.comp2().open) {
+        //                         drawing.fill(40, 175, 176);
+        //                     } else {
+        //                         drawing.fill(151, 204, 4);
+        //                     }
 
-                            drawing.rect(pos.x, pos.y, width, height);
+        //                     drawing.rect(pos.x, pos.y, width, height);
 
-                        });
-                    });
-        });
+        //                 });
+        //             });
+        // });
 
     }
 
     static class Door {
         public int height, width, maxHeight, maxWidth;
         public float timeElapsed;
-        public boolean open;
+        public Changeable_Boolean open;
         public final float UPDATE_DELAY = 0.01f;
         public final float LOWERING_INCREMENT = 1f;
 
-        public Door(int height, int width, Button button) {
+        public Door(int height, int width) {
             this.height = height;
             this.maxHeight = height;
             this.maxWidth = width;
             this.timeElapsed = 0;
             this.width = width;
-
+            this.open = new Changeable_Boolean(false);
         }
 
-        public boolean isOpen(Button btn) {
-            open = btn.pushed ? true : false;
-            return open;
+        public boolean isOpen() {
+            return open.get();
         }
 
-        public void moveDoor(Game game, PVector pos, Button btn) {
+        public void moveDoor(Game game, PVector pos) {
 
             timeElapsed += game.schedule.dt();
 
             if (timeElapsed >= UPDATE_DELAY) {
-                if (isOpen(btn)) {
+                if (isOpen()) {
                     lower(game, pos);
                 } else {
                     raise(pos, game);

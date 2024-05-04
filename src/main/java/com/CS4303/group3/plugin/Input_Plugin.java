@@ -16,7 +16,7 @@ public class Input_Plugin implements Plugin_Interface {
     public void build(Game game) {
         this.dom = game.dom;
 
-        // Resource.add(game, InputSystem.class);
+        Resource.add(game, InputSystem.class);
 
         game.schedule.keyDown(() -> {
             var input = Resource.get(game, InputSystem.class);

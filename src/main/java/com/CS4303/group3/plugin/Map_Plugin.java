@@ -5,14 +5,21 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Box_Plugin.Box;
 import com.CS4303.group3.plugin.Box_Plugin.Grabbable;
+import com.CS4303.group3.plugin.Button_Plugin.Button;
+import com.CS4303.group3.plugin.Button_Plugin.ButtonEventListener;
+import com.CS4303.group3.plugin.Door_Plugin.Door;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
+import com.CS4303.group3.utils.Collision.BasicCollider;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import processing.core.*;
+
+import java.util.HashMap;
 
 import org.tiledreader.*;
 
@@ -22,16 +29,6 @@ public class Map_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
         this.dom = game.dom;
-
-        // test loading a map from file
-        game.schedule.setup(() -> {
-            AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
-
-            dom.createEntity(
-                new TileMap(game, m)
-            );
-        });
 
 //         game.schedule.draw(-5, draw -> {
 //             dom.findEntitiesWith(Ground.class, Position.class)
@@ -89,12 +86,15 @@ public class Map_Plugin implements Plugin_Interface {
         float tileScale = 1;
         TiledMap map;
 
+        HashMap<TiledObject, Entity> objects;
+
         private Game game;
 
         public TileMap(Game game, TiledMap map, float tileScale) {
             this.game = game;
             this.tileScale = tileScale;
             this.map = map;
+            this.objects = new HashMap<>();
             this.generateRenderTiles();
             this.generateObjects();
         }
@@ -130,7 +130,7 @@ public class Map_Plugin implements Plugin_Interface {
             return e;
         }
 
-        private Entity createSpriteFromTile(TiledTile tile, float width, float height, float x, float y) {
+        private PImage getTileImage(TiledTile tile) {
             AssetManager assets = Resource.get(game, AssetManager.class);
 
             // asset manager caches the image so it's not a worry if it gets the same image a bunch of times
@@ -141,6 +141,12 @@ public class Map_Plugin implements Plugin_Interface {
                 map.getTileWidth(),
                 map.getTileHeight()
             );
+
+            return tileImage;
+        }
+
+        private Entity createSpriteFromTile(TiledTile tile, float width, float height, float x, float y) {
+            PImage tileImage = getTileImage(tile);
 
             // return next.getImage().getSource();
             var e = game.dom.createEntity(
@@ -175,7 +181,7 @@ public class Map_Plugin implements Plugin_Interface {
                     for(var obj : objectLayer.getObjects()) {
                         Entity e;
                         if(obj.getType().equals("block") && obj.getTile() != null) {
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY());
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
                             e.add(new Velocity(0.5f));
                             e.add(new Body());
                             e.add(new Grabbable());
@@ -184,7 +190,56 @@ public class Map_Plugin implements Plugin_Interface {
                         } else if(obj.getType().equals("player_spawn")) {
                             WorldManager wm = Resource.get(game, WorldManager.class);
                             wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale);
+                            e = null;
+                        } else if(obj.getType().equals("button")) {
+                            PImage offImage = getTileImage(obj.getTile());
+                            PImage onImage = getTileImage(obj.getTile().getTileset().getTile((int) obj.getProperty("onImage")));
+                            StateSprite sprite = new StateSprite();
+                            sprite.addState("off", new Sprite(offImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                            sprite.addState("on", new Sprite(onImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                            sprite.setState("off");
+                            e = game.dom.createEntity(
+                                new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
+                                sprite
+                            );
+                            Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale), 0.25f);
+                            button.addEventListener(new ButtonEventListener() {
+
+                                @Override
+                                public void onPush() {
+                                    e.get(StateSprite.class).setState("on");
+                                    var door = objects.get(obj.getProperty("trigger"));
+                                    door.get(Door.class).open.change(true);
+                                    door.get(Door.class).moveDoor(game, door.get(Position.class).position);
+                                }
+
+                                @Override
+                                public void onRelease() {
+                                    e.get(StateSprite.class).setState("off");
+                                    var door = objects.get(obj.getProperty("trigger"));
+                                    door.get(Door.class).open.change(false);
+                                    door.get(Door.class).moveDoor(game, door.get(Position.class).position);
+                                }
+                                
+                            });
+                            e.add(button);
+                            e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), 
+                                (self, other) -> {
+                                    self.get(Button.class).pushed = true;
+                                    self.get(Button.class).lastPushed = 0;
+                                })
+                            );
+                        } else if(obj.getType().equals("door")) {
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                            e.add(new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale)));
+                            e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                            e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                        } else if(obj.getTile() != null) { // fallback for visual-only elements
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                        } else {
+                            e = null;
                         }
+                        objects.put(obj, e);
                     }
                 }
             }

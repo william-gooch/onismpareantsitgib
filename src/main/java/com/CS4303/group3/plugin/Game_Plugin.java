@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import org.tiledreader.TiledMap;
+
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.Resource.ResourceEntity;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
@@ -31,7 +34,7 @@ import com.fasterxml.jackson.databind.*;
 public class Game_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
-        game.dom.createEntity(new WorldManager(game, game.displayHeight / 25, game.displayWidth / 30));
+        Resource.add(game, new WorldManager(game, game.displayHeight / 25, game.displayWidth / 30));
 
         game.schedule.setup(() -> {
             var wm = Resource.get(game, WorldManager.class);
@@ -123,7 +126,7 @@ public class Game_Plugin implements Plugin_Interface {
 
         public void clearWorld() {
             game.dom.findAllEntities()
-                    .stream().filter(e -> !e.has(WorldManager.class) && !e.has(InputSystem.class)).forEach(e -> game.dom.deleteEntity(e));
+                    .stream().filter(e -> !e.has(ResourceEntity.class)).forEach(e -> game.dom.deleteEntity(e));
         }
 
         public void clearText() {
@@ -168,7 +171,6 @@ public class Game_Plugin implements Plugin_Interface {
         public void titleScreen() {
             if (state != WorldState.TITLE) {
                 clearWorld();
-                game.dom.createEntity(new InputSystem());
                 createTitleScreen(game.dom);
                 state = WorldState.TITLE;
             }
@@ -205,7 +207,11 @@ public class Game_Plugin implements Plugin_Interface {
 //                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
 //                 );
 //             }
-
+            AssetManager am = Resource.get(game, AssetManager.class);
+            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
+            dom.createEntity(
+                new TileMap(game, m)
+            );
             
 //             int playerWidth = (int) (game.scale/30);
 //             int playerHeight = (int) (game.scale/30);
@@ -227,46 +233,46 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(new Drag());
 
             // create block for testing
-            dom.createEntity(
-                    new Position(new PVector(100, 100)),
-                    new Velocity(0.5f),
-                    Collider.BasicCollider(playerWidth, playerWidth),
-                    new Body(),
-                    new Grabbable(),
-                    new Box(Box_Plugin.change_direction_up, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.UP));
+            // dom.createEntity(
+            //         new Position(new PVector(100, 100)),
+            //         new Velocity(0.5f),
+            //         Collider.BasicCollider(playerWidth, playerWidth),
+            //         new Body(),
+            //         new Grabbable(),
+            //         new Box(Box_Plugin.change_direction_up, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.UP));
 
-            dom.createEntity(
-                    new Position(new PVector(100, 200)),
-                    new Velocity(0.5f),
-                    Collider.BasicCollider(playerWidth, playerWidth),
-                    new Body(),
-                    new Grabbable(),
-                    new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.DOWN));
-
-
-            dom.createEntity(
-                    new Position(new PVector(110, game.scale * 0.9f)),
-                    new Docking_Plugin.Docking(new PVector(playerWidth, playerWidth), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
-                            new Docking_Plugin.Docking.Text("Gravity goes ", new PVector(10, game.scale * 0.9f), new PVector(100, playerHeight)))
-            );
-
-            Entity dock = dom.findEntitiesWith(Docking_Plugin.Docking.class).stream().findFirst().get().entity();
-            Entity box = dom.findEntitiesWith(Box.class).stream().findFirst().get().entity();
-            box.removeType(Velocity.class);
-            box.get(Body.class).disableCollision();
-            dock.get(Docking_Plugin.Docking.class).insert_new_rule(box, dock.get(Position.class).position, game);
+            // dom.createEntity(
+            //         new Position(new PVector(100, 200)),
+            //         new Velocity(0.5f),
+            //         Collider.BasicCollider(playerWidth, playerWidth),
+            //         new Body(),
+            //         new Grabbable(),
+            //         new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.DOWN));
 
 
-            dom.createEntity(
-                    new Position(new PVector(100 - playerWidth/2, 100 - playerHeight/2)),
-                    new Velocity(),
-                    new Player(playerWidth, playerHeight),
-                    new Grab(40),
-                    new Sprite(game.loadImage("player.png"), playerWidth, playerHeight),
-                    new PlayerMovement(game.scale/3f, game.scale/40f, game.scale/40f, game.scale/100f, game.scale/40f, game.scale/2000f, game.scale/800f),
-                    new Body(),
-                    Collider.BasicCollider(playerWidth, playerHeight)
-            );
+            // dom.createEntity(
+            //         new Position(new PVector(110, game.scale * 0.9f)),
+            //         new Docking_Plugin.Docking(new PVector(playerWidth, playerWidth), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
+            //                 new Docking_Plugin.Docking.Text("Gravity goes ", new PVector(10, game.scale * 0.9f), new PVector(100, playerHeight)))
+            // );
+
+            // Entity dock = dom.findEntitiesWith(Docking_Plugin.Docking.class).stream().findFirst().get().entity();
+            // Entity box = dom.findEntitiesWith(Box.class).stream().findFirst().get().entity();
+            // box.removeType(Velocity.class);
+            // box.get(Body.class).disableCollision();
+            // dock.get(Docking_Plugin.Docking.class).insert_new_rule(box, dock.get(Position.class).position, game);
+
+
+            // dom.createEntity(
+            //         new Position(new PVector(100 - playerWidth/2, 100 - playerHeight/2)),
+            //         new Velocity(),
+            //         new Player(playerWidth, playerHeight),
+            //         new Grab(40),
+            //         new Sprite(game.loadImage("player.png"), playerWidth, playerHeight),
+            //         new PlayerMovement(game.scale/3f, game.scale/40f, game.scale/40f, game.scale/100f, game.scale/40f, game.scale/2000f, game.scale/800f),
+            //         new Body(),
+            //         Collider.BasicCollider(playerWidth, playerHeight)
+            // );
 
             int doorWidth = playerWidth / 2;
             int doorHeight = playerHeight;
@@ -274,12 +280,12 @@ public class Game_Plugin implements Plugin_Interface {
             // create two Door for testing
             dom.createEntity(
                     new Position(new PVector(100, 100)),
-                    new Door(doorWidth, doorHeight, null),
+                    new Door(doorWidth, doorHeight),
                     new Collider(new BasicCollider(doorWidth, doorHeight)));
 
             dom.createEntity(
                         new Position(new PVector(100, 50)),
-                        new Door(doorWidth, doorHeight, null),
+                        new Door(doorWidth, doorHeight),
                         new Collider(new BasicCollider(doorWidth, doorHeight)));
 
 
@@ -312,26 +318,26 @@ public class Game_Plugin implements Plugin_Interface {
             // assigns a button to the associated door or changes direction of gravity on push - will need to change this so that
             // this is encoded in the JSON rather
 
-            Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
-            With2<Door, Position> door1 = doors.next();
-            With2<Door, Position> door2 = doors.next();
+            // Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
+            // With2<Door, Position> door1 = doors.next();
+            // With2<Door, Position> door2 = doors.next();
 
-            Button button = dom.findEntitiesWith(Button.class).iterator().next().comp();
+            // Button button = dom.findEntitiesWith(Button.class).iterator().next().comp();
 
             //Testing event listener behaviours for door that is opened by button / changes gravity
-            button.addEventListener(new ButtonEventListener() {
+            // button.addEventListener(new ButtonEventListener() {
 
-                @Override
-                public void onPush() {
-                    door1.comp1().moveDoor(game, door1.comp2().position, button); //this is for a singular door but could be changed to deal with all doors
-                }
+            //     @Override
+            //     public void onPush() {
+            //         door1.comp1().moveDoor(game, door1.comp2().position, button); //this is for a singular door but could be changed to deal with all doors
+            //     }
 
-                @Override
-                public void onRelease() {
-                    door1.comp1().moveDoor(game, door1.comp2().position, button);
-                }
+            //     @Override
+            //     public void onRelease() {
+            //         door1.comp1().moveDoor(game, door1.comp2().position, button);
+            //     }
 
-            });
+            // });
 
             //This works for changing the direction of gravity
             // button.addEventListener(new ButtonEventListener() {
@@ -352,18 +358,18 @@ public class Game_Plugin implements Plugin_Interface {
             // });
 
 
-            button.addEventListener(new ButtonEventListener() {
-                @Override
-                public void onPush() {
-                    door2.comp1().moveDoor(game, door2.comp2().position, button);
-                }
+            // button.addEventListener(new ButtonEventListener() {
+            //     @Override
+            //     public void onPush() {
+            //         door2.comp1().moveDoor(game, door2.comp2().position, button);
+            //     }
 
-                @Override
-                public void onRelease() {
-                    door2.comp1().moveDoor(game, door2.comp2().position, button);
-                }
+            //     @Override
+            //     public void onRelease() {
+            //         door2.comp1().moveDoor(game, door2.comp2().position, button);
+            //     }
 
-            });
+            // });
 
         }
 

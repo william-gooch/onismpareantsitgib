@@ -14,6 +14,7 @@ import processing.core.PImage;
 public class Assets_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
+        System.out.println("creating asset manager");
         Resource.add(game, new AssetManager(game));
     }
 
