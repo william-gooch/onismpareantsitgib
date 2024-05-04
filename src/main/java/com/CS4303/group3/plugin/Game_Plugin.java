@@ -410,7 +410,13 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         private void createTitleScreen(Dominion dom) {
-            dom.createEntity(new TextScreen("OH NO! I sent my professor a rude email and need to sneak in to get it back", "Press [SPACE] to play."));
+            // dom.createEntity(new TextScreen("OH NO! I sent my professor a rude email and need to sneak in to get it back", "Press [SPACE] to play."));
+            AssetManager am = Resource.get(game, AssetManager.class);
+            PImage logo = am.getResource(PImage.class, "logo.png");
+            dom.createEntity(
+                new Position(new PVector(game.width/2 - logo.width/2, game.height/2 - logo.height/2)),
+                new Sprite(logo)
+            );
         }
     }
 

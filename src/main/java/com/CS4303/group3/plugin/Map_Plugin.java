@@ -13,6 +13,7 @@ import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
+import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
@@ -201,17 +202,31 @@ public class Map_Plugin implements Plugin_Interface {
                                 @Override
                                 public void onPush() {
                                     e.get(StateSprite.class).setState("on");
-                                    var door = objects.get(obj.getProperty("trigger"));
-                                    door.get(Door.class).open.change(true);
-                                    door.get(Door.class).moveDoor(game, door.get(Position.class).position);
+                                    var triggerObj = obj.getProperty("trigger");
+                                    if(triggerObj != null) {
+                                        var triggerEntity = objects.get(triggerObj);
+                                        if(triggerEntity != null) {
+                                            var trigger = triggerEntity.get(Trigger.class);
+                                            if(trigger != null) {
+                                                trigger.trigger(game, triggerEntity, true);
+                                            }
+                                        }
+                                    }
                                 }
 
                                 @Override
                                 public void onRelease() {
                                     e.get(StateSprite.class).setState("off");
-                                    var door = objects.get(obj.getProperty("trigger"));
-                                    door.get(Door.class).open.change(false);
-                                    door.get(Door.class).moveDoor(game, door.get(Position.class).position);
+                                    var triggerObj = obj.getProperty("trigger");
+                                    if(triggerObj != null) {
+                                        var triggerEntity = objects.get(triggerObj);
+                                        if(triggerEntity != null) {
+                                            var trigger = triggerEntity.get(Trigger.class);
+                                            if(trigger != null) {
+                                                trigger.trigger(game, triggerEntity, false);
+                                            }
+                                        }
+                                    }
                                 }
                                 
                             });
@@ -247,6 +262,12 @@ public class Map_Plugin implements Plugin_Interface {
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
                         } else {
                             e = null;
+                        }
+                        if(obj.getProperty("onTrigger") != null) {
+                            Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
+                            if(trigger != null) {
+                                e.add(trigger);
+                            }
                         }
                         objects.put(obj, e);
                     }
