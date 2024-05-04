@@ -51,6 +51,9 @@ public class Game_Plugin implements Plugin_Interface {
             if(input.isLastKeyDown(input.keybinds.get(InputSystem.keys.SETTINGS))) {
                 wm.settings();
             }
+            if(input.isLastKeyDown('R')) {
+                wm.restartLevel();
+            }
         });
 
         game.schedule.update(() -> {
@@ -125,8 +128,8 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         public void clearWorld() {
-            game.dom.findAllEntities()
-                    .stream().filter(e -> !e.has(ResourceEntity.class)).forEach(e -> game.dom.deleteEntity(e));
+            game.dom.findEntitiesWith(Position.class)
+                .stream().forEach(p -> game.dom.deleteEntity(p.entity()));
         }
 
         public void clearText() {
@@ -220,13 +223,13 @@ public class Game_Plugin implements Plugin_Interface {
 
             // create button for testing
             float loweringSpeed = 0.2f;
-            dom.createEntity(
-                    new Position(new PVector(150, 100)),
-                    new Button(playerWidth, playerHeight, loweringSpeed),
-                    new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
-                        self.get(Button.class).pushed = true;
-                        self.get(Button.class).lastPushed = 0;
-                    }));
+            // dom.createEntity(
+            //         new Position(new PVector(150, 100)),
+            //         new Button(playerWidth, playerHeight, loweringSpeed),
+            //         new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
+            //             self.get(Button.class).pushed = true;
+            //             self.get(Button.class).lastPushed = 0;
+            //         }));
 
             //initialise forces
             dom.createEntity(new Gravity());
@@ -278,15 +281,15 @@ public class Game_Plugin implements Plugin_Interface {
             int doorHeight = playerHeight;
 
             // create two Door for testing
-            dom.createEntity(
-                    new Position(new PVector(100, 100)),
-                    new Door(doorWidth, doorHeight),
-                    new Collider(new BasicCollider(doorWidth, doorHeight)));
+            // dom.createEntity(
+            //         new Position(new PVector(100, 100)),
+            //         new Door(doorWidth, doorHeight),
+            //         new Collider(new BasicCollider(doorWidth, doorHeight)));
 
-            dom.createEntity(
-                        new Position(new PVector(100, 50)),
-                        new Door(doorWidth, doorHeight),
-                        new Collider(new BasicCollider(doorWidth, doorHeight)));
+            // dom.createEntity(
+            //             new Position(new PVector(100, 50)),
+            //             new Door(doorWidth, doorHeight),
+            //             new Collider(new BasicCollider(doorWidth, doorHeight)));
 
 
 
