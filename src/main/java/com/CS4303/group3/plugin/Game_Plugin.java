@@ -297,21 +297,21 @@ public class Game_Plugin implements Plugin_Interface {
             test_path[2] = new PVector(300,300);
             test_path[3] = new PVector(300,100);
 
-            dom.createEntity(
-                    new Position(new PVector(100,100)),
-                    new Enemy_Plugin.Basic_AI(test_path),
-                    new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
-                        if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
-                            System.out.println("Damaged Player, player is now invulnerable");
-                            other.get(Player.class).lives--;
-                            if (other.get(Player.class).lives <= 0) {
-                                //player has died, restart the level
-                                System.out.println("Player has died");
-                            }
-                            other.get(Player.class).invulnerability = 1f;
-                        }
-                    }, false)
-            );
+            // dom.createEntity(
+            //         new Position(new PVector(100,100)),
+            //         new Enemy_Plugin.Basic_AI(test_path),
+            //         new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
+            //             if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
+            //                 System.out.println("Damaged Player, player is now invulnerable");
+            //                 other.get(Player.class).lives--;
+            //                 if (other.get(Player.class).lives <= 0) {
+            //                     //player has died, restart the level
+            //                     System.out.println("Player has died");
+            //                 }
+            //                 other.get(Player.class).invulnerability = 1f;
+            //             }
+            //         }, false)
+            // );
 
             //Initialise button chained
 

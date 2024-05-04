@@ -10,6 +10,7 @@ import com.CS4303.group3.plugin.Button_Plugin.ButtonEventListener;
 import com.CS4303.group3.plugin.Door_Plugin.Door;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
+import com.CS4303.group3.plugin.Player_Plugin.Player;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
@@ -30,23 +31,12 @@ public class Map_Plugin implements Plugin_Interface {
     public void build(Game game) {
         this.dom = game.dom;
 
-//         game.schedule.draw(-5, draw -> {
-//             dom.findEntitiesWith(Ground.class, Position.class)
-//                 .stream().forEach(entity -> {
-//                     Ground ground = entity.comp1();
-//                     PVector position = entity.comp2().position;
-//                     draw.call(drawing -> {
-//                         drawing.push();
-//                         ground.draw(drawing, position);
-//                         drawing.pop();
-//                     });
-//                 });
-//         });
-
         game.schedule.draw(-10, draw -> {
-            dom.findEntitiesWith(Position.class, RenderTile.class)
-                .stream().forEach(entity -> {
-                    draw.call(drawing -> {
+            draw.call(drawing -> {
+                dom.findEntitiesWith(Position.class, RenderTile.class)
+                    .stream()
+                    .sorted((a, b) -> Integer.compare(a.comp2().layer(), b.comp2().layer()))
+                    .forEach(entity -> {
                         drawing.image(entity.comp2().tileImage(), entity.comp1().position.x, entity.comp1().position.y, entity.comp2().width(), entity.comp2().height());
                     });
                 });
@@ -79,7 +69,8 @@ public class Map_Plugin implements Plugin_Interface {
     static record RenderTile(
         PImage tileImage,
         float width,
-        float height
+        float height,
+        int layer
     ) { }
 
     static class TileMap {
@@ -103,7 +94,7 @@ public class Map_Plugin implements Plugin_Interface {
             this(game, map, (float)game.width / ((map.getWidth()) * map.getTileWidth()));
         }
 
-        private Entity createRenderTileFromTile(TiledTile tile, float x, float y) {
+        private Entity createRenderTileFromTile(TiledTile tile, float x, float y, int layer) {
             AssetManager assets = Resource.get(game, AssetManager.class);
 
             // asset manager caches the image so it's not a worry if it gets the same image a bunch of times
@@ -118,7 +109,7 @@ public class Map_Plugin implements Plugin_Interface {
             // return next.getImage().getSource();
             var e = game.dom.createEntity(
                 new Position(new PVector(x * tileScale, y * tileScale)),
-                new RenderTile(tileImage, map.getTileWidth() * tileScale, map.getTileHeight() * tileScale)
+                new RenderTile(tileImage, map.getTileWidth() * tileScale, map.getTileHeight() * tileScale, layer)
             );
 
             if(!tile.getCollisionObjects().isEmpty()) {
@@ -158,6 +149,7 @@ public class Map_Plugin implements Plugin_Interface {
         }
 
         public void generateRenderTiles() {
+            int layerIdx = 0;
             for(var layer : map.getNonGroupLayers()) {
                 if(TiledTileLayer.class.isInstance(layer)) {
                     TiledTileLayer tileLayer = (TiledTileLayer) layer;
@@ -166,10 +158,11 @@ public class Map_Plugin implements Plugin_Interface {
                             var tile = tileLayer.getTile(x, y);
 
                             if(tile != null) {
-                                createRenderTileFromTile(tile, x * map.getTileWidth(), y * map.getTileHeight());
+                                createRenderTileFromTile(tile, x * map.getTileWidth(), y * map.getTileHeight(), layerIdx);
                             }
                         }
                     }
+                    layerIdx++;
                 }
             }
         }
@@ -234,6 +227,22 @@ public class Map_Plugin implements Plugin_Interface {
                             e.add(new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale)));
                             e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                             e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                        } else if(obj.getType().equals("enemy")) {
+                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                            TiledObject path = (TiledObject) obj.getProperty("path");
+                            PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
+                            e.add(new Enemy_Plugin.Basic_AI(points));
+                            e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
+                                if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
+                                    System.out.println("Damaged Player, player is now invulnerable");
+                                    other.get(Player.class).lives--;
+                                    if (other.get(Player.class).lives <= 0) {
+                                        //player has died, restart the level
+                                        System.out.println("Player has died");
+                                    }
+                                    other.get(Player.class).invulnerability = 1f;
+                                }
+                            }, false));
                         } else if(obj.getTile() != null) { // fallback for visual-only elements
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
                         } else {

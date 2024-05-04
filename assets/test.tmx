@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="9">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="11">
  <tileset firstgid="1" source="tiles.tsx"/>
+ <layer id="4" name="Tile Layer 2" width="10" height="10">
+  <data encoding="csv">
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6
+</data>
+ </layer>
  <layer id="1" name="Tile Layer 1" width="10" height="10">
   <data encoding="csv">
 9,15,15,15,15,15,15,15,15,9,
@@ -9,8 +23,8 @@
 10,0,20,21,21,21,22,0,0,8,
 10,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,8,
-10,0,3,3,3,3,19,4,0,8,
-10,0,15,15,15,15,15,16,0,14,
+10,0,2,3,3,3,19,4,0,8,
+10,0,14,15,15,15,15,16,0,14,
 10,0,0,0,0,0,0,0,0,0,
 9,3,3,3,3,3,3,3,3,3
 </data>
@@ -29,6 +43,14 @@
    <properties>
     <property name="onImage" type="int" value="17"/>
     <property name="trigger" type="object" value="7"/>
+   </properties>
+  </object>
+  <object id="9" name="Enemy Path" type="path" x="39.7609" y="39.7609">
+   <polyline points="0,0 15.6364,49.1384 48.5758,48.7633 64.9337,-0.193284"/>
+  </object>
+  <object id="10" name="Enemy" type="enemy" gid="1" x="35.6996" y="43.6974" width="8" height="8">
+   <properties>
+    <property name="path" type="object" value="9"/>
    </properties>
   </object>
  </objectgroup>
