@@ -23,17 +23,7 @@ public class Sprite_Plugin implements Plugin_Interface {
         game.schedule.draw(draw -> {
             dom.findEntitiesWith(Position.class, Sprite.class)
                 .stream().forEach(sprite -> {
-                    boolean flipX = sprite.comp2().flipX;
-                    boolean flipY = sprite.comp2().flipY;
-                    draw.call(drawing -> {
-                        drawing.push();
-                        drawing.translate(sprite.comp1().position.x, sprite.comp1().position.y);
-                        drawing.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-                        drawing.translate(-sprite.comp2().anchorPoint.x, -sprite.comp2().anchorPoint.y);
-                        drawing.translate((flipX ? -1 : 1) * sprite.comp2().width / 2, (flipY ? -1 : 1) * sprite.comp2().height / 2);
-                        drawing.image(sprite.comp2().image, 0, 0, sprite.comp2().width, sprite.comp2().height);
-                        drawing.pop();
-                    });
+                    draw.call(drawing -> sprite.comp2().draw(drawing, sprite.comp1().position));
                 });
         });
 
@@ -44,17 +34,7 @@ public class Sprite_Plugin implements Plugin_Interface {
                     if(currentSprite == null) {
                         return;
                     }
-                    boolean flipX = currentSprite.flipX;
-                    boolean flipY = currentSprite.flipY;
-                    draw.call(drawing -> {
-                        drawing.push();
-                        drawing.translate(sprite.comp1().position.x, sprite.comp1().position.y);
-                        drawing.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-                        drawing.translate(-currentSprite.anchorPoint.x, -currentSprite.anchorPoint.y);
-                        drawing.translate((flipX ? -1 : 1) * currentSprite.width / 2, (flipY ? -1 : 1) * currentSprite.height / 2);
-                        drawing.image(currentSprite.image, 0, 0, currentSprite.width, currentSprite.height);
-                        drawing.pop();
-                    });
+                    draw.call(drawing -> currentSprite.draw(drawing, sprite.comp1().position));
                 });
         });
     }
@@ -63,6 +43,7 @@ public class Sprite_Plugin implements Plugin_Interface {
         PImage image;
         float width;
         float height;
+        float rotation = 0;
         PVector anchorPoint;
         boolean flipX = false;
         boolean flipY = false;
@@ -71,14 +52,14 @@ public class Sprite_Plugin implements Plugin_Interface {
             this.image = image;
             this.width = image.width;
             this.height = image.height;
-            this.anchorPoint = new PVector(width / 2, height / 2);
+            this.anchorPoint = new PVector(0.5f, 0.5f);
         }
 
         Sprite(PImage image, float width, float height) {
             this.image = image;
             this.width = width;
             this.height = height;
-            this.anchorPoint = new PVector(width / 2, height / 2);
+            this.anchorPoint = new PVector(0.5f, 0.5f);
         }
 
         Sprite(PImage image, float width, float height, PVector anchorPoint) {
@@ -86,6 +67,27 @@ public class Sprite_Plugin implements Plugin_Interface {
             this.width = width;
             this.height = height;
             this.anchorPoint = anchorPoint;
+        }
+
+        public void draw(Game drawing, PVector position) {
+            drawing.push();
+
+            // move to correct location
+            drawing.translate(position.x, position.y);
+
+            // rotate around anchor point
+            drawing.translate(width / 2, height / 2);
+            drawing.rotate(rotation);
+            drawing.translate(-width / 2, -height / 2);
+
+            // flip
+            drawing.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+            drawing.translate(-anchorPoint.x * width, -anchorPoint.y * height);
+
+            // go to middle of sprite
+            drawing.translate((flipX ? -1 : 1) * width / 2, (flipY ? -1 : 1) * height / 2);
+            drawing.image(image, 0, 0, width, height);
+            drawing.pop();
         }
     }
 
