@@ -103,6 +103,13 @@ public class Game extends PApplet {
             else if(gravity.y > 0) target_rotation = 0;
             else if(gravity.x > 0) target_rotation = HALF_PI;
             else if(gravity.x < 0) target_rotation = -HALF_PI;
+
+            if(initial_rotation == -HALF_PI && target_rotation == PI) {
+                initial_rotation = 3*HALF_PI;
+            }
+            if(initial_rotation == PI && target_rotation == -HALF_PI) {
+                initial_rotation = -PI;
+            }
         }
 
         rotation = lerp(initial_rotation, target_rotation, rotation_time);
@@ -111,7 +118,6 @@ public class Game extends PApplet {
             initial_rotation = target_rotation;
         }
         translate(scale/2, scale/2);
-        System.out.println(rotation);
         rotate(rotation);
         translate(-scale/2, -scale/2);
         ops.stream()
