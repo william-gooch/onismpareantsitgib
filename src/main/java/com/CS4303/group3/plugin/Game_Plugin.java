@@ -102,6 +102,9 @@ public class Game_Plugin implements Plugin_Interface {
                 drawing.fill(255, 0, 255);
                 drawing.textAlign(PConstants.LEFT, PConstants.TOP);
                 drawing.text("Level: " + wm.level, 20, 20);
+                drawing.textAlign(PConstants.RIGHT, PConstants.TOP);
+                Player player = Resource.get(game, Player.class);
+                if(player != null) drawing.text("Lives: " + player.lives, game.scale-20, 20);
                 drawing.pop();
             });
         });
