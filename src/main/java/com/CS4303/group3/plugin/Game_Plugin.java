@@ -214,6 +214,7 @@ public class Game_Plugin implements Plugin_Interface {
 
             AssetManager am = Resource.get(game, AssetManager.class);
             TiledMap m = am.getResource(TiledMap.class, "test"+level+".tmx");
+            //TiledMap m = am.getResource(TiledMap.class, "testmap"+level+".tmx");
             //TiledMap m = am.getResource(TiledMap.class, "test.tmx");
             dom.createEntity(
                 new TileMap(game, m)
@@ -233,6 +234,17 @@ public class Game_Plugin implements Plugin_Interface {
             //             self.get(Button.class).pushed = true;
             //             self.get(Button.class).lastPushed = 0;
             //         }));
+
+            dom.createEntity(
+                new Position(new PVector(200,400)),
+                new Collider(new BasicCollider(100, 100), (self, other) -> {
+                    if(other.has(Player.class)) {
+                        var wm = Resource.get(game, WorldManager.class);
+                        wm.newLevel();
+                        System.out.println("Test");
+                    }
+                })
+            );
 
             //initialise forces
             Gravity g = new Gravity();
@@ -384,8 +396,11 @@ public class Game_Plugin implements Plugin_Interface {
 
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
-            float playerWidth = 13 * scale;
-            float playerHeight = 18 * scale;
+            //float playerWidth = 13 * scale;
+            //float playerHeight = 18 * scale;
+
+            float playerWidth = 10 * scale;
+            float playerHeight = 15 * scale;
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),

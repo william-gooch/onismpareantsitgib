@@ -189,39 +189,84 @@ public class Player_Plugin implements Plugin_Interface {
         
         // check if player has reached the end of the level
         game.schedule.update(() -> {
-            dom.findEntitiesWith(Position.class, Player.class)
+            dom.findEntitiesWith(Position.class, Player.class, Collider.class)
                     .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        if (dom.findEntitiesWith(Door.class, Position.class)
+                        var playerPos = res.comp1().position;
+                        var playerCollider = res.comp3().collider;
+                        if (dom.findEntitiesWith(Door.class,  Position.class, Collider.class)
                                 .stream().anyMatch(exit -> {
                                     var doorPos = exit.comp2().position;
-                                    var gravity = Resource.get(game, Gravity.class);
+                                    //var gravity = Resource.get(game, Gravity.class);
+                                    var doorCollider = res.comp3().collider;
+
+                                    // if(gravity.gravity().x > 0){
+
+                                    //     var p = res.comp1().position;
+                                    //     System.out.println("Gravity is facing right");
+                                        
+                                    // }
                                     if (exit.comp1().isExit && exit.comp1().isOpen()) {
                                                                                     //assuming the door is on the right side of the screen when gravity is facing down
                                         
-                                        if (gravity.gravity().y > 0) {//gravity down
-                                            if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x > game.width) {
-                                                return true;
-                                            }
                                         
-                                        } else if (gravity.gravity().y < 0) { // gravity up
-
-                                            if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x < 0) {
-                                                return true;
-                                            }
                                         
-                                        } else if (gravity.gravity().x > 0) { // gravity right
-                                            if(pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y > game.height) {
-                                                return true;
-                                            }
-           
-                                        } else if (gravity.gravity().x < 0) { // gravity left
+                                                                                    // if(gravity.gravity().x > 0){
+                                        //     PVector playerPos = res.comp1().position;
+                                        //     float startX = doorPos.x - exit.comp1().maxHeight;
+                                        //     float endX = doorPos.x;
+                                        //     System.out.println("Player position: " + playerPos.x);
+                                        // }
+                                        // if(gravity.gravity().x > 0 && pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y > game.height) {
+                                            
+                                        //     System.out.println("Player has reached the end of the level");
+                                        // }
 
-                                            if(pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y < 0) {
-                                                return true;
-                                            } 
+                                    //     if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x > game.width ){
+                                           
+                                    //         return true;
+                                       
+                                    // }
 
-                                        }
+                                        //  if (gravity.gravity().y > 0) {//gravity down
+                                        //     if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x > game.width) {
+                                        //         return true;
+                                        //     }
+                                        
+                                        // } else if (gravity.gravity().y < 0) { // gravity up
+                                        //     System.out.println("Player position: " + pos.x + " " + pos.y);
+                                        //     System.out.println("game width: " + game.width);  
+                                        //     System.out.println("game height: " + game.height);  
+                                        //     System.out.println("door position: " + doorPos.x + " " + doorPos.y);
+                                        //     System.out.println("door height: " + exit.comp1().maxHeight);
+                                        //     System.out.println("door width: " + exit.comp1().maxWidth);
+                                        //     System.out.println("stat door position: " +doorPos.x +" "+ (doorPos.y - exit.comp1().maxHeight));
+                                        //     if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x < 0) {
+                                        //         return true;
+                                        //     }
+                                        
+                                        // } else if (gravity.gravity().x > 0) { // gravity right*
+                                        //     //if(pos.x <= (doorPos.x - exit.comp1().maxHeight) && pos.x >= doorPos.x && pos.y > game.height) {
+                                      
+                                           
+                                        // } else if (gravity.gravity().x < 0) { // gravity left
+
+                                        //     if(pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y < 0) {
+                                        //         return true;
+                                        //     } 
+
+                                        // }
+
+                                        System.out.println("Player position: " + playerPos.x + " " + playerPos.y);
+                                        System.out.println("Door position: " + doorPos.x + " " + doorPos.y);
+                                        Position oldPos = new Position();
+                                       //oldPos = oldPos.copy(res.comp1());
+
+                                        oldPos.position.y = exit.comp2().position.y - exit.comp1().maxHeight;
+                                        // Contact c = collider.collide(res.comp1(),exit.comp3().collider , oldPos);
+                                        // if(c != null) {
+                                        //     return true;
+                                        // }
+                                        
                                       
                                     }
                                     return false;
