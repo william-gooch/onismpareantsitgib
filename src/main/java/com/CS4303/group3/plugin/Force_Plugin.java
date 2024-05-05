@@ -63,6 +63,10 @@ public class Force_Plugin implements Plugin_Interface {
 
     public static class Gravity extends Changeable.Changeable_Direction {
 
+        public Gravity(PVector value) {
+            super(value);
+        }
+
         public Gravity() {
             super(new PVector(0,0));
         }

@@ -185,7 +185,7 @@ public class Map_Plugin implements Plugin_Interface {
                             e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                         } else if(obj.getType().equals("player_spawn")) {
                             WorldManager wm = Resource.get(game, WorldManager.class);
-                            wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale);
+                            wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale, tileScale);
                             e = null;
                         } else if(obj.getType().equals("button")) {
                             PImage offImage = getTileImage(obj.getTile());
@@ -260,6 +260,9 @@ public class Map_Plugin implements Plugin_Interface {
                                     other.get(Player.class).invulnerability = 1f;
                                 }
                             }, false));
+                        } else if(obj.getType().equals("gravity")) {
+                            e = game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 0.1f, obj.getY() * tileScale * 0.1f)));
+                            System.out.println("Created gravity, " + tileScale);
                         } else if(obj.getType().equals("dock")) {
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
                             e.add(new Docking_Plugin.Docking(

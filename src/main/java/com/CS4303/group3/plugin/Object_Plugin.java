@@ -16,7 +16,7 @@ import processing.core.PVector;
 
 public class Object_Plugin implements Plugin_Interface {
     Dominion dom;
-    static final float EPSILON = .5f;
+    static final float EPSILON = .001f;
 
     @Override
     public void build(Game game) {
