@@ -24,6 +24,7 @@ import dev.dominion.ecs.api.Entity;
 import processing.core.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.tiledreader.*;
 
@@ -176,103 +177,15 @@ public class Map_Plugin implements Plugin_Interface {
                     TiledObjectLayer objectLayer = (TiledObjectLayer) layer;
                     for(var obj : objectLayer.getObjects()) {
                         Entity e;
-                        if(obj.getType().equals("block") && obj.getTile() != null) {
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
-                            e.add(new Velocity(0.5f));
-                            e.add(new Body());
-                            e.add(new Grabbable());
-                            e.add(new Box(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
-                            e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                        } else if(obj.getType().equals("player_spawn")) {
-                            WorldManager wm = Resource.get(game, WorldManager.class);
-                            wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale, tileScale);
-                            e = null;
-                        } else if(obj.getType().equals("button")) {
-                            PImage offImage = getTileImage(obj.getTile());
-                            PImage onImage = getTileImage(obj.getTile().getTileset().getTile((int) obj.getProperty("onImage")));
-                            StateSprite sprite = new StateSprite();
-                            sprite.addState("off", new Sprite(offImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                            sprite.addState("on", new Sprite(onImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                            sprite.setState("off");
-                            e = game.dom.createEntity(
-                                new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
-                                sprite
-                            );
-                            Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale), 0.25f);
-                            button.addEventListener(new ButtonEventListener() {
-
-                                @Override
-                                public void onPush() {
-                                    e.get(StateSprite.class).setState("on");
-                                    var triggerObj = obj.getProperty("trigger");
-                                    if(triggerObj != null) {
-                                        var triggerEntity = objects.get(triggerObj);
-                                        if(triggerEntity != null) {
-                                            var trigger = triggerEntity.get(Trigger.class);
-                                            if(trigger != null) {
-                                                trigger.trigger(game, triggerEntity, true);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onRelease() {
-                                    e.get(StateSprite.class).setState("off");
-                                    var triggerObj = obj.getProperty("trigger");
-                                    if(triggerObj != null) {
-                                        var triggerEntity = objects.get(triggerObj);
-                                        if(triggerEntity != null) {
-                                            var trigger = triggerEntity.get(Trigger.class);
-                                            if(trigger != null) {
-                                                trigger.trigger(game, triggerEntity, false);
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                            });
-                            e.add(button);
-                            e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), 
-                                (self, other) -> {
-                                    self.get(Button.class).pushed = true;
-                                    self.get(Button.class).lastPushed = 0;
-                                })
-                            );
-                        } else if(obj.getType().equals("door")) {
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
-                            e.add(new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale)));
-                            e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                            e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
-                        } else if(obj.getType().equals("enemy")) {
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
-                            TiledObject path = (TiledObject) obj.getProperty("path");
-                            PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
-                            e.add(new Enemy_Plugin.Basic_AI(points));
-                            e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
-                                if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
-                                    System.out.println("Damaged Player, player is now invulnerable");
-                                    other.get(Player.class).lives--;
-                                    if (other.get(Player.class).lives <= 0) {
-                                        //player has died, restart the level
-                                        System.out.println("Player has died");
-                                    }
-                                    other.get(Player.class).invulnerability = 1f;
-                                }
-                            }, false));
-                        } else if(obj.getType().equals("gravity")) {
-                            e = game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 0.1f, obj.getY() * tileScale * 0.1f)));
-                            System.out.println("Created gravity, " + tileScale);
-                        } else if(obj.getType().equals("dock")) {
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
-                            e.add(new Docking_Plugin.Docking(
-                                new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                                null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class), null
-                            ));
-                        } else if(obj.getTile() != null) { // fallback for visual-only elements
-                            e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                        ObjectFactory factory = objectTypes.get(obj.getType());
+                        if(factory != null) {
+                            e = factory.construct(obj);
                         } else {
-                            e = null;
+                            if(obj.getTile() != null) {
+                                e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                            } else {
+                                e = null;
+                            }
                         }
                         if(obj.getProperty("onTrigger") != null) {
                             Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
@@ -285,5 +198,115 @@ public class Map_Plugin implements Plugin_Interface {
                 }
             }
         }
+
+        @FunctionalInterface
+        interface ObjectFactory {
+            Entity construct(TiledObject obj);
+        }
+
+        Map<String, ObjectFactory> objectTypes = Map.ofEntries(
+            Map.entry("player_spawn", obj -> {
+                WorldManager wm = Resource.get(game, WorldManager.class);
+                wm.createPlayer(game, obj.getX() * tileScale, obj.getY() * tileScale, tileScale);
+                return null;
+            }),
+            Map.entry("block", obj -> {
+                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                e.add(new Velocity(0.5f));
+                e.add(new Body());
+                e.add(new Grabbable());
+                e.add(new Box(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                return e;
+            }),
+            Map.entry("button", obj -> {
+                PImage offImage = getTileImage(obj.getTile());
+                PImage onImage = getTileImage(obj.getTile().getTileset().getTile((int) obj.getProperty("onImage")));
+                StateSprite sprite = new StateSprite();
+                sprite.addState("off", new Sprite(offImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                sprite.addState("on", new Sprite(onImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                sprite.setState("off");
+                Entity e = game.dom.createEntity(
+                    new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
+                    sprite
+                );
+                Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale), 0.25f);
+                button.addEventListener(new ButtonEventListener() {
+
+                    @Override
+                    public void onPush() {
+                        e.get(StateSprite.class).setState("on");
+                        var triggerObj = obj.getProperty("trigger");
+                        if(triggerObj != null) {
+                            var triggerEntity = objects.get(triggerObj);
+                            if(triggerEntity != null) {
+                                var trigger = triggerEntity.get(Trigger.class);
+                                if(trigger != null) {
+                                    trigger.trigger(game, triggerEntity, true);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onRelease() {
+                        e.get(StateSprite.class).setState("off");
+                        var triggerObj = obj.getProperty("trigger");
+                        if(triggerObj != null) {
+                            var triggerEntity = objects.get(triggerObj);
+                            if(triggerEntity != null) {
+                                var trigger = triggerEntity.get(Trigger.class);
+                                if(trigger != null) {
+                                    trigger.trigger(game, triggerEntity, false);
+                                }
+                            }
+                        }
+                    }
+                    
+                });
+                e.add(button);
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), 
+                    (self, other) -> {
+                        self.get(Button.class).pushed = true;
+                        self.get(Button.class).lastPushed = 0;
+                    })
+                );
+                return e;
+            }),
+            Map.entry("door", obj -> {
+                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                e.add(new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale)));
+                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                return e;
+            }),
+            Map.entry("enemy", obj -> {
+                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                TiledObject path = (TiledObject) obj.getProperty("path");
+                PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
+                e.add(new Enemy_Plugin.Basic_AI(points));
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
+                    if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
+                        System.out.println("Damaged Player, player is now invulnerable");
+                        other.get(Player.class).lives--;
+                        if (other.get(Player.class).lives <= 0) {
+                            //player has died, restart the level
+                            System.out.println("Player has died");
+                        }
+                        other.get(Player.class).invulnerability = 1f;
+                    }
+                }, false));
+                return e;
+            }),
+            Map.entry("dock", obj -> {
+                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                e.add(new Docking_Plugin.Docking(
+                    new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
+                    null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class), null
+                ));
+                return e;
+            }),
+            Map.entry("gravity", obj -> game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 0.1f, obj.getY() * tileScale * 0.1f))))
+        );
     }
 }
