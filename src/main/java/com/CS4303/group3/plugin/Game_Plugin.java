@@ -236,6 +236,8 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
+
+
             // create block for testing
             // dom.createEntity(
             //         new Position(new PVector(100, 100)),

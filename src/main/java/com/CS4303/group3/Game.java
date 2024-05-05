@@ -73,6 +73,7 @@ public class Game extends PApplet {
         addPlugin(new Sprite_Plugin());
         addPlugin(new Game_Plugin());
         addPlugin(new Docking_Plugin());
+        addPlugin(new Spike_Plugin());
 
 
         schedule._setup.tick();
