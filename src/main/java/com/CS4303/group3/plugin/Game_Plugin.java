@@ -102,6 +102,9 @@ public class Game_Plugin implements Plugin_Interface {
                 drawing.fill(255, 0, 255);
                 drawing.textAlign(PConstants.LEFT, PConstants.TOP);
                 drawing.text("Level: " + wm.level, 20, 20);
+                drawing.textAlign(PConstants.RIGHT, PConstants.TOP);
+                Player player = Resource.get(game, Player.class);
+                if(player != null) drawing.text("Lives: " + player.lives, game.scale-20, 20);
                 drawing.pop();
             });
         });
@@ -251,6 +254,22 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
+            dom.createEntity(
+                    new Position(new PVector(400, 810)),
+                    new Spike_Plugin.Spikes(400,10),
+                    new Collider(new BasicCollider(400,10), (self, other) -> {
+                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
+                            other.get(Player.class).lives--;
+                            if(other.get(Player.class).lives <= 0) {
+                                //player has died, restart the level
+                                System.out.println("Player has died");
+                            }
+                            other.get(Player.class).invulnerability = 1f;
+
+                        }
+                    })
+            );
+
             // create block for testing
             // dom.createEntity(
             //         new Position(new PVector(100, 100)),
@@ -396,11 +415,17 @@ public class Game_Plugin implements Plugin_Interface {
 
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
+<<<<<<< HEAD
             //float playerWidth = 13 * scale;
             //float playerHeight = 18 * scale;
 
             float playerWidth = 10 * scale;
             float playerHeight = 15 * scale;
+=======
+            float playerRatio = 36f / 26f;
+            float playerWidth = 10 * scale;
+            float playerHeight = playerWidth * playerRatio;
+>>>>>>> main
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
@@ -435,9 +460,13 @@ public class Game_Plugin implements Plugin_Interface {
             // dom.createEntity(new TextScreen("OH NO! I sent my professor a rude email and need to sneak in to get it back", "Press [SPACE] to play."));
             AssetManager am = Resource.get(game, AssetManager.class);
             PImage logo = am.getResource(PImage.class, "logo.png");
+            float logoRatio = PApplet.round((float)game.width / (float)logo.width),
+                  logoWidth = logo.width * logoRatio,
+                  logoHeight = logo.height * logoRatio;
+
             dom.createEntity(
-                new Position(new PVector(game.width/2 - logo.width/2, game.height/2 - logo.height/2)),
-                new Sprite(logo)
+                new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2)),
+                new Sprite(logo, logoWidth, logoHeight)
             );
         }
     }

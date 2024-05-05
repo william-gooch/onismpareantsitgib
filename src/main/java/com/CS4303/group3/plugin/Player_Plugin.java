@@ -52,6 +52,20 @@ public class Player_Plugin implements Plugin_Interface {
         });
 
         game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class)
+                .withAlso(Player.class)
+                .stream().forEach(player -> {
+                    if(player.comp().position.x < 0
+                    || player.comp().position.x > game.width
+                    || player.comp().position.y < 0
+                    || player.comp().position.y > game.width) {
+                        WorldManager wm = Resource.get(game, WorldManager.class);
+                        wm.gameOver();
+                    }
+                });
+        });
+
+        game.schedule.update(() -> {
             dom.findEntitiesWith(Position.class, Grab.class)
                 .stream().forEach(grabber -> {
                     if(grabber.comp2().grabObj != null) {
@@ -332,7 +346,7 @@ public class Player_Plugin implements Plugin_Interface {
             }
             if (input.isKeyDown(input.keybinds.get(InputSystem.keys.JUMP))) {
                 //jump if grounded
-                input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
+                // input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
                 pressDirection.y = -1;
             }
 

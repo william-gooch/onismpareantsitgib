@@ -7,7 +7,6 @@ import com.CS4303.group3.plugin.*;
 
 import dev.dominion.ecs.api.Dominion;
 import processing.core.*;
-import processing.opengl.PGraphicsOpenGL;
 
 public class Game extends PApplet {
     //Global Variables
@@ -16,6 +15,8 @@ public class Game extends PApplet {
     public float scale;
     public boolean paused = false;
     public float playerWidth, playerHeight;
+    public float rotation_time = 1;
+    public float rotation = 0f, initial_rotation = 0f, target_rotation = 0f;
 
     PriorityBlockingQueue<PriorityDrawOperation<?>> drawQueue = new PriorityBlockingQueue<PriorityDrawOperation<?>>();
 
@@ -38,7 +39,7 @@ public class Game extends PApplet {
 
         if(displayHeight > displayWidth) {
             scale = displayWidth;
-        } else scale = displayHeight * 0.5f;
+        } else scale = displayHeight * 0.8f;
 
         noSmooth();
 //        size((int)scale, (int)scale, P2D);
@@ -73,6 +74,7 @@ public class Game extends PApplet {
         addPlugin(new Sprite_Plugin());
         addPlugin(new Game_Plugin());
         addPlugin(new Docking_Plugin());
+        addPlugin(new Spike_Plugin());
 
 
         schedule._setup.tick();
@@ -94,25 +96,35 @@ public class Game extends PApplet {
 
         //rotate view with the gravity
         Force_Plugin.Gravity gravity_entity = Resource.get(this, Force_Plugin.Gravity.class);
+        rotation_time = Math.min(1f, rotation_time+schedule.dt());
         if(gravity_entity != null) {
             PVector gravity = gravity_entity.gravity();
-            if (gravity.y < 0) {
-                rotate(PI);
-                translate(-scale, -scale);
+            if(gravity.y < 0) target_rotation = PI;
+            else if(gravity.y > 0) target_rotation = 0;
+            else if(gravity.x > 0) target_rotation = HALF_PI;
+            else if(gravity.x < 0) target_rotation = -HALF_PI;
+
+            if(initial_rotation == -HALF_PI && target_rotation == PI) {
+                initial_rotation = 3*HALF_PI;
             }
-            if (gravity.x > 0) {
-                rotate(HALF_PI);
-                translate(0, -scale);
-            }
-            if (gravity.x < 0) {
-                rotate(-HALF_PI);
-                translate(-scale, 0);
+            if(initial_rotation == PI && target_rotation == -HALF_PI) {
+                initial_rotation = -PI;
             }
         }
+
+        rotation = lerp(initial_rotation, target_rotation, rotation_time);
+        if(rotation_time == 1f) {
+            //set the initial rotation
+            initial_rotation = target_rotation;
+        }
+        translate(scale/2, scale/2);
+        rotate(rotation);
+        translate(-scale/2, -scale/2);
         ops.stream()
             .forEach(op -> {
                 op.operation.perform(this);
             });
+
     }
 
     //Renderings
