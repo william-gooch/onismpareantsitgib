@@ -51,6 +51,9 @@ public class Game_Plugin implements Plugin_Interface {
             if(input.isLastKeyDown(input.keybinds.get(InputSystem.keys.SETTINGS))) {
                 wm.settings();
             }
+            if(input.isLastKeyDown('R')) {
+                wm.restartLevel();
+            }
         });
 
         game.schedule.update(() -> {
@@ -125,8 +128,8 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         public void clearWorld() {
-            game.dom.findAllEntities()
-                    .stream().filter(e -> !e.has(ResourceEntity.class)).forEach(e -> game.dom.deleteEntity(e));
+            game.dom.findEntitiesWith(Position.class)
+                .stream().forEach(p -> game.dom.deleteEntity(p.entity()));
         }
 
         public void clearText() {
@@ -215,18 +218,18 @@ public class Game_Plugin implements Plugin_Interface {
             
 //             int playerWidth = (int) (game.scale/30);
 //             int playerHeight = (int) (game.scale/30);
-            int playerWidth = (int) game.playerWidth;//26;
-            int playerHeight = (int) game.playerHeight;//36;
+            // int playerWidth = (int) game.playerWidth;//26;
+            // int playerHeight = (int) game.playerHeight;//36;
 
             // create button for testing
-            float loweringSpeed = 0.2f;
-            dom.createEntity(
-                    new Position(new PVector(150, 100)),
-                    new Button(playerWidth, playerHeight, loweringSpeed),
-                    new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
-                        self.get(Button.class).pushed = true;
-                        self.get(Button.class).lastPushed = 0;
-                    }));
+            // float loweringSpeed = 0.2f;
+            // dom.createEntity(
+            //         new Position(new PVector(150, 100)),
+            //         new Button(playerWidth, playerHeight, loweringSpeed),
+            //         new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
+            //             self.get(Button.class).pushed = true;
+            //             self.get(Button.class).lastPushed = 0;
+            //         }));
 
             //initialise forces
             Gravity g = new Gravity();
@@ -275,28 +278,28 @@ public class Game_Plugin implements Plugin_Interface {
             //         Collider.BasicCollider(playerWidth, playerHeight)
             // );
 
-            int doorWidth = playerWidth / 2;
-            int doorHeight = playerHeight;
+            // int doorWidth = playerWidth / 2;
+            // int doorHeight = playerHeight;
 
             // create two Door for testing
-            dom.createEntity(
-                    new Position(new PVector(100, 100)),
-                    new Door(doorWidth, doorHeight),
-                    new Collider(new BasicCollider(doorWidth, doorHeight)));
+            // dom.createEntity(
+            //         new Position(new PVector(100, 100)),
+            //         new Door(doorWidth, doorHeight),
+            //         new Collider(new BasicCollider(doorWidth, doorHeight)));
 
-            dom.createEntity(
-                        new Position(new PVector(100, 50)),
-                        new Door(doorWidth, doorHeight),
-                        new Collider(new BasicCollider(doorWidth, doorHeight)));
-
-
+            // dom.createEntity(
+            //             new Position(new PVector(100, 50)),
+            //             new Door(doorWidth, doorHeight),
+            //             new Collider(new BasicCollider(doorWidth, doorHeight)));
 
 
-            PVector[] test_path = new PVector[4];
-            test_path[0] = new PVector(100,100);
-            test_path[1] = new PVector(100,300);
-            test_path[2] = new PVector(300,300);
-            test_path[3] = new PVector(300,100);
+
+
+            // PVector[] test_path = new PVector[4];
+            // test_path[0] = new PVector(100,100);
+            // test_path[1] = new PVector(100,300);
+            // test_path[2] = new PVector(300,300);
+            // test_path[3] = new PVector(300,100);
 
             // dom.createEntity(
             //         new Position(new PVector(100,100)),
@@ -374,12 +377,12 @@ public class Game_Plugin implements Plugin_Interface {
 
         }
 
-        public void createPlayer(Game game, float x, float y) {
+        public void createPlayer(Game game, float x, float y, float scale) {
 
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
-            int playerWidth = 26;
-            int playerHeight = 36;
+            float playerWidth = 13 * scale;
+            float playerHeight = 18 * scale;
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
@@ -388,9 +391,9 @@ public class Game_Plugin implements Plugin_Interface {
                     playerImage,
                     playerWidth,
                     playerHeight,
-                    new PVector(9, 18)
+                    new PVector(0.25f, 0.5f)
                 ),
-                new Player(playerWidth, playerHeight),
+                new Player(),
                 new Grab(40),
                 new PlayerMovement(),
                 new Body(),

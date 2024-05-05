@@ -15,6 +15,7 @@ import com.CS4303.group3.utils.Collision.Contact;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
+import processing.core.PConstants;
 import processing.core.PVector;
 
 public class Player_Plugin implements Plugin_Interface {
@@ -27,6 +28,22 @@ public class Player_Plugin implements Plugin_Interface {
         this.dom = game.dom;
         playerHeight = (int) game.playerHeight;
         playerWidth = (int) game.playerWidth;
+
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Velocity.class, Sprite.class)
+                .withAlso(Player.class)
+                .stream().forEach(player -> {
+                    PVector gravity = Resource.get(game, Gravity.class).get();
+                    player.comp2().rotation = gravity.heading() - PConstants.PI/2;
+
+                    float velocityPerpToGravity = player.comp1().velocity.dot(gravity.copy().rotate(PConstants.PI/2));
+                    if(velocityPerpToGravity > 0) {
+                        player.comp2().flipX = true;
+                    } else {
+                        player.comp2().flipX = false;
+                    }
+                });
+        });
 
         game.schedule.update(() -> {
             dom.findEntitiesWith(Position.class, Grab.class)
@@ -165,20 +182,20 @@ public class Player_Plugin implements Plugin_Interface {
 
 
         //draw the player
-        game.schedule.draw(-1, draw -> {
-            dom.findEntitiesWith(Position.class, Player.class)
-                .stream().forEach(res -> {
-                    var pos = res.comp1().position;
-                    Gravity gravity = Resource.get(game, Gravity.class);
-                    draw.call(drawing -> {
-                        //draw the player character
-                        drawing.fill(128);
-                        if(res.comp2().invulnerability > 0f) drawing.fill(128,128);
-                        if(gravity == null || gravity.gravity().y != 0) drawing.rect(pos.x, pos.y, playerWidth, playerHeight);
-                        else drawing.rect(pos.x, pos.y, playerHeight, playerWidth);
-                    });
-                });
-        });
+        // game.schedule.draw(-1, draw -> {
+        //     dom.findEntitiesWith(Position.class, Player.class)
+        //         .stream().forEach(res -> {
+        //             var pos = res.comp1().position;
+        //             Gravity gravity = Resource.get(game, Gravity.class);
+        //             draw.call(drawing -> {
+        //                 //draw the player character
+        //                 drawing.fill(128);
+        //                 if(res.comp2().invulnerability > 0f) drawing.fill(128,128);
+        //                 if(gravity == null || gravity.gravity().y != 0) drawing.rect(pos.x, pos.y, playerWidth, playerHeight);
+        //                 else drawing.rect(pos.x, pos.y, playerHeight, playerWidth);
+        //             });
+        //         });
+        // });
     }
 
     static class PlayerMovement {
@@ -216,7 +233,7 @@ public class Player_Plugin implements Plugin_Interface {
             }
             if (input.isKeyDown(input.keybinds.get(InputSystem.keys.JUMP))) {
                 //jump if grounded
-                // input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
+                input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
                 pressDirection.y = -1;
             }
 
@@ -264,12 +281,10 @@ public class Player_Plugin implements Plugin_Interface {
     }
 
     static class Player {
-        public int height, width, lives;
+        public int lives;
         public float invulnerability = 0f;
 
-        public Player(int height, int width) {
-            this.height = height;
-            this.width = width;
+        public Player() {
             this.lives = 3;
         }
     }

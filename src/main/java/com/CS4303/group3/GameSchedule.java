@@ -36,7 +36,7 @@ public class GameSchedule {
     }
 
     public float dt() {
-        return (float)this._update.deltaTime();
+        return Math.min((float)this._update.deltaTime(), 0.1f);
     }
 
     public GameSchedule setup(Runnable system) {
