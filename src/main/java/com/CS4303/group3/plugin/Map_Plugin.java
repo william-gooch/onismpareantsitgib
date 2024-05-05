@@ -310,7 +310,10 @@ public class Map_Plugin implements Plugin_Interface {
                 return e;
             }),
             Map.entry("gravity", obj -> {
-                return game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f)));
+                return game.dom.createEntity(
+                    new Position(new PVector()), // to make sure gravity gets deleted when world is reset
+                    new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f))
+                );
             })
         );
     }

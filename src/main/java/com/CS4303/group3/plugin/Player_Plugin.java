@@ -9,6 +9,7 @@ import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
+import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
 import com.CS4303.group3.utils.Collision.Contact;
@@ -41,6 +42,20 @@ public class Player_Plugin implements Plugin_Interface {
                         player.comp2().flipX = true;
                     } else if (velocityPerpToGravity < 0) {
                         player.comp2().flipX = false;
+                    }
+                });
+        });
+
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class)
+                .withAlso(Player.class)
+                .stream().forEach(player -> {
+                    if(player.comp().position.x < 0
+                    || player.comp().position.x > game.width
+                    || player.comp().position.y < 0
+                    || player.comp().position.y > game.width) {
+                        WorldManager wm = Resource.get(game, WorldManager.class);
+                        wm.gameOver();
                     }
                 });
         });
