@@ -58,7 +58,7 @@ public class Button_Plugin implements Plugin_Interface {
         // });
     }
 
-    static class Button extends Changeable.Changeable_Boolean {
+    static class Button extends Changeable.Changeable_Interface {
         //store the entity on top of the button
         public Entity object = null;
         public int height, width;
@@ -78,13 +78,13 @@ public class Button_Plugin implements Plugin_Interface {
 
         public void push(){
             for(ButtonEventListener e: listeners){
-                if(get()) e.onPush();
+                if((boolean)get()) e.onPush();
             }
         }
 
         public void release(){
             for(ButtonEventListener e: listeners){
-                if(get()) e.onRelease();
+                if((boolean)get()) e.onRelease();
             }
         }
 

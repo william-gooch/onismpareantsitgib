@@ -5,7 +5,7 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Button_Plugin.Button;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
-import com.CS4303.group3.utils.Changeable.Changeable_Boolean;
+import com.CS4303.group3.utils.Changeable;
 
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
@@ -50,7 +50,7 @@ public class Door_Plugin implements Plugin_Interface {
     static class Door {
         public int height, width, maxHeight, maxWidth;
         public float timeElapsed;
-        public Changeable_Boolean open;
+        public Changeable.Changeable_Interface open;
         public final float UPDATE_DELAY = 0.01f;
         public final float LOWERING_INCREMENT = 1f;
 
@@ -60,11 +60,11 @@ public class Door_Plugin implements Plugin_Interface {
             this.maxWidth = width;
             this.timeElapsed = 0;
             this.width = width;
-            this.open = new Changeable_Boolean(false);
+            this.open = new Changeable.Changeable_Interface<>(false);
         }
 
         public boolean isOpen() {
-            return open.get();
+            return (boolean) open.get();
         }
 
         public void moveDoor(Game game, PVector pos) {

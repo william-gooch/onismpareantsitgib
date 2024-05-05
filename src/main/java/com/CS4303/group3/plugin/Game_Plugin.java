@@ -232,7 +232,8 @@ public class Game_Plugin implements Plugin_Interface {
             //         }));
 
             //initialise forces
-            // dom.createEntity(new Gravity(new PVector(0, 1)));
+            Gravity g = new Gravity();
+            dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
             // create block for testing
