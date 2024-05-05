@@ -23,7 +23,7 @@ public class Sprite_Plugin implements Plugin_Interface {
         game.schedule.draw(draw -> {
             dom.findEntitiesWith(Position.class, Sprite.class)
                 .stream().forEach(sprite -> {
-                    draw.call(drawing -> sprite.comp2().draw(drawing, sprite.comp1().position));
+                    draw.call(drawing -> sprite.comp2().draw(drawing, sprite.entity()));
                 });
         });
 
@@ -34,7 +34,7 @@ public class Sprite_Plugin implements Plugin_Interface {
                     if(currentSprite == null) {
                         return;
                     }
-                    draw.call(drawing -> currentSprite.draw(drawing, sprite.comp1().position));
+                    draw.call(drawing -> currentSprite.draw(drawing, sprite.entity()));
                 });
         });
     }
@@ -69,7 +69,8 @@ public class Sprite_Plugin implements Plugin_Interface {
             this.anchorPoint = anchorPoint;
         }
 
-        public void draw(Game drawing, PVector position) {
+        public void draw(Game drawing, Entity sprite) {
+            PVector position = sprite.get(Position.class).position;
             drawing.push();
 
             // move to correct location
@@ -86,7 +87,9 @@ public class Sprite_Plugin implements Plugin_Interface {
 
             // go to middle of sprite
             drawing.translate((flipX ? -1 : 1) * width / 2, (flipY ? -1 : 1) * height / 2);
+            if(sprite.has(Player_Plugin.Player.class) && sprite.get(Player_Plugin.Player.class).invulnerability > 0f) drawing.tint(255, 180);
             drawing.image(image, 0, 0, width, height);
+            drawing.tint(255,255);
             drawing.pop();
         }
     }
