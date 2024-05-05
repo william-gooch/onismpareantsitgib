@@ -21,15 +21,19 @@ public class Force_Plugin implements Plugin_Interface {
             Gravity gravity = Resource.get(game, Gravity.class);
             if(input == null || gravity == null) return;
             if(input.isKeyDown(39)) { //gravity goes right
+                game.rotation_time = 0f;
                 gravity.changeGravity(new PVector(1,0));
             }
             if(input.isKeyDown(37)) { //gravity goes left
+                game.rotation_time = 0f;
                 gravity.changeGravity(new PVector(-1,0));
             }
             if(input.isKeyDown(40)) { //gravity goes down
+                game.rotation_time = 0f;
                 gravity.changeGravity(new PVector(0,1));
             }
             if(input.isKeyDown(38)) { //gravity goes up
+                game.rotation_time = 0f;
                 gravity.changeGravity(new PVector(0,-1));
             }
         });
@@ -72,6 +76,7 @@ public class Force_Plugin implements Plugin_Interface {
         }
 
         public void changeGravity(PVector new_gravity) {
+//            game.rotation_time = 0f; set the games rotation time to 0
             change(new_gravity);
         }
 
