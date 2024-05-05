@@ -5,10 +5,15 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
+import com.CS4303.group3.plugin.Player_Plugin.Grab;
+import com.CS4303.group3.plugin.Player_Plugin.Player;
+import com.CS4303.group3.plugin.Player_Plugin.PlayerMovement;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
+import com.CS4303.group3.plugin.Door_Plugin.Door;
 import com.CS4303.group3.plugin.Force_Plugin.*;
+import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
 import com.CS4303.group3.utils.Collision.Contact;
@@ -21,6 +26,7 @@ public class Player_Plugin implements Plugin_Interface {
     Dominion dom;
 
     int playerHeight, playerWidth = 10;
+    boolean print = true;
 
     @Override
     public void build(Game game) {
@@ -163,6 +169,54 @@ public class Player_Plugin implements Plugin_Interface {
         //flip
         
 
+        
+        // check if player has reached the end of the level
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class, Player.class)
+                    .stream().forEach(res -> {
+                        var pos = res.comp1().position;
+                        if (dom.findEntitiesWith(Door.class, Position.class)
+                                .stream().anyMatch(exit -> {
+                                    var doorPos = exit.comp2().position;
+                                    var gravity = Resource.get(game, Gravity.class);
+                                    if (exit.comp1().isExit && exit.comp1().isOpen()) {
+                                                                                    //assuming the door is on the right side of the screen when gravity is facing down
+                                        
+                                        if (gravity.gravity().y > 0) {//gravity down
+                                            if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x > game.width) {
+                                                return true;
+                                            }
+                                        
+                                        } else if (gravity.gravity().y < 0) { // gravity up
+
+                                            if(pos.y >= (doorPos.y - exit.comp1().maxHeight) && pos.y <= doorPos.y && pos.x < 0) {
+                                                return true;
+                                            }
+                                        
+                                        } else if (gravity.gravity().x > 0) { // gravity right
+                                            if(pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y > game.height) {
+                                                return true;
+                                            }
+           
+                                        } else if (gravity.gravity().x < 0) { // gravity left
+
+                                            if(pos.x >= (doorPos.x - exit.comp1().maxHeight) && pos.x <= doorPos.x && pos.y < 0) {
+                                                return true;
+                                            } 
+
+                                        }
+                                      
+                                    }
+                                    return false;
+                                })) {
+
+                            
+                           
+                            var wm = Resource.get(game, WorldManager.class);
+                            wm.newLevel();
+                        }
+                    });
+                });
 
         //draw the player
         game.schedule.draw(-1, draw -> {

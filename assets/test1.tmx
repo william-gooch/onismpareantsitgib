@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="9">
+ <tileset firstgid="1" source="tiles.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="10" height="10">
+  <data encoding="csv">
+9,15,15,15,15,15,15,15,15,9,
+10,0,0,0,0,1,0,0,0,8,
+10,0,0,0,0,1,0,0,0,8,
+10,0,20,21,21,21,22,0,0,8,
+10,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,8,
+10,0,3,3,3,3,19,4,0,8,
+10,0,15,15,15,15,15,16,0,14,
+10,0,0,0,0,0,0,0,0,0,
+9,3,3,3,3,3,3,3,3,3
+</data>
+ </layer>
+ <objectgroup id="2" name="Object Layer 1">
+  <object id="1" name="Block" type="block" gid="7" x="49.8278" y="78.2732" width="12.4729" height="12.4729"/>
+  <object id="5" name="Player Spawn" type="player_spawn" x="56.2898" y="43.5287">
+   <point/>
+  </object>
+  <object id="7" name="Door" type="door" gid="24" x="144" y="144" width="16" height="16">
+   <properties>
+    <property name="onTrigger" value="open"/>
+   </properties>
+  </object>
+  <object id="8" name="Button" type="button" gid="12" x="96" y="96" width="16" height="16">
+   <properties>
+    <property name="onImage" type="int" value="17"/>
+    <property name="trigger" type="object" value="7"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

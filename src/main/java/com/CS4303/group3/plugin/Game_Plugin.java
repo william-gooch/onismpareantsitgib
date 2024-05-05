@@ -210,8 +210,11 @@ public class Game_Plugin implements Plugin_Interface {
 //                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
 //                 );
 //             }
+
+
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
+            TiledMap m = am.getResource(TiledMap.class, "test"+level+".tmx");
+            //TiledMap m = am.getResource(TiledMap.class, "test.tmx");
             dom.createEntity(
                 new TileMap(game, m)
             );
