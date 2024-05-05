@@ -415,17 +415,9 @@ public class Game_Plugin implements Plugin_Interface {
 
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
-<<<<<<< HEAD
-            //float playerWidth = 13 * scale;
-            //float playerHeight = 18 * scale;
-
-            float playerWidth = 10 * scale;
-            float playerHeight = 15 * scale;
-=======
             float playerRatio = 36f / 26f;
             float playerWidth = 10 * scale;
             float playerHeight = playerWidth * playerRatio;
->>>>>>> main
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
