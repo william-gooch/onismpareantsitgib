@@ -39,7 +39,7 @@ public class Player_Plugin implements Plugin_Interface {
                     float velocityPerpToGravity = player.comp1().velocity.dot(gravity.copy().rotate(PConstants.PI/2));
                     if(velocityPerpToGravity > 0) {
                         player.comp2().flipX = true;
-                    } else {
+                    } else if (velocityPerpToGravity < 0) {
                         player.comp2().flipX = false;
                     }
                 });
