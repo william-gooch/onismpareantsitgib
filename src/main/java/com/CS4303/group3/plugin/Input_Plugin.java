@@ -58,6 +58,10 @@ public class Input_Plugin implements Plugin_Interface {
             keybinds.put(keys.SETTINGS, (int) 'S');
         }
 
+        public InputSystem(Map keybinds) {
+            this.keybinds = keybinds;
+        }
+
         boolean isKeyDown(int key) {
             return keysDown.contains(key);
         }

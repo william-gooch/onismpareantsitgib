@@ -61,7 +61,7 @@ public class Force_Plugin implements Plugin_Interface {
         });
     }
 
-    public static class Gravity extends Changeable.Changeable_Direction {
+    public static class Gravity extends Changeable.Changeable_Interface {
 
         public Gravity() {
             super(new PVector(0,0));
@@ -71,7 +71,7 @@ public class Force_Plugin implements Plugin_Interface {
             change(new_gravity);
         }
 
-        public PVector gravity() {return get();}
+        public PVector gravity() {return (PVector) get();}
     }
 
     public static class Drag {

@@ -77,7 +77,7 @@ public class Docking_Plugin implements Plugin_Interface {
 
             //run the rule of the new box
             rule = new_rule;
-            if(rule.get(Box_Plugin.Box.class).action != null) rule.get(Box_Plugin.Box.class).run_action(game, changeable);
+            if(rule.get(Box_Plugin.Box.class).action != null) rule.get(Box_Plugin.Box.class).run_action(game, changeable.get());
         }
 
         //returns true if the two positions are close enough to swap
