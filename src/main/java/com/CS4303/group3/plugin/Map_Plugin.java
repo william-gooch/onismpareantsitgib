@@ -265,9 +265,10 @@ public class Map_Plugin implements Plugin_Interface {
                             System.out.println("Created gravity, " + tileScale);
                         } else if(obj.getType().equals("dock")) {
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                            //need to find a way to link to the changeable in the entity being changed
                             e.add(new Docking_Plugin.Docking(
                                 new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                                null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class), null
+                                null, rule_types.OPERATIONAL, "find a way to link to the changeable in the entity being changed", null
                             ));
                         } else if(obj.getTile() != null) { // fallback for visual-only elements
                             e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
