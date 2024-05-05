@@ -38,7 +38,7 @@ public class Game extends PApplet {
 
         if(displayHeight > displayWidth) {
             scale = displayWidth;
-        } else scale = displayHeight * 0.5f;
+        } else scale = displayHeight * 0.8f;
 
         noSmooth();
 //        size((int)scale, (int)scale, P2D);

@@ -140,16 +140,22 @@ public class Map_Plugin implements Plugin_Interface {
             return tileImage;
         }
 
-        private Entity createSpriteFromTile(TiledTile tile, float width, float height, float x, float y) {
+        private Entity createSpriteFromObject(TiledObject obj) {
+            float width = obj.getWidth() * tileScale,
+                  height = obj.getHeight() * tileScale,
+                  x = obj.getX() * tileScale,
+                  y = obj.getY() * tileScale;
+
+            TiledTile tile = obj.getTile();
+            if(tile == null) {
+                return game.dom.createEntity(new Position(new PVector(x, y)));
+            }
+
             PImage tileImage = getTileImage(tile);
-
-            // return next.getImage().getSource();
-            var e = game.dom.createEntity(
-                new Position(new PVector(x * tileScale, y * tileScale)),
-                new Sprite(tileImage, width * tileScale, height * tileScale)
+            return game.dom.createEntity(
+                new Position(new PVector(x, y - height)),
+                new Sprite(tileImage, width, height)
             );
-
-            return e;
         }
 
         public void generateRenderTiles() {
@@ -181,11 +187,7 @@ public class Map_Plugin implements Plugin_Interface {
                         if(factory != null) {
                             e = factory.construct(obj);
                         } else {
-                            if(obj.getTile() != null) {
-                                e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
-                            } else {
-                                e = null;
-                            }
+                            e = createSpriteFromObject(obj);
                         }
                         if(obj.getProperty("onTrigger") != null) {
                             Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
@@ -211,7 +213,7 @@ public class Map_Plugin implements Plugin_Interface {
                 return null;
             }),
             Map.entry("block", obj -> {
-                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                Entity e = createSpriteFromObject(obj);
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
@@ -274,14 +276,14 @@ public class Map_Plugin implements Plugin_Interface {
                 return e;
             }),
             Map.entry("door", obj -> {
-                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                Entity e = createSpriteFromObject(obj);
                 e.add(new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale)));
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
                 return e;
             }),
             Map.entry("enemy", obj -> {
-                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                Entity e = createSpriteFromObject(obj);
                 TiledObject path = (TiledObject) obj.getProperty("path");
                 PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
                 e.add(new Enemy_Plugin.Basic_AI(points));
@@ -299,7 +301,7 @@ public class Map_Plugin implements Plugin_Interface {
                 return e;
             }),
             Map.entry("dock", obj -> {
-                Entity e = createSpriteFromTile(obj.getTile(), obj.getWidth(), obj.getHeight(), obj.getX(), obj.getY() - obj.getHeight());
+                Entity e = createSpriteFromObject(obj);
                 //need to find a way to link to the changeable in the entity being changed
                 e.add(new Docking_Plugin.Docking(
                     new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
@@ -307,7 +309,9 @@ public class Map_Plugin implements Plugin_Interface {
                 ));
                 return e;
             }),
-            Map.entry("gravity", obj -> game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 0.1f, obj.getY() * tileScale * 0.1f))))
+            Map.entry("gravity", obj -> {
+                return game.dom.createEntity(new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f)));
+            })
         );
     }
 }

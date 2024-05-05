@@ -211,7 +211,7 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test.tmx");
+            TiledMap m = am.getResource(TiledMap.class, "test2.tmx");
             dom.createEntity(
                 new TileMap(game, m)
             );
@@ -417,9 +417,13 @@ public class Game_Plugin implements Plugin_Interface {
             // dom.createEntity(new TextScreen("OH NO! I sent my professor a rude email and need to sneak in to get it back", "Press [SPACE] to play."));
             AssetManager am = Resource.get(game, AssetManager.class);
             PImage logo = am.getResource(PImage.class, "logo.png");
+            float logoRatio = PApplet.round((float)game.width / (float)logo.width),
+                  logoWidth = logo.width * logoRatio,
+                  logoHeight = logo.height * logoRatio;
+
             dom.createEntity(
-                new Position(new PVector(game.width/2 - logo.width/2, game.height/2 - logo.height/2)),
-                new Sprite(logo)
+                new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2)),
+                new Sprite(logo, logoWidth, logoHeight)
             );
         }
     }
