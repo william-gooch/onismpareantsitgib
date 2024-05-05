@@ -233,7 +233,7 @@ public class Player_Plugin implements Plugin_Interface {
             }
             if (input.isKeyDown(input.keybinds.get(InputSystem.keys.JUMP))) {
                 //jump if grounded
-                input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
+                // input.keysDown.remove((int) 'W'); //makes wall jumping and movement require more skill
                 pressDirection.y = -1;
             }
 
