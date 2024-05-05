@@ -30,6 +30,10 @@ public class Object_Plugin implements Plugin_Interface {
                 .forEach(obj -> {
                     obj.comp1().previous_position = obj.comp1().position.copy();
 
+                    //Temporary
+                    if(game.abs(obj.comp4().velocity.x) < 0.01f) obj.comp4().velocity.x = 0; //if object moving to slow stop it
+                    if(game.abs(obj.comp4().velocity.y) < 0.01f) obj.comp4().velocity.y = 0;
+
                     //if entity is a player and holding a box move the box
                     if(obj.entity().has(Grab.class)) {
                         Grab grab = obj.entity().get(Grab.class);
@@ -46,35 +50,7 @@ public class Object_Plugin implements Plugin_Interface {
                     obj.comp1().grounded = false;
 
                     //correct collisions with the ground
-                    Contact firstCollision = (Contact) dom.findEntitiesWith(Position.class, Collider.class)
-                        .stream()
-                        .filter(other -> preCollision(obj, other))
-                        .<Contact> map(other -> {
-                            // // check if collided vertically
-                            // yCollide(game, obj, other);
-                            // // check if collided horizontally
-                            // xCollide(game, obj, other);
-
-                            Contact contact = collision(obj, other);
-                            return contact;
-                        })
-                        .filter(c -> c != null)
-                        .min(Comparator.comparing(a -> a.collisionTime()))
-                        .orElse(null);
-                    
-                    if (firstCollision == null) {
-                        System.out.println("no collisions here" + obj.comp1().position.toString());
-                        obj.comp1().position.add(obj.comp4().velocity);
-                    } else {
-                        System.out.println("collision " + firstCollision.cNormal());
-                        obj.comp1().position.add(obj.comp4().velocity.copy().mult(firstCollision.collisionTime() * 0.99f));
-                        float dotprod = obj.comp4().velocity.dot(firstCollision.cNormal()) * (1 - firstCollision.collisionTime());
-                        obj.comp4().velocity.set(firstCollision.cNormal().y * dotprod, firstCollision.cNormal().x * dotprod);
-
-                        if(firstCollision.cNormal().dot(Resource.get(game, Gravity.class).gravity()) < 0) {
-                            obj.comp1().grounded = true;
-                        }
-                    }
+                    resolve_collision(game, obj, 1, 0);
                 });
         });
         
@@ -86,6 +62,7 @@ public class Object_Plugin implements Plugin_Interface {
                     });
                 });
         });
+
 
         game.schedule.draw(draw -> {
             dom.findEntitiesWith(Position.class, Collider.class)
@@ -124,8 +101,58 @@ public class Object_Plugin implements Plugin_Interface {
         return true;
     }
 
-    public static Contact collision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
-        Contact collision = obj.comp2().collider.collide(obj.comp1(), obj.entity().get(Velocity.class), other.comp2().collider, other.comp1());
+    public static void resolve_collision(Game game, With4<Position, Collider, Body, Velocity> obj, float time_remaining, int depth) {
+        if(depth == 5) {
+            //if this many collisions resolved give up and just stop all movement
+            obj.comp4().velocity.set(0,0);
+            return;
+        }
+        Contact firstCollision = (Contact) game.dom.findEntitiesWith(Position.class, Collider.class)
+                .stream()
+                .filter(other -> preCollision(obj, other))
+                .<Contact> map(other -> {
+                    // // check if collided vertically
+                    // yCollide(game, obj, other);
+                    // // check if collided horizontally
+                    // xCollide(game, obj, other);
+
+                    Contact contact = collision(obj, other);
+                    return contact;
+                })
+                .filter(c -> c != null)
+                .min(Comparator.comparing(a -> a.collisionTime()))
+                .orElse(null);
+
+        if (firstCollision == null) {
+            obj.comp1().position.add(obj.comp4().velocity);
+        } else {
+            if(firstCollision.collisionTime() == 0) {
+                //if already colliding move backwards
+                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.1f));
+            }
+            obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * firstCollision.collisionTime() * 0.8f));
+//                        if(game.abs(firstCollision.cNormal().x) == 0) obj.comp1().position.x += obj.comp4().velocity.copy().x;
+//                        else obj.comp1().position.x += obj.comp4().velocity.copy().x * firstCollision.collisionTime();
+//                        if(game.abs(firstCollision.cNormal().y) == 0) obj.comp1().position.y += obj.comp4().velocity.copy().y;
+//                        else obj.comp1().position.y += obj.comp4().velocity.copy().y * firstCollision.collisionTime();
+
+//                        float dotprod = obj.comp4().velocity.dot(firstCollision.cNormal()) * (1 - firstCollision.collisionTime());
+//                        obj.comp4().velocity.set(firstCollision.cNormal().y * dotprod, firstCollision.cNormal().x * dotprod);
+            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+
+            if (firstCollision.cNormal().dot(Resource.get(game, Gravity.class).gravity()) < 0 && time_remaining == 1) {
+                obj.comp1().grounded = true;
+            }
+
+            //TODO: check if colliding on the x-direction, if it is set to be walled
+
+            resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
+        }
+    }
+
+    public static Contact partial_collision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other, float partial) {
+        Contact collision = obj.comp2().collider.partial_collide(obj.comp1(), obj.entity().get(Velocity.class), other.comp2().collider, other.comp1(), partial);
         if(collision == null) return null;
 
         // some objects may have custom collision callbacks (e.g. buttons)
@@ -137,8 +164,12 @@ public class Object_Plugin implements Plugin_Interface {
         if (obj.comp2().isTrigger || other.comp2().isTrigger) {
             return null;
         }
-        
+
         return collision;
+    }
+
+    public static Contact collision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
+        return partial_collision(obj, other, 1);
     }
 
     public static void yCollide(Game game, With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {

@@ -5,12 +5,14 @@ import java.util.*;
 import com.CS4303.group3.plugin.Object_Plugin;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
+import javafx.geometry.Pos;
 import processing.core.PVector;
 
 public class Collision {
     //Interfaces
     public interface Collider_Interface {
         public Contact collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther);
+        public Contact partial_collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther, float partial);
     }
 
     public record Contact(
@@ -39,15 +41,22 @@ public class Collision {
         }
 
         @Override
-        public Contact collide(Object_Plugin.Position pThis, Velocity vThis, Collider_Interface other, Object_Plugin.Position pOther) {
+        public Contact partial_collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther, float partial) {
             PVector velocity;
             if (vThis == null) velocity = new PVector();
             else velocity = vThis.velocity;
+
+            velocity = velocity.mult(partial);
 
             if (other instanceof BasicCollider) {
                 return collideSwept(pThis.position, velocity, (BasicCollider) other, pOther.position);
             }
             return null;
+        }
+
+        @Override
+        public Contact collide(Object_Plugin.Position pThis, Velocity vThis, Collider_Interface other, Object_Plugin.Position pOther) {
+            return partial_collide(pThis, vThis, other, pOther, 1);
         }
 
         private boolean collideBroadPhase(
