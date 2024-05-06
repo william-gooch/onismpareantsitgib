@@ -102,11 +102,14 @@ public class Object_Plugin implements Plugin_Interface {
     }
 
     public static void resolve_collision(Game game, With4<Position, Collider, Body, Velocity> obj, float time_remaining, int depth) {
+        boolean bouncy = true;
+
         if(depth == 5) {
             //if this many collisions resolved give up and just stop all movement
             obj.comp4().velocity.set(0,0);
             return;
         }
+        
         Contact firstCollision = (Contact) game.dom.findEntitiesWith(Position.class, Collider.class)
                 .stream()
                 .filter(other -> preCollision(obj, other))
@@ -130,7 +133,16 @@ public class Object_Plugin implements Plugin_Interface {
 //                //if already colliding move backwards
 //                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
 //            }
+
+           
+// if(bouncy && obj.entity().has(Player.class)){
+//     obj.comp4().velocity.y = obj.comp4().velocity.y*-1f;
+// }
+
+    
             obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
+        
+          
 //                        if(game.abs(firstCollision.cNormal().x) == 0) obj.comp1().position.x += obj.comp4().velocity.copy().x;
 //                        else obj.comp1().position.x += obj.comp4().velocity.copy().x * firstCollision.collisionTime();
 //                        if(game.abs(firstCollision.cNormal().y) == 0) obj.comp1().position.y += obj.comp4().velocity.copy().y;
@@ -158,8 +170,13 @@ public class Object_Plugin implements Plugin_Interface {
                 obj.comp1().position.add(firstCollision.cNormal());
             }
 
-            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
-                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+            if(bouncy && obj.entity().has(Player.class)){
+                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
+                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
+            }else{
+                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+            }
 
             resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
         }
