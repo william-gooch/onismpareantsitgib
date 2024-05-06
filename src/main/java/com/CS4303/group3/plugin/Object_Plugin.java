@@ -141,19 +141,24 @@ public class Object_Plugin implements Plugin_Interface {
 //                        float dotprod = obj.comp4().velocity.dot(firstCollision.cNormal()) * (1 - firstCollision.collisionTime());
 //                        obj.comp4().velocity.set(firstCollision.cNormal().y * dotprod, firstCollision.cNormal().x * dotprod);
 
-            if (firstCollision.cNormal().dot(Resource.get(game, Gravity.class).gravity()) < 0 && time_remaining == 1) {
-                obj.comp1().grounded = true;
-                obj.comp1().prev_walled = 0;
-                obj.comp1().walled = 0;
-            }
+            Gravity gravity = Resource.get(game, Gravity.class);
+            if(gravity != null) {
+                if (firstCollision.cNormal().dot(gravity.gravity()) < 0 && time_remaining == 1) {
+                    obj.comp1().grounded = true;
+                    obj.comp1().prev_walled = 0;
+                    obj.comp1().walled = 0;
+                }
 
-            //check if colliding on the x-direction, if it is set to be walled
-            if((firstCollision.cNormal().x * Resource.get(game, Gravity.class).gravity().y != 0
-                    || firstCollision.cNormal().y * Resource.get(game, Gravity.class).gravity().x != 0) && time_remaining == 1) {
-                if(Resource.get(game, Gravity.class).gravity().x != 0) obj.comp1().walled = obj.comp4().velocity.y > 0 ? 1 : -1;
-                else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
 
-                System.out.println(obj.comp1().walled);
+                //check if colliding on the x-direction, if it is set to be walled
+                if ((firstCollision.cNormal().x * gravity.gravity().y != 0
+                        || firstCollision.cNormal().y * gravity.gravity().x != 0) && time_remaining == 1) {
+                    if (gravity.gravity().x != 0)
+                        obj.comp1().walled = obj.comp4().velocity.y > 0 ? 1 : -1;
+                    else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
+
+                    System.out.println(obj.comp1().walled);
+                }
             }
 
             if(firstCollision.collisionTime() <= EPSILON) {

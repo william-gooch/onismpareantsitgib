@@ -31,7 +31,9 @@ public class Player_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Velocity.class, SpriteRenderer.class, Grab.class)
                 .withAlso(Player.class)
                 .stream().forEach(player -> {
-                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    Gravity grav = Resource.get(game, Gravity.class);
+                    if(grav == null) return;
+                    PVector gravity = (PVector) grav.get();
                     player.comp2().rotation = gravity.heading() - PConstants.PI/2;
 
                     float velocityPerpToGravity = player.comp1().velocity.dot(gravity.copy().rotate(PConstants.PI/2));
