@@ -392,7 +392,6 @@ public class Map_Plugin implements Plugin_Interface {
                 Gravity g = new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f));
                 Entity e = game.dom.createEntity(
                     new Position(new PVector()), // to make sure gravity gets deleted when world is reset
-                    new Gravity(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
                     new Changeable(g),
                     g
                 );
