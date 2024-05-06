@@ -13,6 +13,8 @@ import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
+import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.ISprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
@@ -26,6 +28,7 @@ import dev.dominion.ecs.api.Entity;
 import processing.core.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.tiledreader.*;
@@ -150,7 +153,9 @@ public class Map_Plugin implements Plugin_Interface {
 
             TiledTile tile = obj.getTile();
             if(tile == null) {
-                return game.dom.createEntity(new Position(new PVector(x, y)));
+                return game.dom.createEntity(
+                    new Position(new PVector(x, y - height))
+                );
             }
 
             PImage tileImage = getTileImage(tile);
@@ -304,7 +309,22 @@ public class Map_Plugin implements Plugin_Interface {
                 return null;
             }),
             Map.entry("enemy", obj -> {
-                Entity e = createSpriteFromObject(obj);
+                AnimatedSprite sprite = new AnimatedSprite();
+                PImage enemyImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "enemy-anim.png");
+                List<ISprite> frames = AnimatedSprite.framesFromSpriteSheet(enemyImage, 9);
+                frames
+                    .stream()
+                    .limit(7)
+                    .forEach(f -> sprite.addFrame(f, 1f/30f));
+                for(int i = 0; i < 16; i++) {
+                    sprite.addFrame(frames.get(7 + (i%2)), 1f/30f);
+                }
+
+                Entity e = game.dom.createEntity(
+                    new Position(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
+                    new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
+                );
+
                 TiledObject path = (TiledObject) obj.getProperty("path");
                 PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
                 e.add(new Enemy_Plugin.Basic_AI(points));
@@ -318,7 +338,7 @@ public class Map_Plugin implements Plugin_Interface {
                         }
                         other.get(Player.class).invulnerability = 1f;
                     }
-                }, false));
+                }, true));
                 return e;
             }),
             Map.entry("dock", obj -> {
