@@ -36,6 +36,16 @@ public class Object_Plugin implements Plugin_Interface {
                     if(game.abs(obj.comp4().velocity.x) < 0.01f) obj.comp4().velocity.x = 0; //if object moving to slow stop it
                     if(game.abs(obj.comp4().velocity.y) < 0.01f) obj.comp4().velocity.y = 0;
 
+                    PVector dirlock = obj.comp4().directionLocked;
+                    if(dirlock.magSq() > 0) {
+                        // check if the object's velocity is facing towards the locked direction
+                        float dotprod = dirlock.dot(obj.comp4().velocity);
+                        if(dotprod > 0) {
+                            PVector tangent = new PVector(dirlock.y, -dirlock.x).normalize();
+                            obj.comp4().velocity.set(tangent.mult(tangent.dot(obj.comp4().velocity)));
+                        }
+                    }
+
                     //if entity is a player and holding a box move the box
                     if(obj.entity().has(Grab.class)) {
                         Grab grab = obj.entity().get(Grab.class);
@@ -266,6 +276,8 @@ public class Object_Plugin implements Plugin_Interface {
     public static class Velocity {
         public PVector velocity = new PVector(0,0);
         public float mass = 1f;
+
+        public PVector directionLocked = new PVector();
 
         public Velocity() {}
 
