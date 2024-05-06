@@ -80,6 +80,11 @@ public class Force_Plugin implements Plugin_Interface {
             change(new_gravity.setMag(((PVector)get()).mag()));
         }
 
+        @Override
+        public void change(Object value) {
+            super.change(((PVector) value).setMag(((PVector)get()).mag()));
+        }
+
         public PVector gravity() {return (PVector) get();}
     }
 

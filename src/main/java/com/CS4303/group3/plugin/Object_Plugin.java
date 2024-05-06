@@ -93,7 +93,7 @@ public class Object_Plugin implements Plugin_Interface {
         // static objects like the ground are always collidable.
         if(other.entity().has(Body.class) && !other.entity().get(Body.class).canCollide) { return false; }
         //don't do collisions with enemies if the player is invulnerable
-        if(obj.entity().has(Player.class) && other.entity().has(Enemy_Plugin.Basic_AI.class)) {
+        if(obj.entity().has(Player.class) && (other.entity().has(Enemy_Plugin.Basic_AI.class) || other.entity().has(Spike_Plugin.Spikes.class))) {
             if(obj.entity().get(Player.class).invulnerability > 0f) {
                 return false;
             }
@@ -116,8 +116,8 @@ public class Object_Plugin implements Plugin_Interface {
                     // yCollide(game, obj, other);
                     // // check if collided horizontally
                     // xCollide(game, obj, other);
-
                     Contact contact = collision(obj, other);
+
                     return new Pair<>(other.entity(), contact);
                 })
                 .filter(c -> c.getValue() != null)
@@ -157,7 +157,6 @@ public class Object_Plugin implements Plugin_Interface {
                         obj.comp1().walled = obj.comp4().velocity.y > 0 ? 1 : -1;
                     else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
 
-                    System.out.println(obj.comp1().walled);
                 }
             }
 
@@ -167,7 +166,7 @@ public class Object_Plugin implements Plugin_Interface {
             }
 
             Entity otherEntity = entityAndContact.getKey();
-            if(otherEntity.has(Body.class)) {
+            if(otherEntity.has(Body.class) && otherEntity.has(Velocity.class)) {
                 System.out.println("tryna push " + firstCollision.cNormal());
                 otherEntity.get(Velocity.class).velocity.add(
                     firstCollision.cNormal().y == 0 ? obj.comp4().velocity.x * 0.3f : 0,
@@ -177,6 +176,11 @@ public class Object_Plugin implements Plugin_Interface {
 
             obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
                     firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+
+//            if(entityAndContact.getKey().get(Collider.class).isTrigger && obj.comp2().isTrigger) {
+//                entityAndContact.getKey().get(Collider.class).triggerCollision(entityAndContact.getKey(), obj.entity());
+//                obj.comp2().triggerCollision(obj.entity(), entityAndContact.getKey());
+//            }
 
             resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
         }
@@ -188,7 +192,7 @@ public class Object_Plugin implements Plugin_Interface {
 
         // some objects may have custom collision callbacks (e.g. buttons)
         obj.comp2().triggerCollision(obj.entity(), other.entity());
-        if(!other.entity().has(Enemy_Plugin.Basic_AI.class)) other.comp2().triggerCollision(other.entity(), obj.entity());
+        other.comp2().triggerCollision(other.entity(), obj.entity());
 
         // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
         // if so, skip over handling the collision after this point

@@ -50,7 +50,7 @@ public class Docking_Plugin implements Plugin_Interface {
 
     public static class Docking<T> {
         PVector size;
-        Entity rule;
+        Entity block = null;
         Box_Plugin.rule_types rule_type;
         Changeable changeable;
         T default_val;
@@ -73,21 +73,6 @@ public class Docking_Plugin implements Plugin_Interface {
 
         public void set_default_val() {
             changeable.get().change(default_val);
-        }
-
-        public void insert_new_rule(Entity new_rule, PVector this_position, Game game) {
-            //give the old box the grabbable object
-            if(rule != null) rule.add(new Box_Plugin.Grabbable());
-
-            //remove the grabbable object from the box
-            new_rule.removeType(Box_Plugin.Grabbable.class);
-
-            //move the new box
-            new_rule.get(Object_Plugin.Position.class).position = this_position;
-
-            //run the rule of the new box
-            rule = new_rule;
-            if(rule.get(Box_Plugin.Box.class).action != null) rule.get(Box_Plugin.Box.class).run_action(game, changeable.get());
         }
 
         //returns true if the two positions are close enough to swap

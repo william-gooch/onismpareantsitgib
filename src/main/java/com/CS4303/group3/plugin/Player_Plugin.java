@@ -145,28 +145,20 @@ public class Player_Plugin implements Plugin_Interface {
                                                 box.entity().removeType(Velocity.class); //until collisions are fixed
                                                 // box.comp2().position.y = player.comp3().position.y - player.comp4().collider.getSize().y;
 
+                                                if(box.entity().get(Box.class).docked != null) {
+                                                    Entity dock = box.entity().get(Box.class).docked;
+                                                    dock.get(Docking_Plugin.Docking.class).block = null;
+
+                                                    //reset dock to default
+                                                    dock.get(Docking_Plugin.Docking.class).changeable.get().change(dock.get(Docking_Plugin.Docking.class).default_val);
+
+                                                    box.entity().get(Box.class).docked = null;
+                                                }
+
                                             }
                                         }
 
                                     });
-                        } else if(dom.findEntitiesWith(Docking_Plugin.Docking.class, Position.class)
-                                .stream().anyMatch(dock -> {
-                                    return dock.comp1().is_close(grab.grabObj.get(Position.class).position, grab.grabObj.get(Box.class).size, dock.comp2().position, grab.grabObj.get(Box.class).rule_type);
-                                })) {
-                            //insert the box into the dock and pick up the block from the dock
-                            Entity dock_object = dom.findEntitiesWith(Docking_Plugin.Docking.class, Position.class)
-                                    .stream().filter(dock -> {
-                                        return dock.comp1().is_close(grab.grabObj.get(Position.class).position, grab.grabObj.get(Box.class).size, dock.comp2().position, grab.grabObj.get(Box.class).rule_type);
-                                    }).findFirst().get().entity();
-
-                            Entity docked_box = dock_object.get(Docking_Plugin.Docking.class).rule;
-                            dock_object.get(Docking_Plugin.Docking.class).insert_new_rule(grab.grabObj, dock_object.get(Position.class).position, game);
-
-                            //pick up the new object
-                            grab.grabObj = docked_box;
-                            docked_box.get(Grabbable.class).player = player.entity();
-                            input.keysDown.remove(input.keybinds.get(InputSystem.keys.THROW));
-
                         } else {
                             grab.grabObj.get(Body.class).enableCollision();
                             //throw the box
