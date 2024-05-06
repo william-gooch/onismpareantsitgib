@@ -2,8 +2,12 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Force_Plugin.Gravity;
+import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.utils.Collision;
 import dev.dominion.ecs.api.Dominion;
+import processing.core.PConstants;
 import processing.core.PVector;
 
 public class Enemy_Plugin implements Plugin_Interface {
@@ -22,8 +26,6 @@ public class Enemy_Plugin implements Plugin_Interface {
                     });
         });
 
-
-
         //reduce the death animation time of all ai
         game.schedule.update(() -> {
             dom.findEntitiesWith(Basic_AI.class)
@@ -36,19 +38,32 @@ public class Enemy_Plugin implements Plugin_Interface {
                     });
         });
 
+        // //draw the basic AI
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
+        //             .stream().forEach(res -> {
+        //                 var pos = res.comp1().position;
+        //                 draw.call(drawing -> {
+        //                     //draw the player character
+        //                     drawing.fill(255,0,0);
+        //                     drawing.rect(pos.x, pos.y, playerSize, playerSize);
+        //                 });
+        //             });
+        // });
 
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class, SpriteRenderer.class, Basic_AI.class)
+                .stream().forEach(player -> {
+                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    player.comp2().rotation = gravity.heading() - PConstants.PI/2;
 
-        //draw the basic AI
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        draw.call(drawing -> {
-                            //draw the player character
-                            drawing.fill(255,0,0);
-                            drawing.rect(pos.x, pos.y, playerSize, playerSize);
-                        });
-                    });
+                    float velocityPerpToGravity = player.comp3().getDirection(game, player.comp1()).dot(gravity.copy().rotate(PConstants.PI/2));
+                    if(velocityPerpToGravity > 0) {
+                        player.comp2().flipX = true;
+                    } else if (velocityPerpToGravity < 0) {
+                        player.comp2().flipX = false;
+                    }
+                });
         });
     }
 
