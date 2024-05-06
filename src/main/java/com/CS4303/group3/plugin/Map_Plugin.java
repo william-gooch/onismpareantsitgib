@@ -232,7 +232,7 @@ public class Map_Plugin implements Plugin_Interface {
                     new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
                     sprite
                 );
-                Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale), 0.25f);
+                Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
                 button.addEventListener(new ButtonEventListener() {
 
                     @Override
@@ -281,6 +281,11 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
                 return e;
+            }),
+            Map.entry("exit_point", obj -> {
+                WorldManager wm = Resource.get(game, WorldManager.class);
+                wm.createExit(game, obj.getX() * tileScale, obj.getY() * tileScale);
+                return null;
             }),
             Map.entry("enemy", obj -> {
                 Entity e = createSpriteFromObject(obj);

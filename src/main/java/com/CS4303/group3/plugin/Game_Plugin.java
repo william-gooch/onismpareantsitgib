@@ -214,7 +214,8 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test2.tmx");
+            TiledMap m = am.getResource(TiledMap.class, "test"+level+".tmx");
+            //TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             dom.createEntity(
                 new TileMap(game, m)
             );
@@ -336,64 +337,6 @@ public class Game_Plugin implements Plugin_Interface {
             //         }, false)
             // );
 
-            //Initialise button chained
-
-            // assigns a button to the associated door or changes direction of gravity on push - will need to change this so that
-            // this is encoded in the JSON rather
-
-            // Iterator<With2<Door, Position>> doors = dom.findEntitiesWith(Door.class, Position.class).iterator();
-            // With2<Door, Position> door1 = doors.next();
-            // With2<Door, Position> door2 = doors.next();
-
-            // Button button = dom.findEntitiesWith(Button.class).iterator().next().comp();
-
-            //Testing event listener behaviours for door that is opened by button / changes gravity
-            // button.addEventListener(new ButtonEventListener() {
-
-            //     @Override
-            //     public void onPush() {
-            //         door1.comp1().moveDoor(game, door1.comp2().position, button); //this is for a singular door but could be changed to deal with all doors
-            //     }
-
-            //     @Override
-            //     public void onRelease() {
-            //         door1.comp1().moveDoor(game, door1.comp2().position, button);
-            //     }
-
-            // });
-
-            //This works for changing the direction of gravity
-            // button.addEventListener(new ButtonEventListener() {
-            //     @Override
-            //     public void onPush() {
-            //         Gravity gravity = Resource.get(game, Gravity.class);
-            //         gravity.changeGravity(new PVector(0,1));
-            //         //door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
-            //     }
-
-            //     @Override
-            //     public void onRelease() {
-            //         Gravity gravity = Resource.get(game, Gravity.class);
-            //         gravity.changeGravity(new PVector(1,0));
-            //         //door1.comp1().moveDoor(game, door1.comp2().position, btn.comp());
-            //     }
-
-            // });
-
-
-            // button.addEventListener(new ButtonEventListener() {
-            //     @Override
-            //     public void onPush() {
-            //         door2.comp1().moveDoor(game, door2.comp2().position, button);
-            //     }
-
-            //     @Override
-            //     public void onRelease() {
-            //         door2.comp1().moveDoor(game, door2.comp2().position, button);
-            //     }
-
-            // });
-
         }
 
         public void createPlayer(Game game, float x, float y, float scale) {
@@ -419,6 +362,21 @@ public class Game_Plugin implements Plugin_Interface {
                 new Body(),
                 Collider.BasicCollider(playerWidth, playerHeight)
             );
+        }
+
+        public void createExit(Game game, float x, float y){
+        
+            game.dom.createEntity(
+                    new Position(new PVector(x, y)),
+                    new Collider(new BasicCollider(45, 45), (self, other) -> {
+                        if(other.has(Player.class)) {
+                            var wm = Resource.get(game, WorldManager.class);
+                            wm.newLevel();
+                        }
+                    })
+
+            );
+
         }
 
         private void createSettingsScene(Dominion dom) {

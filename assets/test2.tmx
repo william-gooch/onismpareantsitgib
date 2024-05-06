@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="20">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
   <data encoding="csv">
@@ -80,6 +80,9 @@
    <point/>
   </object>
   <object id="19" x="-212" y="-81">
+   <point/>
+  </object>
+  <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
    <point/>
   </object>
  </objectgroup>
