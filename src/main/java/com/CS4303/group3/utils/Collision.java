@@ -30,6 +30,7 @@ public class Collision {
     public static class BasicCollider implements Collider_Interface {
         public PVector size;
         public PVector offset;
+     
 
         public BasicCollider(float width, float height, float x, float y) {
             size = new PVector(width, height);
@@ -75,15 +76,15 @@ public class Collision {
             );
         }
 
-        private static boolean AABBCheck(
+        public static boolean AABBCheck(
             PVector aPos, PVector aSize,
             PVector bPos, PVector bSize
         ) {
             return
-                   aPos.x + aSize.x   >= bPos.x
-                && aPos.x             <= bPos.x + bSize.x
-                && aPos.y + aSize.y   >= bPos.y
-                && aPos.y             <= bPos.y + bSize.y;
+                   aPos.x + aSize.x   > bPos.x
+                && aPos.x             < bPos.x + bSize.x
+                && aPos.y + aSize.y   > bPos.y
+                && aPos.y             < bPos.y + bSize.y;
         }
 
         private Contact collideBasic(PVector pThis, BasicCollider other, PVector pOther) {

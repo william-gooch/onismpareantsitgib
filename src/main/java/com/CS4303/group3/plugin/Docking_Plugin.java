@@ -48,24 +48,32 @@ public class Docking_Plugin implements Plugin_Interface {
         });
     }
 
-    public static class Docking {
+    public static class Docking<T> {
         PVector size;
         Entity rule;
         Box_Plugin.rule_types rule_type;
         Changeable changeable;
+        T default_val;
 
         Text text;
 
 
         float insert_range = 80f;
 
-        public Docking(PVector size, Entity rule, Box_Plugin.rule_types rule_type, Changeable changeable, Text text) {
+        public Docking(PVector size, T default_val, Box_Plugin.rule_types rule_type, Changeable changeable, Text text) {
             this.size = size;
-            this.rule = rule;
+            this.default_val = default_val;
             this.rule_type = rule_type;
             this.changeable = changeable;
             this.text = text;
+
+            //set default val
+//            if(changeable != null) set_default_val();
         };
+
+        public void set_default_val() {
+            changeable.get().change(default_val);
+        }
 
         public void insert_new_rule(Entity new_rule, PVector this_position, Game game) {
             //give the old box the grabbable object

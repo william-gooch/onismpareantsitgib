@@ -8,6 +8,7 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.plugin.Door_Plugin.Door;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.utils.Changeable;
 
 import dev.dominion.ecs.api.*;
 import processing.core.*;
@@ -28,13 +29,15 @@ public class Trigger_Plugin {
     public static final Map<String, Trigger> STANDARD_TRIGGERS = Map.ofEntries(
         Map.entry("open", new Trigger((game, self, value) -> {
             if (self.has(Door.class)) {
-                self.get(Door.class).open.change((boolean) value);
+                self.get(Door.class).change((boolean) value);
                 self.get(Door.class).moveDoor(game, self.get(Position.class).position);
             }
         })),
-        Map.entry("change", new Trigger((game, self, value) -> {
-            if (self.has(Gravity.class)) {
-                self.get(Gravity.class).changeGravity((PVector) value);
+        Map.entry("gravity", new Trigger((game, self, value) -> {
+            if(self.has(Changeable.class)) {
+                self.get(Changeable.class).get().change(value);
+            } else {
+                self.add(new Changeable(self.get(Gravity.class)));
             }
         }))
     );

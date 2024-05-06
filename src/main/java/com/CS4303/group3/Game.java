@@ -44,8 +44,6 @@ public class Game extends PApplet {
         noSmooth();
 //        size((int)scale, (int)scale, P2D);
         size((int)scale, (int)scale);
-        playerWidth = scale/25;
-        playerHeight = scale/16;
     }
 
     //Setup
@@ -119,7 +117,7 @@ public class Game extends PApplet {
             rotation = initial_rotation;
         }
         if(rotation != 0) {
-            System.out.println(rotation);
+           // System.out.println(rotation);
             translate(scale / 2, scale / 2);
             rotate(rotation);
             translate(-scale / 2, -scale / 2);

@@ -10,6 +10,7 @@ import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
+import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
 import com.CS4303.group3.utils.Collision.Contact;
@@ -22,25 +23,23 @@ import processing.core.PVector;
 public class Player_Plugin implements Plugin_Interface {
     Dominion dom;
 
-    int playerHeight, playerWidth = 10;
-
     @Override
     public void build(Game game) {
         this.dom = game.dom;
-        playerHeight = (int) game.playerHeight;
-        playerWidth = (int) game.playerWidth;
 
         game.schedule.update(() -> {
             dom.findEntitiesWith(Velocity.class, SpriteRenderer.class, Grab.class)
                 .withAlso(Player.class)
                 .stream().forEach(player -> {
-                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    Gravity grav = Resource.get(game, Gravity.class);
+                    if(grav == null) return;
+                    PVector gravity = (PVector) grav.get();
                     player.comp2().rotation = gravity.heading() - PConstants.PI/2;
 
                     float velocityPerpToGravity = player.comp1().velocity.dot(gravity.copy().rotate(PConstants.PI/2));
-                    if(velocityPerpToGravity > 0) {
+                    if(velocityPerpToGravity > 0.02f) {
                         player.comp2().flipX = true;
-                    } else if (velocityPerpToGravity < 0) {
+                    } else if (velocityPerpToGravity < -0.02f) {
                         player.comp2().flipX = false;
                     }
 
@@ -80,7 +79,7 @@ public class Player_Plugin implements Plugin_Interface {
                         PVector gravity = gravity_entity.gravity();
                         grabPos.previous_position = grabPos.position;
                         //set to be above head dependent on gravity
-                        grabPos.position = PVector.add(grabber.comp1().position, new PVector(-playerWidth * 1.2f * gravity.x, -playerWidth * 1.2f * gravity.y, 0));
+                        grabPos.position = PVector.add(grabber.comp1().position, new PVector(-game.playerWidth * 1.2f * gravity.x, -game.playerWidth * 1.2f * gravity.y, 0));
                     }
                 });
         });
@@ -118,19 +117,23 @@ public class Player_Plugin implements Plugin_Interface {
                             dom.findEntitiesWith(Collider.class, Position.class, Grabbable.class)
                                     .stream().forEach(box -> {
                                         // //if colliding with box pick it up
-                                        PVector player_mid = new PVector(player.comp3().position.copy().x + playerWidth/2, player.comp3().position.copy().y + playerHeight/2);
-                                        PVector box_mid = new PVector(box.comp2().position.copy().x + playerWidth/2, box.comp2().position.copy().y + playerHeight/2);
+                                        PVector player_mid = new PVector(player.comp3().position.copy().x + game.playerWidth/2, player.comp3().position.copy().y + game.playerHeight/2);
+                                        PVector box_mid = new PVector(box.comp2().position.copy().x + game.playerWidth/2, box.comp2().position.copy().y + game.playerHeight/2);
 
-                                        float range = (float) (2f*Math.sqrt(2*(playerHeight/2)*(playerHeight/2)));
+                                        float range = (float) (2f*Math.sqrt(2*(game.playerHeight/2)*(game.playerHeight/2)));
 
                                         if (player_mid.copy().sub(box_mid).mag() < range) {
                                             //check collision zone above head
 
                                             if (!dom.findEntitiesWith(Collider.class, Position.class)
-                                                    .stream().anyMatch(object -> {
-                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerHeight)), null, object.comp1().collider, object.comp2());
-                                                        return c != null && object.comp2().position != box.comp2().position;
-                                                    })) {
+                                                    .stream().anyMatch(object ->
+                                                        Collision.BasicCollider.AABBCheck(
+                                                            box.comp3().get_above_head_position(game, player.comp3().position, game.playerHeight),
+                                                            ((BasicCollider) box.comp1().collider).size,
+                                                            object.comp2().position,
+                                                            ((BasicCollider) object.comp1().collider).size
+                                                        )
+                                                    )) {
 
                                                 grab.grabObj = box.entity();
                                                 box.comp3().player = player.entity();
