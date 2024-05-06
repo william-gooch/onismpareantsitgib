@@ -2,12 +2,15 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Force_Plugin.Gravity;
+import com.CS4303.group3.plugin.Object_Plugin.Position;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import javafx.util.Pair;
+import processing.core.PConstants;
 import processing.core.PVector;
 
 import java.util.Comparator;
@@ -62,6 +65,20 @@ public class Enemy_Plugin implements Plugin_Interface {
         //                 });
         //             });
         // });
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class, SpriteRenderer.class, Basic_AI.class)
+                .stream().forEach(player -> {
+                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    player.comp2().rotation = gravity.heading() - PConstants.PI/2;
+
+                    float velocityPerpToGravity = player.comp3().getDirection(game, player.comp1()).dot(gravity.copy().rotate(PConstants.PI/2));
+                    if(velocityPerpToGravity > 0) {
+                        player.comp2().flipX = true;
+                    } else if (velocityPerpToGravity < 0) {
+                        player.comp2().flipX = false;
+                    }
+                });
+        });
     }
 
     public interface AI {

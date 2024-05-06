@@ -250,9 +250,15 @@ public class Map_Plugin implements Plugin_Interface {
                 sprite.addState("off", new Sprite(offImage));
                 sprite.addState("on", new Sprite(onImage));
                 sprite.setState("off");
+                float rotation = obj.getRotation()*(PConstants.PI/180);
+                PVector pos = new PVector(obj.getX() * tileScale, obj.getY() * tileScale);
+                // translate to the center
+                pos.sub(new PVector(obj.getWidth() * tileScale / 2, obj.getHeight() * tileScale / 2));
+                // then translate to the bottom-left corner (where it is by default), rotated to make sure it's always in the right spot
+                pos.sub(new PVector(-obj.getWidth() * tileScale / 2, obj.getHeight() * tileScale / 2).rotate(rotation));
                 Entity e = game.dom.createEntity(
-                    new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
-                    new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
+                    new Position(pos),
+                    new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale, rotation)
                 );
                 Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
                 button.addEventListener(new ButtonEventListener() {
