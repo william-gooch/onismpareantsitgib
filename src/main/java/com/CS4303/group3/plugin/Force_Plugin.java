@@ -6,6 +6,7 @@ import com.CS4303.group3.plugin.Input_Plugin.InputSystem;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
 import com.CS4303.group3.utils.Changeable;
+import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
 
@@ -22,19 +23,19 @@ public class Force_Plugin implements Plugin_Interface {
             if(input == null || gravity == null) return;
             if(input.isKeyDown(39)) { //gravity goes right
                 game.rotation_time = 0f;
-                gravity.changeGravity(new PVector(1,0));
+                gravity.change(new PVector(1,0));
             }
             if(input.isKeyDown(37)) { //gravity goes left
                 game.rotation_time = 0f;
-                gravity.changeGravity(new PVector(-1,0));
+                gravity.change(new PVector(-1,0));
             }
             if(input.isKeyDown(40)) { //gravity goes down
                 game.rotation_time = 0f;
-                gravity.changeGravity(new PVector(0,1));
+                gravity.change(new PVector(0,1));
             }
             if(input.isKeyDown(38)) { //gravity goes up
                 game.rotation_time = 0f;
-                gravity.changeGravity(new PVector(0,-1));
+                gravity.change(new PVector(0,-1));
             }
         });
 
@@ -65,7 +66,7 @@ public class Force_Plugin implements Plugin_Interface {
         });
     }
 
-    public static class Gravity extends Changeable.Changeable_Interface {
+    public static class Gravity extends Changeable_Interface {
 
         public Gravity(PVector value) {
             super(value);

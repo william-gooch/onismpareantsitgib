@@ -186,7 +186,7 @@ public class Collision {
         }
 
         //checks if a point is in the object
-        private boolean is_in(PVector object, PVector size, PVector point) {
+        public static boolean is_in(PVector object, PVector size, PVector point) {
             return point.x >= object.x
                     && point.x <= object.x + size.x
                     && point.y >= object.y

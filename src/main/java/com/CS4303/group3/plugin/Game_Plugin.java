@@ -245,6 +245,24 @@ public class Game_Plugin implements Plugin_Interface {
 //            dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
+            dom.createEntity(
+                    new Position(new PVector(50, 50)),
+                    new Enemy_Plugin.Patrol_AI(10, 20, 20),
+                    new Body(),
+                    new Velocity(),
+                    new Collider(new BasicCollider(20,20), (self, other) -> {
+                        if(other.get(Position.class).position.copy().sub(self.get(Position.class).position).dot(Resource.get(game, Gravity.class).gravity()) < 0) self.get(Enemy_Plugin.Patrol_AI.class).flipped = !self.get(Enemy_Plugin.Patrol_AI.class).flipped;
+                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
+                            other.get(Player.class).lives--;
+                            if(other.get(Player.class).lives <= 0) {
+                                //player has died, restart the level
+                                System.out.println("Player has died");
+                            }
+                            other.get(Player.class).invulnerability = 1f;
+                        }
+                        }, false)
+            );
+
             // dom.createEntity(
             //         new Position(new PVector(400, 810)),
             //         new Spike_Plugin.Spikes(400,10),

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import com.CS4303.group3.Game;
 
 import com.CS4303.group3.utils.Changeable;
+import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 
@@ -66,7 +67,7 @@ public class Button_Plugin implements Plugin_Interface {
     /**
      * Button class that represents a button in the game
      */
-    static class Button extends Changeable.Changeable_Interface {
+    static class Button extends Changeable_Interface {
         //store the entity on top of the button
         public Entity object = null;
         public int height, width;

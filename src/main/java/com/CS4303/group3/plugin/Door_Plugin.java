@@ -5,6 +5,7 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.utils.Changeable;
 
+import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
 
@@ -24,7 +25,7 @@ public class Door_Plugin implements Plugin_Interface {
     /**
      * Door class that represents a door in the game
      */
-    static class Door extends Changeable.Changeable_Interface {
+    static class Door extends Changeable_Interface {
         public int height, width, maxHeight, maxWidth;
         public float timeElapsed;
 //        public Changeable.Changeable_Interface open;

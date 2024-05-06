@@ -225,7 +225,10 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
-                rule_types rule_type = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                String rt = ((String) obj.getProperty("ruleType"));
+                rule_types rule_type;
+                if(rt != null) rule_type = rt.equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                else rule_type = null;
                 T value = null;
                 if(rule_type == rule_types.DIRECTIONAL) {
                     int val = (int) obj.getProperty("value");

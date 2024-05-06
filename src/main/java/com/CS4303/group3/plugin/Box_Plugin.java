@@ -5,6 +5,7 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
 
 import com.CS4303.group3.utils.Changeable;
+import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import processing.core.PApplet;
@@ -100,26 +101,5 @@ public class Box_Plugin implements Plugin_Interface {
         OPERATIONAL
     }
 
-    //consumers for changing the direction of a value
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_direction_up = (game, directional) -> {
-        if(directional != null) directional.change(new PVector(0, -1));
-    };
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_direction_left = (game, directional) -> {
-        if(directional != null) directional.change(new PVector(-1, 0));
-    };
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_direction_right = (game, directional) -> {
-        if(directional != null) directional.change(new PVector(1, 0));
-    };
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_direction_down = (game, directional) -> {
-        if(directional != null) directional.change(new PVector(0, 1));
-    };
-
-    //consumers for changing the boolean of a value
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_true = (game, directional) -> {
-        if(directional != null) directional.change(true);
-    };
-    public static BiConsumer<Game, Changeable.Changeable_Interface> change_false = (game, directional) -> {
-        if(directional != null) directional.change(false);
-    };
 
 }
