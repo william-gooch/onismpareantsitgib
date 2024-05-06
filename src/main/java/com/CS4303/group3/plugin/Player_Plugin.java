@@ -5,7 +5,7 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Object_Plugin.*;
-import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
@@ -31,7 +31,7 @@ public class Player_Plugin implements Plugin_Interface {
         playerWidth = (int) game.playerWidth;
 
         game.schedule.update(() -> {
-            dom.findEntitiesWith(Velocity.class, Sprite.class)
+            dom.findEntitiesWith(Velocity.class, SpriteRenderer.class, Grab.class)
                 .withAlso(Player.class)
                 .stream().forEach(player -> {
                     PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
@@ -42,6 +42,16 @@ public class Player_Plugin implements Plugin_Interface {
                         player.comp2().flipX = true;
                     } else if (velocityPerpToGravity < 0) {
                         player.comp2().flipX = false;
+                    }
+
+                    if(player.comp3().grabObj != null) {
+                        ((StateSprite) player.comp2().sprite).setState("throw");
+                    } else {
+                        if(Math.abs(velocityPerpToGravity) > 0.2f) {
+                            ((StateSprite) player.comp2().sprite).setState("run");
+                        } else {
+                            ((StateSprite) player.comp2().sprite).setState("idle");
+                        }
                     }
                 });
         });
