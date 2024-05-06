@@ -80,13 +80,14 @@
   </object>
   <object id="22" name="Block" type="block" gid="7" x="161" y="223" width="14" height="14">
    <properties>
-    <property name="value" type="int" value="0"/>
+    <property name="ruleType" value="Directional"/>
+    <property name="value" type="int" value="2"/>
    </properties>
   </object>
   <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
    <point/>
   </object>
-  <object id="23" name="Dock" type="dock" gid="13" x="192" y="400" width="16" height="16">
+  <object id="23" name="Dock" type="dock" gid="13" x="192" y="400" width="16" height="13.5">
    <properties>
     <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>

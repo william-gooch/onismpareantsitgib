@@ -225,7 +225,18 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
-                e.add(new Box(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                rule_types rule_type = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                T value = null;
+                if(rule_type == rule_types.DIRECTIONAL) {
+                    int val = (int) obj.getProperty("value");
+                    if(val == 0) value = (T) new PVector(0,1); //down
+                    if(val == 1) value = (T) new PVector(1,0); //right
+                    if(val == 2) value = (T) new PVector(0,-1); //up
+                    if(val == 3) value = (T) new PVector(-1,0); //left
+                } else {
+
+                }
+                e.add(new Box(rule_type, value));
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 return e;
             }),
@@ -354,13 +365,26 @@ public class Map_Plugin implements Plugin_Interface {
                     //TODO: other directions
                 } else {
                     default_value = null;
+                    //TODO: have a map of strings to functions
                 }
-                System.out.println(changeable.get().get());
                 e.add(new Docking_Plugin.Docking(
                     new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
                     default_value, ruleType, changeable, null
                 ));
-                System.out.println(changeable.get().get());
+//                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
+                    if(other.has(Box.class) && other.get(Box.class).rule_type == self.get(Docking_Plugin.Docking.class).rule_type) {
+                        //lock box into place (remove velocity)
+                        System.out.println(other.get(Box.class).value);
+                        other.removeType(Velocity.class);
+
+
+                        //apply box value to the changeable
+                        if(other.get(Box.class).docked == null) self.get(Docking_Plugin.Docking.class).changeable.get().change(other.get(Box.class).value);
+                        self.get(Docking_Plugin.Docking.class).block = other;
+                        other.get(Box.class).docked = self;
+                    }
+                }, false));
                 return e;
             }),
             Map.entry("gravity", obj -> {
@@ -370,7 +394,6 @@ public class Map_Plugin implements Plugin_Interface {
                     new Changeable(g),
                     g
                 );
-                System.out.println(e.get(Gravity.class).gravity() + "-");
                 return e;
             })
         );
