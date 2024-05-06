@@ -420,7 +420,6 @@ public class Map_Plugin implements Plugin_Interface {
                     }),
                     new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
                 );
-                return e;
             })
         );
     }
