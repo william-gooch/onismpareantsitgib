@@ -16,6 +16,7 @@ import com.CS4303.group3.plugin.Player_Plugin.Player;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
+import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
@@ -77,7 +78,7 @@ public class Map_Plugin implements Plugin_Interface {
         int layer
     ) { }
 
-    static class TileMap {
+    static class TileMap<T> {
         float tileScale = 1;
         TiledMap map;
 
@@ -190,6 +191,7 @@ public class Map_Plugin implements Plugin_Interface {
                             e = createSpriteFromObject(obj);
                         }
                         if(obj.getProperty("onTrigger") != null) {
+                            System.out.println(obj.getProperty("onTrigger"));
                             Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
                             if(trigger != null) {
                                 e.add(trigger);
@@ -278,7 +280,7 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("door", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 Door d = new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
-                d.openDirection = (int) obj.getProperty("openDirection");
+                d.openDirection = 0; //(int) obj.getProperty("openDirection");
                 e.add(d);
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
@@ -310,17 +312,45 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("dock", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 //need to find a way to link to the changeable in the entity being changed
+                rule_types ruleType = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                var trigObj = obj.getProperty("trigger");
+                Changeable changeable = null;
+                if(trigObj != null) {
+                    var trigEntity = objects.get(trigObj);
+                    if(trigEntity != null) {
+                        changeable = trigEntity.get(Changeable.class);
+                    }
+                }
+
+                T default_value;
+                if(ruleType == rule_types.DIRECTIONAL) {
+                    String default_value_string = (String) obj.getProperty("defaultValue");
+                    if(default_value_string.equals("Down")) {
+                        default_value = (T) new PVector(0,1);
+                    } else {
+                        default_value = (T) new PVector(0,-1);
+                    }
+                    //TODO: other directions
+                } else {
+                    default_value = null;
+                }
+                System.out.println(changeable.get().get());
                 e.add(new Docking_Plugin.Docking(
                     new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                    null, rule_types.OPERATIONAL, null, null
+                    default_value, ruleType, changeable, null
                 ));
+                System.out.println(changeable.get().get());
                 return e;
             }),
             Map.entry("gravity", obj -> {
-                return game.dom.createEntity(
+                Gravity g = new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f));
+                Entity e = game.dom.createEntity(
                     new Position(new PVector()), // to make sure gravity gets deleted when world is reset
-                    new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f))
+                    new Changeable(g),
+                    g
                 );
+                System.out.println(e.get(Gravity.class).gravity() + "-");
+                return e;
             })
         );
     }

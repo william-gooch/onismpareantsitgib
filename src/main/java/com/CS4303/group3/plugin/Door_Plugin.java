@@ -24,10 +24,10 @@ public class Door_Plugin implements Plugin_Interface {
     /**
      * Door class that represents a door in the game
      */
-    static class Door {
+    static class Door extends Changeable.Changeable_Interface {
         public int height, width, maxHeight, maxWidth;
         public float timeElapsed;
-        public Changeable.Changeable_Interface open;
+//        public Changeable.Changeable_Interface open;
         public final float UPDATE_DELAY = 0.01f;
         public final float LOWERING_INCREMENT = 1f;
         public int openDirection = 0;
@@ -38,12 +38,13 @@ public class Door_Plugin implements Plugin_Interface {
          * @param width - width of the door
          */
         public Door(int height, int width) {
+            super(false);
             this.height = height;
             this.maxHeight = height; 
             this.maxWidth = width;
             this.timeElapsed = 0;
             this.width = width;
-            this.open = new Changeable.Changeable_Interface<>(false);
+//            this.open = new Changeable.Changeable_Interface<>(false);
         }
 
         /**
@@ -51,7 +52,7 @@ public class Door_Plugin implements Plugin_Interface {
          * @return boolean - true if the door is open, false if the door is closed
          */
         public boolean isOpen() {
-            return (boolean) open.get();
+            return (boolean) get();
         }
 
         /**
