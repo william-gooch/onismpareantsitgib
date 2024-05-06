@@ -348,9 +348,9 @@ public class Game_Plugin implements Plugin_Interface {
 
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
-            // float playerRatio = 36f / 26f;
-            float playerRatio = 1;
-            float playerWidth = 12 * scale;
+            float playerRatio = 36f / 26f;
+            // float playerRatio = 1;
+            float playerWidth = 10 * scale;
             float playerHeight = playerWidth * playerRatio;
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player-anim.png");
 
@@ -370,13 +370,16 @@ public class Game_Plugin implements Plugin_Interface {
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
                 new Velocity(),
-                new SpriteRenderer(playerSprite, playerWidth, playerHeight, new PVector(0.25f, 0.5f)),
+                new SpriteRenderer(playerSprite, playerHeight, playerHeight, new PVector(1-(1/playerRatio), 0.5f)),
                 new Player(),
                 new Grab(40),
                 new PlayerMovement(),
                 new Body(),
                 Collider.BasicCollider(playerWidth, playerHeight)
             );
+
+            game.playerWidth = playerWidth;
+            game.playerHeight = playerHeight;
         }
 
         public void createExit(Game game, float x, float y){

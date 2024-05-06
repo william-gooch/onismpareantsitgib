@@ -44,8 +44,6 @@ public class Game extends PApplet {
         noSmooth();
 //        size((int)scale, (int)scale, P2D);
         size((int)scale, (int)scale);
-        playerWidth = scale/25;
-        playerHeight = scale/16;
     }
 
     //Setup

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import dev.dominion.ecs.api.*;
 import dev.dominion.ecs.api.Results.*;
+import javafx.util.Pair;
 import processing.core.PVector;
 
 public class Object_Plugin implements Plugin_Interface {
@@ -107,25 +108,26 @@ public class Object_Plugin implements Plugin_Interface {
             obj.comp4().velocity.set(0,0);
             return;
         }
-        Contact firstCollision = (Contact) game.dom.findEntitiesWith(Position.class, Collider.class)
+        Pair<Entity, Contact> entityAndContact = (Pair<Entity, Contact>) game.dom.findEntitiesWith(Position.class, Collider.class)
                 .stream()
                 .filter(other -> preCollision(obj, other))
-                .<Contact> map(other -> {
+                .<Pair<Entity, Contact>> map(other -> {
                     // // check if collided vertically
                     // yCollide(game, obj, other);
                     // // check if collided horizontally
                     // xCollide(game, obj, other);
 
                     Contact contact = collision(obj, other);
-                    return contact;
+                    return new Pair<>(other.entity(), contact);
                 })
-                .filter(c -> c != null)
-                .min(Comparator.comparing(a -> a.collisionTime()))
+                .filter(c -> c.getValue() != null)
+                .min(Comparator.comparing(a -> ((Pair<Entity, Contact>) a).getValue().collisionTime()))
                 .orElse(null);
 
-        if (firstCollision == null) {
+        if (entityAndContact == null || entityAndContact.getValue() == null) {
             obj.comp1().position.add(obj.comp4().velocity);
         } else {
+            Contact firstCollision = entityAndContact.getValue();
 //            if(firstCollision.collisionTime() == 0) {
 //                //if already colliding move backwards
 //                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
@@ -155,7 +157,17 @@ public class Object_Plugin implements Plugin_Interface {
             }
 
             if(firstCollision.collisionTime() <= EPSILON) {
+                System.out.println(game.frameCount + "] oops im inside an object " + firstCollision.cNormal());
                 obj.comp1().position.add(firstCollision.cNormal());
+            }
+
+            Entity otherEntity = entityAndContact.getKey();
+            if(otherEntity.has(Body.class)) {
+                System.out.println("tryna push " + firstCollision.cNormal());
+                otherEntity.get(Velocity.class).velocity.add(
+                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.x * 0.3f : 0,
+                    firstCollision.cNormal().x == 0 ? obj.comp4().velocity.y * 0.3f : 0
+                );
             }
 
             obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
