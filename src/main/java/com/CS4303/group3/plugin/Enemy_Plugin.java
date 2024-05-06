@@ -4,7 +4,11 @@ import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.utils.Collision;
 import dev.dominion.ecs.api.Dominion;
+import dev.dominion.ecs.api.Entity;
+import javafx.util.Pair;
 import processing.core.PVector;
+
+import java.util.Comparator;
 
 public class Enemy_Plugin implements Plugin_Interface {
     Dominion dom;
@@ -88,6 +92,38 @@ public class Enemy_Plugin implements Plugin_Interface {
             }
 
             return direction;
+        }
+    }
+
+    public static class Patrol_AI implements AI {
+        float velocity;
+        float death_animation = 0;
+        boolean flipped = false; //moves negative whichever direction it was going
+        Collision.Collider_Interface collider;
+
+        public Patrol_AI(float velocity, float width, float height) {
+            this.velocity = velocity;
+            collider = Object_Plugin.Collider.BasicCollider(width, height).collider;
+        }
+
+        public PVector getDirection(Game game, Object_Plugin.Position position) {
+            //get movement direction
+            Force_Plugin.Gravity gravity = Resource.get(game, Force_Plugin.Gravity.class);
+            if(gravity == null) return new PVector(0,0);
+
+            PVector direction = new PVector(game.abs(gravity.gravity().y),game.abs(gravity.gravity().y));
+            if(flipped) direction.mult(-1);
+
+            //use collider to check the direction that will be moved in
+            Collision.Contact collision = game.dom.findEntitiesWith(Object_Plugin.Position.class, Object_Plugin.Collider.class)
+                    .stream().map(other -> {
+                        return collider.collide(position, new Object_Plugin.Velocity(direction.mult(velocity)), other.comp2().collider, other.comp1());
+                    }).filter(c -> c != null)
+                    .min(Comparator.comparing(a -> a.collisionTime()))
+                    .orElse(null);
+
+            if(collision == null) return direction;
+            else return direction.mult(collision.collisionTime()*0.99f);
         }
     }
 }
