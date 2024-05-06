@@ -2,6 +2,7 @@ package com.CS4303.group3.plugin;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -34,6 +35,16 @@ public class Object_Plugin implements Plugin_Interface {
                     //Temporary
                     if(game.abs(obj.comp4().velocity.x) < 0.01f) obj.comp4().velocity.x = 0; //if object moving to slow stop it
                     if(game.abs(obj.comp4().velocity.y) < 0.01f) obj.comp4().velocity.y = 0;
+
+                    PVector dirlock = obj.comp4().directionLocked;
+                    if(dirlock.magSq() > 0) {
+                        // check if the object's velocity is facing towards the locked direction
+                        float dotprod = dirlock.dot(obj.comp4().velocity);
+                        if(dotprod > 0) {
+                            PVector tangent = new PVector(dirlock.y, -dirlock.x).normalize();
+                            obj.comp4().velocity.set(tangent.mult(tangent.dot(obj.comp4().velocity)));
+                        }
+                    }
 
                     //if entity is a player and holding a box move the box
                     if(obj.entity().has(Grab.class)) {
@@ -103,6 +114,8 @@ public class Object_Plugin implements Plugin_Interface {
     }
 
     public static void resolve_collision(Game game, With4<Position, Collider, Body, Velocity> obj, float time_remaining, int depth) {
+        boolean bouncing = true;
+
         if(depth == 5) {
             //if this many collisions resolved give up and just stop all movement
             obj.comp4().velocity.set(0,0);
@@ -128,11 +141,28 @@ public class Object_Plugin implements Plugin_Interface {
             obj.comp1().position.add(obj.comp4().velocity);
         } else {
             Contact firstCollision = entityAndContact.getValue();
+
+            if(obj.comp2().isFragile) {
+                game.dom.deleteEntity(obj.entity());
+            }
+            if(entityAndContact.getKey().get(Collider.class).isFragile) {
+                game.dom.deleteEntity(entityAndContact.getKey());
+            }
 //            if(firstCollision.collisionTime() == 0) {
 //                //if already colliding move backwards
 //                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
 //            }
-            obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
+
+           
+// if(bouncy && obj.entity().has(Player.class)){
+//     obj.comp4().velocity.y = obj.comp4().velocity.y*-1f;
+// }
+
+
+                obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
+            
+        
+          
 //                        if(game.abs(firstCollision.cNormal().x) == 0) obj.comp1().position.x += obj.comp4().velocity.copy().x;
 //                        else obj.comp1().position.x += obj.comp4().velocity.copy().x * firstCollision.collisionTime();
 //                        if(game.abs(firstCollision.cNormal().y) == 0) obj.comp1().position.y += obj.comp4().velocity.copy().y;
@@ -165,6 +195,12 @@ public class Object_Plugin implements Plugin_Interface {
                 obj.comp1().position.add(firstCollision.cNormal());
             }
 
+
+            float bounceThreshold = 4f;
+
+            // System.out.println(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
+         
+      
             Entity otherEntity = entityAndContact.getKey();
             if(otherEntity.has(Body.class) && otherEntity.has(Velocity.class)) {
                 System.out.println("tryna push " + firstCollision.cNormal());
@@ -174,8 +210,30 @@ public class Object_Plugin implements Plugin_Interface {
                 );
             }
 
-            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
-                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+            // obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+            //         firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+
+
+            Gravity grav = Resource.get(game, Gravity.class);
+            boolean aboveThreshold = false;
+
+            if(grav.gravity().y > 0 ){
+                aboveThreshold = obj.comp4().velocity.y * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold;
+            }else if(grav.gravity().x > 0 ){
+                aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold;
+            }else if(grav.gravity().y < 0 ){
+                aboveThreshold = obj.comp4().velocity.y * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
+            }else if(grav.gravity().x < 0 ){
+                aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
+            }
+
+            if(obj.comp2().isBouncy && aboveThreshold) {
+                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
+                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
+            }else{
+                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+            }
 
 //            if(entityAndContact.getKey().get(Collider.class).isTrigger && obj.comp2().isTrigger) {
 //                entityAndContact.getKey().get(Collider.class).triggerCollision(entityAndContact.getKey(), obj.entity());
@@ -191,8 +249,8 @@ public class Object_Plugin implements Plugin_Interface {
         if(collision == null) return null;
 
         // some objects may have custom collision callbacks (e.g. buttons)
-        obj.comp2().triggerCollision(obj.entity(), other.entity());
-        other.comp2().triggerCollision(other.entity(), obj.entity());
+        obj.comp2().triggerCollision(obj.entity(), other.entity(), collision);
+        other.comp2().triggerCollision(other.entity(), obj.entity(), collision);
 
         // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
         // if so, skip over handling the collision after this point
@@ -226,6 +284,8 @@ public class Object_Plugin implements Plugin_Interface {
         public PVector velocity = new PVector(0,0);
         public float mass = 1f;
 
+        public PVector directionLocked = new PVector();
+
         public Velocity() {}
 
         public Velocity(float mass) {
@@ -240,22 +300,27 @@ public class Object_Plugin implements Plugin_Interface {
     public static class Collider {
         Collider_Interface collider;
 
-        BiConsumer<Entity, Entity> onCollide = null;
+        public static record Collision (Entity self, Entity other, Contact contact) {}
+
+        Consumer<Collision> onCollide = null;
         boolean isTrigger = false;
+        boolean isBouncy = false;
+        boolean isFragile = false;
 
         public Collider(Collider_Interface collider) {
             this.collider = collider;
         }
 
-        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide) {
+        public Collider(Collider_Interface collider, Consumer<Collision> onCollide) {
             this.collider = collider;
             this.onCollide = onCollide;
             this.isTrigger = true;
         }
 
-        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide, boolean isTrigger) {
+        public Collider(Collider_Interface collider, Consumer<Collision> onCollide, boolean isTrigger) {
             this.collider = collider;
             this.onCollide = onCollide;
+            this.isTrigger = isTrigger;
         }
 
         public static Collider BasicCollider(float width, float height) {
@@ -266,9 +331,9 @@ public class Object_Plugin implements Plugin_Interface {
             return new Collider(new BasicCollider(width, height, x, y));
         }
 
-        public void triggerCollision(Entity self, Entity other) {
+        public void triggerCollision(Entity self, Entity other, Contact contact) {
             if(onCollide != null) {
-                onCollide.accept(self, other);
+                onCollide.accept(new Collision(self, other, contact));
             }
         }
     }

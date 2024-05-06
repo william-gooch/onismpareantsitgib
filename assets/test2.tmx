@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="27">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
   <data encoding="csv">
@@ -54,9 +54,9 @@
 10,0,0,14,15,15,15,15,15,21,21,21,21,22,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-9,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,3,3,9
+9,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,3,3,3
 </data>
  </layer>
  <objectgroup id="5" name="Object Layer 1">
@@ -87,12 +87,20 @@
   <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
    <point/>
   </object>
-  <object id="23" name="Dock" type="dock" gid="13" x="192" y="400" width="16" height="13.5">
+  <object id="23" name="Dock" type="dock" gid="13" x="192" y="400" width="16" height="16">
    <properties>
     <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
+  </object>
+  <object id="24" type="enemy" x="256" y="368" width="16" height="16">
+   <properties>
+    <property name="path" type="object" value="26"/>
+   </properties>
+  </object>
+  <object id="26" name="Enemy Path" type="path" x="256" y="368">
+   <polyline points="0,0 64,0"/>
   </object>
  </objectgroup>
 </map>
