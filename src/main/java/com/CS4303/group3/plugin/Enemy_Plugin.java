@@ -2,6 +2,8 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
+import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
@@ -34,6 +36,12 @@ public class Enemy_Plugin implements Plugin_Interface {
                     .stream().filter(ai -> ai.comp().death_animation > 0).forEach(ai -> {
                         //reduce the time on the death animation
                         ai.comp().death_animation -= game.schedule.dt();
+                        if(ai.entity().has(SpriteRenderer.class)) {
+                            var sprite = ai.entity().get(SpriteRenderer.class);
+                            if(sprite.sprite instanceof StateSprite) {
+                                ((StateSprite) sprite.sprite).setState("dead");
+                            }
+                        }
 
                         //delete entity if fully dead
                         if(ai.comp().death_animation <= 0) dom.deleteEntity(ai.entity());
@@ -43,17 +51,17 @@ public class Enemy_Plugin implements Plugin_Interface {
 
 
         //draw the basic AI
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        draw.call(drawing -> {
-                            //draw the player character
-                            drawing.fill(255,0,0);
-                            drawing.rect(pos.x, pos.y, playerSize, playerSize);
-                        });
-                    });
-        });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
+        //             .stream().forEach(res -> {
+        //                 var pos = res.comp1().position;
+        //                 draw.call(drawing -> {
+        //                     //draw the player character
+        //                     drawing.fill(255,0,0);
+        //                     drawing.rect(pos.x, pos.y, playerSize, playerSize);
+        //                 });
+        //             });
+        // });
     }
 
     public interface AI {

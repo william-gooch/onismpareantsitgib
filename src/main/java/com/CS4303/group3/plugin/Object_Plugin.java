@@ -2,6 +2,7 @@ package com.CS4303.group3.plugin;
 
 import java.util.Comparator;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
@@ -231,8 +232,8 @@ public class Object_Plugin implements Plugin_Interface {
         if(collision == null) return null;
 
         // some objects may have custom collision callbacks (e.g. buttons)
-        obj.comp2().triggerCollision(obj.entity(), other.entity());
-        other.comp2().triggerCollision(other.entity(), obj.entity());
+        obj.comp2().triggerCollision(obj.entity(), other.entity(), collision);
+        other.comp2().triggerCollision(other.entity(), obj.entity(), collision);
 
         // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
         // if so, skip over handling the collision after this point
@@ -280,7 +281,9 @@ public class Object_Plugin implements Plugin_Interface {
     public static class Collider {
         Collider_Interface collider;
 
-        BiConsumer<Entity, Entity> onCollide = null;
+        public static record Collision (Entity self, Entity other, Contact contact) {}
+
+        Consumer<Collision> onCollide = null;
         boolean isTrigger = false;
         boolean isBouncy = false;
 
@@ -288,16 +291,16 @@ public class Object_Plugin implements Plugin_Interface {
             this.collider = collider;
         }
 
-        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide) {
+        public Collider(Collider_Interface collider, Consumer<Collision> onCollide) {
             this.collider = collider;
             this.onCollide = onCollide;
             this.isTrigger = true;
         }
 
-        public Collider(Collider_Interface collider, BiConsumer<Entity, Entity> onCollide, boolean isTrigger) {
+        public Collider(Collider_Interface collider, Consumer<Collision> onCollide, boolean isTrigger) {
             this.collider = collider;
             this.onCollide = onCollide;
-        
+            this.isTrigger = isTrigger;
         }
 
         public static Collider BasicCollider(float width, float height) {
@@ -308,9 +311,9 @@ public class Object_Plugin implements Plugin_Interface {
             return new Collider(new BasicCollider(width, height, x, y));
         }
 
-        public void triggerCollision(Entity self, Entity other) {
+        public void triggerCollision(Entity self, Entity other, Contact contact) {
             if(onCollide != null) {
-                onCollide.accept(self, other);
+                onCollide.accept(new Collision(self, other, contact));
             }
         }
     }

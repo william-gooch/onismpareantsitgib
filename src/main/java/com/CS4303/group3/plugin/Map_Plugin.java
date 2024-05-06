@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.plaf.nimbus.State;
+
 import org.tiledreader.*;
 
 public class Map_Plugin implements Plugin_Interface {
@@ -288,9 +290,9 @@ public class Map_Plugin implements Plugin_Interface {
                 });
                 e.add(button);
                 e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), 
-                    (self, other) -> {
-                        self.get(Button.class).pushed = true;
-                        self.get(Button.class).lastPushed = 0;
+                    (collision) -> {
+                        collision.self().get(Button.class).pushed = true;
+                        collision.self().get(Button.class).lastPushed = 0;
                     })
                 );
                 return e;
@@ -310,16 +312,22 @@ public class Map_Plugin implements Plugin_Interface {
                 return null;
             }),
             Map.entry("enemy", obj -> {
-                AnimatedSprite sprite = new AnimatedSprite();
                 PImage enemyImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "enemy-anim.png");
-                List<ISprite> frames = AnimatedSprite.framesFromSpriteSheet(enemyImage, 9);
+                List<ISprite> frames = AnimatedSprite.framesFromSpriteSheet(enemyImage, 10);
+
+                AnimatedSprite normalSprite = new AnimatedSprite();
                 frames
                     .stream()
                     .limit(7)
-                    .forEach(f -> sprite.addFrame(f, 1f/30f));
+                    .forEach(f -> normalSprite.addFrame(f, 1f/30f));
                 for(int i = 0; i < 16; i++) {
-                    sprite.addFrame(frames.get(7 + (i%2)), 1f/30f);
+                    normalSprite.addFrame(frames.get(7 + (i%2)), 1f/30f);
                 }
+
+                StateSprite sprite = new StateSprite();
+                sprite.addState("alive", normalSprite);
+                sprite.addState("dead", frames.get(9));
+                sprite.setState("alive");
 
                 Entity e = game.dom.createEntity(
                     new Position(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
@@ -329,15 +337,26 @@ public class Map_Plugin implements Plugin_Interface {
                 TiledObject path = (TiledObject) obj.getProperty("path");
                 PVector[] points = path.getPoints().stream().map(p -> new PVector(((float)p.getX() + obj.getX()) * tileScale, ((float)p.getY() + obj.getY()) * tileScale)).toList().toArray(new PVector[0]);
                 e.add(new Enemy_Plugin.Basic_AI(points));
-                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
-                    if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
+                    // check if collision normal is negative y (i.e. getting hit from above)
+                    if(collision.contact().cNormal().y < 0) {
+                        System.out.println("oof ouch owie im dead");
+                        collision.self().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                        collision.self().get(Collider.class).onCollide = null;
+                        if(collision.other().has(Velocity.class)) {
+                            collision.other().get(Velocity.class).velocity.y *= -1;
+                        }
+                        return;
+                    }
+
+                    if(collision.other().has(Player.class) && collision.other().get(Player.class).invulnerability == 0f) {
                         System.out.println("Damaged Player, player is now invulnerable");
-                        other.get(Player.class).lives--;
-                        if (other.get(Player.class).lives <= 0) {
+                        collision.other().get(Player.class).lives--;
+                        if (collision.other().get(Player.class).lives <= 0) {
                             //player has died, restart the level
                             System.out.println("Player has died");
                         }
-                        other.get(Player.class).invulnerability = 1f;
+                        collision.other().get(Player.class).invulnerability = 1f;
                     }
                 }, true));
                 return e;
@@ -373,17 +392,17 @@ public class Map_Plugin implements Plugin_Interface {
                     default_value, ruleType, changeable, null
                 ));
 //                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
-                    if(other.has(Box.class) && other.get(Box.class).rule_type == self.get(Docking_Plugin.Docking.class).rule_type) {
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
+                    if(collision.other().has(Box.class) && collision.other().get(Box.class).rule_type == collision.self().get(Docking_Plugin.Docking.class).rule_type) {
                         //lock box into place (remove velocity)
-                        System.out.println(other.get(Box.class).value);
-                        other.removeType(Velocity.class);
+                        System.out.println(collision.other().get(Box.class).value);
+                        collision.other().removeType(Velocity.class);
 
 
                         //apply box value to the changeable
-                        if(other.get(Box.class).docked == null) self.get(Docking_Plugin.Docking.class).changeable.get().change(other.get(Box.class).value);
-                        self.get(Docking_Plugin.Docking.class).block = other;
-                        other.get(Box.class).docked = self;
+                        if(collision.other().get(Box.class).docked == null) collision.self().get(Docking_Plugin.Docking.class).changeable.get().change(collision.other().get(Box.class).value);
+                        collision.self().get(Docking_Plugin.Docking.class).block = collision.other();
+                        collision.other().get(Box.class).docked = collision.self();
                     }
                 }, false));
                 return e;
@@ -406,14 +425,14 @@ public class Map_Plugin implements Plugin_Interface {
                 return game.dom.createEntity(
                     new Position(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
                     new Spike_Plugin.Spikes(obj.getWidth() * tileScale,obj.getHeight() * tileScale),
-                    new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
-                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
-                            other.get(Player.class).lives--;
-                            if(other.get(Player.class).lives <= 0) {
+                    new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
+                        if(collision.other().has(Player.class) && collision.other().get(Player.class).invulnerability <= 0f) {
+                            collision.other().get(Player.class).lives--;
+                            if(collision.other().get(Player.class).lives <= 0) {
                                 //player has died, restart the level
                                 System.out.println("Player has died");
                             }
-                            other.get(Player.class).invulnerability = 1f;
+                            collision.other().get(Player.class).invulnerability = 1f;
 
                         }
                     }),

@@ -387,8 +387,8 @@ public class Game_Plugin implements Plugin_Interface {
         
             game.dom.createEntity(
                     new Position(new PVector(x, y)),
-                    new Collider(new BasicCollider(45, 45), (self, other) -> {
-                        if(other.has(Player.class)) {
+                    new Collider(new BasicCollider(45, 45), (collision) -> {
+                        if(collision.other().has(Player.class)) {
                             var wm = Resource.get(game, WorldManager.class);
                             wm.newLevel();
                         }
