@@ -2,11 +2,16 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Force_Plugin.Gravity;
+import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
+import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Map;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import javafx.util.Pair;
+import processing.core.PConstants;
 import processing.core.PVector;
 
 import java.util.Comparator;
@@ -44,6 +49,12 @@ public class Enemy_Plugin implements Plugin_Interface {
                     .stream().filter(ai -> ai.comp().death_animation > 0).forEach(ai -> {
                         //reduce the time on the death animation
                         ai.comp().death_animation -= game.schedule.dt();
+                        if(ai.entity().has(SpriteRenderer.class)) {
+                            var sprite = ai.entity().get(SpriteRenderer.class);
+                            if(sprite.sprite instanceof StateSprite) {
+                                ((StateSprite) sprite.sprite).setState("dead");
+                            }
+                        }
 
                         //delete entity if fully dead
                         if(ai.comp().death_animation <= 0) dom.deleteEntity(ai.entity());
@@ -63,16 +74,30 @@ public class Enemy_Plugin implements Plugin_Interface {
 
 
         //draw the basic AI
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        draw.call(drawing -> {
-                            //draw the player character
-                            drawing.fill(255,0,0);
-                            drawing.rect(pos.x, pos.y, playerSize, playerSize);
-                        });
-                    });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Object_Plugin.Position.class, Basic_AI.class)
+        //             .stream().forEach(res -> {
+        //                 var pos = res.comp1().position;
+        //                 draw.call(drawing -> {
+        //                     //draw the player character
+        //                     drawing.fill(255,0,0);
+        //                     drawing.rect(pos.x, pos.y, playerSize, playerSize);
+        //                 });
+        //             });
+        // });
+        game.schedule.update(() -> {
+            dom.findEntitiesWith(Position.class, SpriteRenderer.class, Basic_AI.class)
+                .stream().forEach(player -> {
+                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    player.comp2().rotation = gravity.heading() - PConstants.PI/2;
+
+                    float velocityPerpToGravity = player.comp3().getDirection(game, player.comp1()).dot(gravity.copy().rotate(PConstants.PI/2));
+                    if(velocityPerpToGravity > 0) {
+                        player.comp2().flipX = true;
+                    } else if (velocityPerpToGravity < 0) {
+                        player.comp2().flipX = false;
+                    }
+                });
         });
 
         //draw the patrol AI

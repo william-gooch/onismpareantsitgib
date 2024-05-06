@@ -49,6 +49,14 @@ public class Sprite_Plugin implements Plugin_Interface {
             this.anchorPoint = anchorPoint;
         }
 
+        public SpriteRenderer(ISprite sprite, float width, float height, float rotation) {
+            this.sprite = sprite;
+            this.width = width;
+            this.height = height;
+            this.anchorPoint = new PVector(0.5f, 0.5f);
+            this.rotation = rotation;
+        }
+
         public void draw(Game drawing, Entity sprite) {
             PVector position = sprite.get(Position.class).position;
             drawing.push();
@@ -90,6 +98,30 @@ public class Sprite_Plugin implements Plugin_Interface {
         @Override
         public void draw(Game drawing, Entity sprite, float width, float height) {
             drawing.image(image, 0, 0, width, height);
+        }
+    }
+
+    static class RepeatedSprite implements ISprite {
+        PImage image;
+        float baseWidth, baseHeight;
+
+        RepeatedSprite(PImage image, float baseWidth, float baseHeight) {
+            this.image = image;
+            this.baseWidth = baseWidth;
+            this.baseHeight = baseHeight;
+        }
+
+        @Override
+        public void draw(Game drawing, Entity sprite, float width, float height) {
+            int tilesX = Game.floor(width / baseWidth);
+            int tilesY = Game.floor(height / baseHeight);
+            float tileWidth = width / tilesX;
+            float tileHeight = height / tilesY;
+            for(float i = 0; i < tilesX; i++) {
+                for(float j = 0; j < tilesY; j++) {
+                    drawing.image(image, i * tileWidth, j * tileHeight, tileWidth, tileHeight);
+                }
+            }
         }
     }
 

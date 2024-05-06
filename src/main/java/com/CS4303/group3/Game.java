@@ -48,6 +48,7 @@ public class Game extends PApplet {
 
     //Setup
     public void setup() {
+        windowTitle("OH NO!!! I SENT MY PROFESSOR A RUDE EMAIL AND NEED TO SNEAK IN TO GET IT BACK!");
         // size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
 //        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
 //        frameRate(1);
@@ -117,7 +118,7 @@ public class Game extends PApplet {
             rotation = initial_rotation;
         }
         if(rotation != 0) {
-            System.out.println(rotation);
+           // System.out.println(rotation);
             translate(scale / 2, scale / 2);
             rotate(rotation);
             translate(-scale / 2, -scale / 2);

@@ -90,9 +90,9 @@ public class Game_Plugin implements Plugin_Interface {
                             drawing.textAlign(PConstants.CENTER, PConstants.TOP);
                             drawing.textSize(30);
                             drawing.fill(255);
-                            drawing.text(res.comp().text(), 10, game.scale/2 - 50, game.scale - 10, game.scale);
+                            drawing.text(res.comp().text(), 10, game.scale/2 + res.comp().textPosition(), game.scale - 10, game.scale);
                             drawing.textSize(20);
-                            drawing.text(res.comp().subText(), 10, game.scale/2 + 50, game.scale - 10, game.scale);
+                            drawing.text(res.comp().subText(), 10, game.scale/2 + res.comp().subTextPosition(), game.scale - 10, game.scale);
                             drawing.pop();
                         });
                     });
@@ -219,7 +219,8 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test"+(level+1)+".tmx");
+            TiledMap m = am.getResource(TiledMap.class, "test"+(level)+".tmx");
+            //TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             //TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             dom.createEntity(
                 new TileMap(game, m)
@@ -404,8 +405,8 @@ public class Game_Plugin implements Plugin_Interface {
         
             game.dom.createEntity(
                     new Position(new PVector(x, y)),
-                    new Collider(new BasicCollider(45, 45), (self, other) -> {
-                        if(other.has(Player.class)) {
+                    new Collider(new BasicCollider(45, 45), (collision) -> {
+                        if(collision.other().has(Player.class)) {
                             var wm = Resource.get(game, WorldManager.class);
                             wm.newLevel();
                         }
@@ -417,18 +418,18 @@ public class Game_Plugin implements Plugin_Interface {
 
         private void createSettingsScene(Dominion dom) {
             dom.createEntity(new TextScreen("Select a binding and then press the desired key", "0: Settings\n" +
-                                                                                                            "1: Move Left\n" +
-                                                                                                            "2: Move Right\n" +
-                                                                                                            "3: Jump\n" +
-                                                                                                            "4: Pickup/Throw\n"));
+                                                                                               "1: Move Left\n" +
+                                                                                               "2: Move Right\n" +
+                                                                                               "3: Jump\n" +
+                                                                                               "4: Pickup/Throw\n", -50, 50));
         }
 
         private void createGameOver(Dominion dom) {
-            dom.createEntity(new TextScreen("Game over!", "Press [SPACE] to play again."));
+            dom.createEntity(new TextScreen("Game over!", "Press [SPACE] to play again.", -50, 50));
         }
 
         private void createTitleScreen(Dominion dom) {
-            // dom.createEntity(new TextScreen("OH NO! I sent my professor a rude email and need to sneak in to get it back", "Press [SPACE] to play."));
+            dom.createEntity(new TextScreen("", "Press [SPACE] to play.", 0, 225));
             AssetManager am = Resource.get(game, AssetManager.class);
             PImage logo = am.getResource(PImage.class, "logo.png");
             float logoRatio = PApplet.round((float)game.width / (float)logo.width),
@@ -436,7 +437,7 @@ public class Game_Plugin implements Plugin_Interface {
                   logoHeight = logo.height * logoRatio;
 
             dom.createEntity(
-                new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2)),
+                new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2 - 50)),
                 new SpriteRenderer(new Sprite(logo), logoWidth, logoHeight)
             );
         }
@@ -445,6 +446,9 @@ public class Game_Plugin implements Plugin_Interface {
 
     static record TextScreen(
             String text,
-            String subText
-    ) {}
+            String subText,
+            float textPosition,
+            float subTextPosition
+    ) {
+    }
 }
