@@ -196,10 +196,22 @@ public class Object_Plugin implements Plugin_Interface {
             // obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
             //         firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
 
-            
-            if(obj.comp2().isBouncy && obj.entity().has(Player.class) && otherEntity.has(Ground.class) &&
-                (obj.comp4().velocity.y * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold || obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold)){
-                    
+
+            Gravity grav = Resource.get(game, Gravity.class);
+            boolean aboveThreshold = false;
+
+            if(grav.gravity().y > 0 ){
+                aboveThreshold = obj.comp4().velocity.y * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold;
+            }else if(grav.gravity().x > 0 ){
+                aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) > bounceThreshold;
+            }else if(grav.gravity().y < 0 ){
+                aboveThreshold = obj.comp4().velocity.y * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
+            }else if(grav.gravity().x < 0 ){
+                aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
+            }
+
+
+            if(obj.comp2().isBouncy && obj.entity().has(Player.class) && otherEntity.has(Ground.class) && aboveThreshold) {
                 obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
                 firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
             }else{
@@ -267,7 +279,7 @@ public class Object_Plugin implements Plugin_Interface {
 
         BiConsumer<Entity, Entity> onCollide = null;
         boolean isTrigger = false;
-        boolean isBouncy = false;
+        boolean isBouncy = true;
 
         public Collider(Collider_Interface collider) {
             this.collider = collider;
