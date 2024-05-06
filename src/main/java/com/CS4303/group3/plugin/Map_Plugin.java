@@ -364,7 +364,7 @@ public class Map_Plugin implements Plugin_Interface {
                         }
                         collision.other().get(Player.class).invulnerability = 1f;
                     }
-                }, true));
+                }, false));
                 return e;
             }),
             Map.entry("dock", obj -> {
