@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="27">
+ <tileset firstgid="1" source="tiles.tsx"/>
+ <layer id="4" name="Tile Layer 2" width="20" height="20" locked="1">
+  <data encoding="csv">
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
+</data>
+ </layer>
+ <layer id="1" name="Tile Layer 1" width="20" height="20">
+  <data encoding="csv">
+9,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,9,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,20,21,21,21,21,21,21,21,22,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,20,21,21,22,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,20,21,21,8,
+10,0,0,20,21,21,21,21,22,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,20,22,0,0,0,0,0,14,
+10,0,0,0,0,0,0,20,21,22,0,0,0,0,0,0,0,0,0,0,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,21,21,21,21,21,21,21,21,22,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,9
+</data>
+ </layer>
+ <objectgroup id="5" name="Object Layer 1">
+  <object id="13" name="Door" type="door" gid="24" x="303.521" y="224.313" width="16" height="16">
+   <properties>
+    <property name="onTrigger" value="open"/>
+   </properties>
+  </object>
+  <object id="14" name="Block" type="block" gid="7" x="65" y="255.833" width="12" height="12"/>
+  <object id="15" name="Button" type="button" gid="12" x="304.485" y="143.924" width="16" height="16" rotation="-180">
+   <properties>
+    <property name="onImage" type="int" value="17"/>
+    <property name="trigger" type="object" value="13"/>
+   </properties>
+  </object>
+  <object id="16" name="Player Spawn" type="player_spawn" x="24.5" y="252.167">
+   <point/>
+  </object>
+  <object id="18" name="Gravity" type="gravity" x="0" y="1">
+   <point/>
+  </object>
+  <object id="20" name="Exit Point" type="exit_point" x="317.812" y="217.48">
+   <point/>
+  </object>
+  <object id="24" name="Block" type="block" gid="7" x="110" y="131" width="12" height="12" rotation="-180"/>
+  <object id="25" name="Button" type="button" gid="12" x="143.667" y="256.333" width="16" height="16">
+   <properties>
+    <property name="onImage" type="int" value="17"/>
+    <property name="trigger" type="object" value="18"/>
+   </properties>
+  </object>
+  <object id="26" name="Button" type="button" gid="12" x="79.75" y="47.5" width="16" height="16" rotation="-180">
+   <properties>
+    <property name="onImage" type="int" value="17"/>
+    <property name="trigger" type="object" value="18"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

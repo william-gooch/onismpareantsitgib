@@ -88,5 +88,8 @@
     <property name="value" type="int" value="0"/>
    </properties>
   </object>
+  <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
+   <point/>
+  </object>
  </objectgroup>
 </map>
