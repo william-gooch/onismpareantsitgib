@@ -55,7 +55,10 @@ public class Player_Plugin implements Plugin_Interface {
                 });
         });
 
+        // Check for game over conditions
         game.schedule.update(() -> {
+            WorldManager wm = Resource.get(game, WorldManager.class);
+
             dom.findEntitiesWith(Position.class)
                 .withAlso(Player.class)
                 .stream().forEach(player -> {
@@ -63,10 +66,14 @@ public class Player_Plugin implements Plugin_Interface {
                     || player.comp().position.x > game.width
                     || player.comp().position.y < 0
                     || player.comp().position.y > game.width) {
-                        WorldManager wm = Resource.get(game, WorldManager.class);
                         wm.gameOver();
                     }
                 });
+
+            // if there is no player object
+            if(wm.state == WorldManager.WorldState.PLAYING && !dom.findEntitiesWith(Player.class).iterator().hasNext()) {
+                wm.gameOver();
+            }
         });
 
         game.schedule.update(() -> {

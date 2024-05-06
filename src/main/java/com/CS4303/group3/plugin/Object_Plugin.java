@@ -141,6 +141,13 @@ public class Object_Plugin implements Plugin_Interface {
             obj.comp1().position.add(obj.comp4().velocity);
         } else {
             Contact firstCollision = entityAndContact.getValue();
+
+            if(obj.comp2().isFragile) {
+                game.dom.deleteEntity(obj.entity());
+            }
+            if(entityAndContact.getKey().get(Collider.class).isFragile) {
+                game.dom.deleteEntity(entityAndContact.getKey());
+            }
 //            if(firstCollision.collisionTime() == 0) {
 //                //if already colliding move backwards
 //                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
@@ -220,7 +227,7 @@ public class Object_Plugin implements Plugin_Interface {
                 aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
             }
 
-            if(obj.comp2().isBouncy && obj.entity().has(Player.class) && otherEntity.has(Ground.class) && aboveThreshold) {
+            if(obj.comp2().isBouncy && aboveThreshold) {
                 obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
                 firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
             }else{
@@ -298,6 +305,7 @@ public class Object_Plugin implements Plugin_Interface {
         Consumer<Collision> onCollide = null;
         boolean isTrigger = false;
         boolean isBouncy = false;
+        boolean isFragile = false;
 
         public Collider(Collider_Interface collider) {
             this.collider = collider;
