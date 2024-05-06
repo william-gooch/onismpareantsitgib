@@ -77,7 +77,7 @@ public class Force_Plugin implements Plugin_Interface {
 
         public void changeGravity(PVector new_gravity) {
 //            game.rotation_time = 0f; set the games rotation time to 0
-            change(new_gravity);
+            change(new_gravity.setMag(((PVector)get()).mag()));
         }
 
         public PVector gravity() {return (PVector) get();}

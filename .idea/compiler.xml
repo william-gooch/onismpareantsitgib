@@ -9,5 +9,8 @@
         <module name="onismpareantsitgib" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="onismpareantsitgib" target="16" />
+    </bytecodeTargetLevel>
   </component>
 </project>

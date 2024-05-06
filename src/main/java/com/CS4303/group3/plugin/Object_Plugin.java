@@ -1,14 +1,16 @@
 package com.CS4303.group3.plugin;
 
+import java.util.Comparator;
 import java.util.function.BiConsumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Map_Plugin.Ground;
 import com.CS4303.group3.plugin.Box_Plugin.*;
+import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.utils.Collision.*;
-
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import dev.dominion.ecs.api.*;
 import dev.dominion.ecs.api.Results.*;
@@ -21,71 +23,25 @@ public class Object_Plugin implements Plugin_Interface {
     @Override
     public void build(Game game) {
         dom = game.dom;
-        
-        //move object
-        game.schedule.update(() -> {
-            dom.findEntitiesWith(Position.class, Velocity.class, Collider.class)
-                .stream().forEach(entity -> {
-                    entity.comp1().previous_position = entity.comp1().position.copy();
-                    entity.comp1().position.add(entity.comp2().velocity);
-
-                    //if entity is a player and holding a box move the box
-                    if(entity.entity().has(Grab.class)) {
-                        Grab grab = entity.entity().get(Grab.class);
-                        if(grab.grabObj != null) {
-                            grab.grabObj.get(Position.class).previous_position = grab.grabObj.get(Position.class).position;
-                            
-                            // entity.entity().get(Player.class).box.get(Position.class).position.y = entity.comp1().position.y-entity.comp3().collider.getSize().y;
-                            // entity.entity().get(Player.class).box.get(Position.class).position.x = entity.comp1().position.x;
-                        }
-                    }
-                });
-        });
-
-            //move object
-            // game.schedule.update(() -> {
-            //     dom.findEntitiesWith( Button.class, Velocity.class, Position.class, Collider.class)
-            //         .stream().forEach(button -> {
-            //             float mag =  button.comp2().velocity.y;
-            
-
-            //             if(button.comp1().pushed && button.comp4().collider.getSize().y > 0){
-            //                 button.comp4().collider.getSize().y -= mag;
-            //                 button.comp1().height -= mag;
-                         
-            //                 if(button.comp1().height <= 0) {
-            //                     button.comp1().height = 0;
-            //                     button.comp4().collider.getSize().y = 0;
-            //                     button.comp2().velocity.y = 0;
-                                
-            //                 }
-
-            //             }
-                    
-            //         });
-            // });
-
-        //check for collsions
-        //check for collisions with the edge of the play area
-        game.schedule.update(() -> {
-            dom.findEntitiesWith(Collider.class, Position.class, Velocity.class)
-                .stream().forEach(res -> {
-                    PVector position = res.comp2().position;
-                    PVector velocity = res.comp3().velocity;
-                    if(position.x < 0) {
-                        position.x = 0;
-                        velocity.x = 0;
-                    // } else if(position.x + res.comp1().collider.getSize().x > game.displayWidth) {
-                    //     velocity.x = 0;
-                    //     position.x = game.displayWidth - res.comp1().collider.getSize().x;
-                    }
-                });
-        });
 
         //check collisions with anything with position and collider
         game.schedule.update(() -> {
-            dom.findEntitiesWith(Position.class, Collider.class, Body.class).stream()
+            dom.findEntitiesWith(Position.class, Collider.class, Body.class, Velocity.class).stream()
                 .forEach(obj -> {
+                    obj.comp1().previous_position = obj.comp1().position.copy();
+
+                    //Temporary
+                    if(game.abs(obj.comp4().velocity.x) < 0.01f) obj.comp4().velocity.x = 0; //if object moving to slow stop it
+                    if(game.abs(obj.comp4().velocity.y) < 0.01f) obj.comp4().velocity.y = 0;
+
+                    //if entity is a player and holding a box move the box
+                    if(obj.entity().has(Grab.class)) {
+                        Grab grab = obj.entity().get(Grab.class);
+                        if(grab.grabObj != null) {
+                            grab.grabObj.get(Position.class).previous_position = grab.grabObj.get(Position.class).position;
+                        }
+                    }
+
                     if(!obj.comp3().canCollide) {
                         return;
                     }
@@ -94,155 +50,42 @@ public class Object_Plugin implements Plugin_Interface {
                     obj.comp1().grounded = false;
 
                     //correct collisions with the ground
-                    dom.findEntitiesWith(Position.class, Collider.class)
-                        .stream()
-                        .filter(other -> preCollision(obj, other))
-                        .forEach(other -> {
-                            // check if collided vertically
-                            yCollide(game, obj, other);
-                            // check if collided horizontally
-                            xCollide(game, obj, other);
-                        });
+                    resolve_collision(game, obj, 1, 0);
                 });
         });
-
-
-        //TODO: COLLISIONS WITH BUTTONS
-        // game.schedule.update(() -> {
-        //     dom.findEntitiesWith(Position.class, Collider.class).without(Ground.class, Button.class)
-        //         .stream().forEach(player -> {
-
-        //             deleted_entity = false;
-        //             //disables the current entity
-        //             player.entity().setEnabled(false);
-
-        //             if(player.entity().has(Box.class)) {
-        //                 if(player.entity().get(Box.class).player != null) { //ensures that doesn't count collisions with player that is carrying
-        //                     player.entity().get(Box.class).player.setEnabled(false);
-        //                 }
-        //             }
-
-        //             if(player.entity().has(Player.class)) {
-        //                 if(player.entity().get(Player.class).box != null) { //ensures that doesn't count collisions with box that it is carrying
-        //                     player.entity().get(Player.class).box.setEnabled(false);
-        //                 }
-        //             }
-
-
-        //             dom.findEntitiesWith(Position.class, Collider.class, Button.class)
-        //             .stream().forEach(button -> {
-        //                 if(button.entity().isEnabled() && !deleted_entity) {
-        //                     PVector collision = player.comp2().collider.collision_correction(player.comp1(), button.comp2().collider, button.comp1());
-
-        //                     button.entity().get(Button.class).pushed = collision.y != 0 ? true : false;
-        //                      if(button.entity().get(Button.class).pushed) System.out.println("Button pushed " );
-        //                      System.out.println("Moved y - collision.y = "+ collision.y);
-        //                      System.out.println("Moved y - collision.x = "+ collision.x);
-        //                      System.out.println("Grounded = "+ player.comp1().grounded);
-                            
-        //                     //check if collided vertically
-        //                     if(collision.y != 0) {
-                              
-
-        //                         if(player.entity().has(Velocity.class)) {
-        //                             System.out.println("player velocity.y =  "+ player.entity().get(Velocity.class).velocity.y);
-        //                         // if(!player.comp1().buttoned){
-        //                             if(player.entity().get(Velocity.class).velocity.y * (collision.y - player.comp1().position.y) < 0) {
-        //                                 if(player.entity().get(Velocity.class).velocity.y > 0) {
-        //                                   //  player.comp1().grounded = true;
-        //                                     player.comp1().prev_walled = 0;
-        //                                     player.comp1().walled = 0;
-        //                                     // System.out.println("Grounded");
-        //                                 }
-        //                                     player.entity().get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                                     button.entity().get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                                     System.out.println("player velocity.y =  "+ player.entity().get(Velocity.class).velocity.y);
-        //                                     System.out.println("button velocity.y =  "+  button.entity().get(Velocity.class).velocity.y);
-        //                                     System.out.println("button velocity.x =  "+  button.entity().get(Velocity.class).velocity.x);
-                                            
-
-                                           
-        //                                 }
-        //                                 player.comp1().position.y = collision.y;
-        //                         //   }
-        //                         } else {
-        //                             if(!player.comp1().grounded){
-        //                                  //stop the block and player
-        //                                 player.comp1().position.y = collision.y+1;
-        //                                 player.entity().get(Box.class).player.get(Position.class).position.y = player.comp1().position.y + player.comp2().collider.getSize().y;
-        //                                 player.entity().get(Box.class).player.get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                                 button.entity().get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                              }
-        //                             }
-                                   
-        //                     }
-
-                    
-        //                     //check if collided horizontally
-        //                     //issue with setting enabled to false
-        //                     if(collision.x != 0 && !deleted_entity) {
-        //                         if(button.entity().has(Button.class)) {
-        //                             //stop velocity if going into the object
-        //                             if(player.entity().has(Velocity.class)) {
-        //                                 if(player.entity().get(Velocity.class).velocity.x * (collision.x - player.comp1().position.x) < 0) {
-        //                                     player.comp1().walled = (int)((collision.x - player.comp1().position.x) / Math.abs(collision.x - player.comp1().position.x)); //opposite direction of collision
-        //                                     player.entity().get(Velocity.class).velocity.x = 0;
-        //                                 }
-        //                                 player.entity().get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                                 button.entity().get(Velocity.class).velocity.y = button.entity().get(Button.class).loweringSpeed;
-        //                                 System.out.println("player velocity.x =  "+ player.entity().get(Velocity.class).velocity.x);
-        //                                 System.out.println("player velocity.y =  "+ player.entity().get(Velocity.class).velocity.y);
-        //                                 System.out.println("button velocity.y =  "+  button.entity().get(Velocity.class).velocity.y);
-        //                                 System.out.println("button velocity.x =  "+  button.entity().get(Velocity.class).velocity.x);
-        //                                 player.comp1().position.x = collision.x;
-        //                             } else {
-        //                                 //stop the block being carried if the player is still moving (This allows for wall jumping with the blocks - discuss if we want this)
-        //                                 if(player.entity().get(Box.class).player.get(Velocity.class).velocity.x != 0) {
-        //                                     player.entity().get(Box.class).player.setEnabled(true);
-        //                                     player.entity().get(Box.class).player.get(Player.class).box = null;
-        //                                     player.entity().get(Box.class).player = null;
-        //                                     player.entity().setEnabled(true);
-        //                                     dom.createEntityAs(player.entity(), new Velocity(0.5f));
-        //                                     dom.deleteEntity(player.entity());
-        //                                     deleted_entity = true;
-        //                                 }
-
-        //                                 //stop the player
-        //                                 // player.comp1().position.x = collision.x;
-        //                                 // player.entity().get(Box.class).player.get(Position.class).position.x = player.comp1().position.x;
-        //                                 // player.entity().get(Box.class).player.get(Velocity.class).velocity.x = 0;
-
-        //                             }
-        //                         }
-        //                     }
-        //                 }});
-
-
-        //                 if(!deleted_entity) {
-        //                     player.entity().setEnabled(true);
-        //                     if(player.entity().has(Box.class)) {
-        //                         if(player.entity().get(Box.class).player != null) {
-        //                             player.entity().get(Box.class).player.setEnabled(true);
-        //                         }
-        //                     }
-        //                     if(player.entity().has(Player.class)) {
-        //                         if(player.entity().get(Player.class).box != null) { //ensures that doesn't count collisions with box that it is carrying
-        //                             player.entity().get(Player.class).box.setEnabled(true);
-        //                         }
-        //                     }
-        //                 }
-                    
+        
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Velocity.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 drawing.line(obj.comp1().position.x, obj.comp1().position.y, obj.comp1().position.x + obj.comp2().velocity.x, obj.comp1().position.y + obj.comp2().velocity.y);
         //             });
-                
-                
         //         });
+        // });
 
-                
 
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Collider.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
+        //                 drawing.rect(obj.comp1().position.x, obj.comp1().position.y, size.x, size.y);
+        //             });
+        //         });
+        // });
 
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Collider.class, Velocity.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
+        //                 drawing.rect(obj.comp1().position.x + obj.comp3().velocity.x, obj.comp1().position.y + obj.comp3().velocity.y, size.x, size.y);
+        //             });
+        //         });
+        // });
     }
 
-    public static boolean preCollision(With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+    public static boolean preCollision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
         //check that it isn't looking at itself
         if(obj.entity() == other.entity()) { return false; }
         // if the object is a body that can't collide, then return early
@@ -258,8 +101,72 @@ public class Object_Plugin implements Plugin_Interface {
         return true;
     }
 
-    public static Contact collision(With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
-        Contact collision = obj.comp2().collider.collide(obj.comp1(), other.comp2().collider, other.comp1());
+    public static void resolve_collision(Game game, With4<Position, Collider, Body, Velocity> obj, float time_remaining, int depth) {
+        if(depth == 5) {
+            //if this many collisions resolved give up and just stop all movement
+            obj.comp4().velocity.set(0,0);
+            return;
+        }
+        Contact firstCollision = (Contact) game.dom.findEntitiesWith(Position.class, Collider.class)
+                .stream()
+                .filter(other -> preCollision(obj, other))
+                .<Contact> map(other -> {
+                    // // check if collided vertically
+                    // yCollide(game, obj, other);
+                    // // check if collided horizontally
+                    // xCollide(game, obj, other);
+
+                    Contact contact = collision(obj, other);
+                    return contact;
+                })
+                .filter(c -> c != null)
+                .min(Comparator.comparing(a -> a.collisionTime()))
+                .orElse(null);
+
+        if (firstCollision == null) {
+            obj.comp1().position.add(obj.comp4().velocity);
+        } else {
+//            if(firstCollision.collisionTime() == 0) {
+//                //if already colliding move backwards
+//                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
+//            }
+            obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
+//                        if(game.abs(firstCollision.cNormal().x) == 0) obj.comp1().position.x += obj.comp4().velocity.copy().x;
+//                        else obj.comp1().position.x += obj.comp4().velocity.copy().x * firstCollision.collisionTime();
+//                        if(game.abs(firstCollision.cNormal().y) == 0) obj.comp1().position.y += obj.comp4().velocity.copy().y;
+//                        else obj.comp1().position.y += obj.comp4().velocity.copy().y * firstCollision.collisionTime();
+
+//                        float dotprod = obj.comp4().velocity.dot(firstCollision.cNormal()) * (1 - firstCollision.collisionTime());
+//                        obj.comp4().velocity.set(firstCollision.cNormal().y * dotprod, firstCollision.cNormal().x * dotprod);
+
+            if (firstCollision.cNormal().dot(Resource.get(game, Gravity.class).gravity()) < 0 && time_remaining == 1) {
+                obj.comp1().grounded = true;
+                obj.comp1().prev_walled = 0;
+                obj.comp1().walled = 0;
+            }
+
+            //check if colliding on the x-direction, if it is set to be walled
+            if((firstCollision.cNormal().x * Resource.get(game, Gravity.class).gravity().y != 0
+                    || firstCollision.cNormal().y * Resource.get(game, Gravity.class).gravity().x != 0) && time_remaining == 1) {
+                if(Resource.get(game, Gravity.class).gravity().x != 0) obj.comp1().walled = obj.comp4().velocity.y > 0 ? 1 : -1;
+                else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
+
+                System.out.println(obj.comp1().walled);
+            }
+
+            if(firstCollision.collisionTime() <= EPSILON) {
+                obj.comp1().position.add(firstCollision.cNormal());
+            }
+
+            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+
+            resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
+        }
+    }
+
+    public static Contact partial_collision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other, float partial) {
+        Contact collision = obj.comp2().collider.partial_collide(obj.comp1(), obj.entity().get(Velocity.class), other.comp2().collider, other.comp1(), partial);
         if(collision == null) return null;
 
         // some objects may have custom collision callbacks (e.g. buttons)
@@ -271,11 +178,15 @@ public class Object_Plugin implements Plugin_Interface {
         if (obj.comp2().isTrigger || other.comp2().isTrigger) {
             return null;
         }
-        
+
         return collision;
     }
 
-    public static void yCollide(Game game, With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+    public static Contact collision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
+        return partial_collision(obj, other, 1);
+    }
+
+    public static void yCollide(Game game, With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
         Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
         PVector gravity;
         if(gravity_object != null) gravity = gravity_object.gravity();
@@ -333,7 +244,7 @@ public class Object_Plugin implements Plugin_Interface {
         }
     }
 
-    public static void xCollide(Game game, With3<Position, Collider, Body> obj, With2<Position, Collider> other) {
+    public static void xCollide(Game game, With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
         Force_Plugin.Gravity gravity_object = Resource.get(game, Force_Plugin.Gravity.class);
         PVector gravity;
         if(gravity_object != null) gravity = gravity_object.gravity();

@@ -30,6 +30,7 @@ public class Door_Plugin implements Plugin_Interface {
         public Changeable.Changeable_Interface open;
         public final float UPDATE_DELAY = 0.01f;
         public final float LOWERING_INCREMENT = 1f;
+        public int openDirection = 0;
 
         /**
          * Constructor for the Door class
@@ -81,26 +82,27 @@ public class Door_Plugin implements Plugin_Interface {
          */
         public void lower(Game game, PVector pos) {
             if (height > 0 && width > 0) {
-                Gravity gravity = Resource.get(game, Gravity.class);
 
-                if (gravity.gravity().y > 0) { // gravity is pulling down
+                if (openDirection == 0) {
 
                     height -= LOWERING_INCREMENT;
                     pos.y += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().y < 0) { // gravity is pulling up
+                } else if (openDirection == 2) {
 
                     height -= LOWERING_INCREMENT;
+                    pos.y -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x > 0) { // gravity is pulling right
+                } else if (openDirection == 1) {
 
                     width -= LOWERING_INCREMENT;
 
                     pos.x += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x < 0) { // gravity is pulling left
+                } else if (openDirection == 3) {
 
                     width -= LOWERING_INCREMENT;
+                    pos.x -= LOWERING_INCREMENT;
 
                 }
 
@@ -122,26 +124,27 @@ public class Door_Plugin implements Plugin_Interface {
          */
         public void raise( Game game, PVector pos) {
 
-            Gravity gravity = Resource.get(game, Gravity.class);
             if (height < maxHeight || width < maxWidth) {
-                if (gravity.gravity().y > 0) { // gravity is pulling down
+                if (openDirection == 0) {
 
                     height += LOWERING_INCREMENT;
                     pos.y -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().y < 0) { // gravity is pulling up
+                } else if (openDirection == 2) {
 
                     height += LOWERING_INCREMENT;
+                    pos.y += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x > 0) { // gravity is pulling right
+                } else if (openDirection == 1) {
 
                     width += LOWERING_INCREMENT;
 
                     pos.x -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x < 0) { // gravity is pulling left
+                } else if (openDirection == 3) {
 
                     width += LOWERING_INCREMENT;
+                    pos.x += LOWERING_INCREMENT;
 
                 }
             }

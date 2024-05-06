@@ -116,10 +116,14 @@ public class Game extends PApplet {
         if(rotation_time == 1f) {
             //set the initial rotation
             initial_rotation = target_rotation;
+            rotation = initial_rotation;
         }
-        translate(scale/2, scale/2);
-        rotate(rotation);
-        translate(-scale/2, -scale/2);
+        if(rotation != 0) {
+            System.out.println(rotation);
+            translate(scale / 2, scale / 2);
+            rotate(rotation);
+            translate(-scale / 2, -scale / 2);
+        }
         ops.stream()
             .forEach(op -> {
                 op.operation.perform(this);

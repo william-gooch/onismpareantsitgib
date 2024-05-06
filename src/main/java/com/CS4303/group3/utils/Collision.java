@@ -5,12 +5,14 @@ import java.util.*;
 import com.CS4303.group3.plugin.Object_Plugin;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
+import javafx.geometry.Pos;
 import processing.core.PVector;
 
 public class Collision {
     //Interfaces
     public interface Collider_Interface {
-        public Contact collide(Position pThis, Collider_Interface other, Position pOther);
+        public Contact collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther);
+        public Contact partial_collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther, float partial);
     }
 
     public record Contact(
@@ -20,7 +22,8 @@ public class Collision {
         Collider_Interface c1,
         Collider_Interface c2,
 
-        PVector cNormal
+        PVector cNormal,
+        float collisionTime
     ) {}
 
     //basic collider -- need to update if dealing with non box collisions
@@ -38,22 +41,53 @@ public class Collision {
         }
 
         @Override
-        public Contact collide(Object_Plugin.Position pThis, Collider_Interface other, Object_Plugin.Position pOther) {
+        public Contact partial_collide(Position pThis, Velocity vThis, Collider_Interface other, Position pOther, float partial) {
+            PVector velocity;
+            if (vThis == null) velocity = new PVector();
+            else velocity = vThis.velocity;
+
+            velocity = velocity.mult(partial);
+
             if (other instanceof BasicCollider) {
-                return collideBasic(pThis.position, (BasicCollider) other, pOther.position);
+                return collideSwept(pThis.position, velocity, (BasicCollider) other, pOther.position);
             }
             return null;
         }
 
+        @Override
+        public Contact collide(Object_Plugin.Position pThis, Velocity vThis, Collider_Interface other, Object_Plugin.Position pOther) {
+            return partial_collide(pThis, vThis, other, pOther, 1);
+        }
 
+        private boolean collideBroadPhase(
+            PVector pThis, PVector vThis,
+            BasicCollider other, PVector pOther
+        ) {
+            float bpx = Math.min(pThis.x, pThis.x + vThis.x),
+                  bpy = Math.min(pThis.y, pThis.y + vThis.y),
+                  bpw = this.size.x + Math.abs(vThis.x),
+                  bph = this.size.y + Math.abs(vThis.y);
+
+            return AABBCheck(
+                new PVector(bpx, bpy),
+                new PVector(bpw, bph),
+                pOther, other.size
+            );
+        }
+
+        private static boolean AABBCheck(
+            PVector aPos, PVector aSize,
+            PVector bPos, PVector bSize
+        ) {
+            return
+                   aPos.x + aSize.x   >= bPos.x
+                && aPos.x             <= bPos.x + bSize.x
+                && aPos.y + aSize.y   >= bPos.y
+                && aPos.y             <= bPos.y + bSize.y;
+        }
 
         private Contact collideBasic(PVector pThis, BasicCollider other, PVector pOther) {
-            boolean colliding =
-                   pThis.x + size.x >= pOther.x
-                && pThis.x             <= pOther.x + other.size.x
-                && pThis.y + size.y >= pOther.y
-                && pThis.y             <= pOther.y + other.size.y;
-
+            boolean colliding = AABBCheck(pThis, this.size, pOther, other.size);
             if (colliding) {
                 float
                     leftDist = (pOther.x + other.size.x) - pThis.x,
@@ -73,9 +107,81 @@ public class Collision {
                     normal = new PVector(0, -bottomDist);
                 }
 
-                return new Contact(pThis, pOther, this, other, normal);
+                return new Contact(pThis, pOther, this, other, normal, 0);
             } else {
                 return null;
+            }
+        }
+
+        // adapted from https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+        private Contact collideSwept(
+            PVector pThis, PVector vThis,
+            BasicCollider other, PVector pOther
+        ) {
+            if(!collideBroadPhase(pThis, vThis, other, pOther)) return null;
+            float xInvEntry, yInvEntry, xInvExit, yInvExit;
+            if (vThis.x > 0) {
+                xInvEntry = pOther.x - (pThis.x + size.x);
+                xInvExit = (pOther.x + other.size.x) - pThis.x;
+            } else {
+                xInvEntry = (pOther.x + other.size.x) - pThis.x;
+                xInvExit = pOther.x - (pThis.x + size.x);
+            }
+            if (vThis.y > 0) {
+                yInvEntry = pOther.y - (pThis.y + size.y);
+                yInvExit = (pOther.y + other.size.y) - pThis.y;
+            } else {
+                yInvEntry = (pOther.y + other.size.y) - pThis.y;
+                yInvExit = pOther.y - (pThis.y + size.y);
+            }
+
+            float xEntry, yEntry, xExit, yExit;
+            if (vThis.x == 0f) {
+                xEntry = Float.NEGATIVE_INFINITY;
+                xExit = Float.POSITIVE_INFINITY;
+            } else {
+                xEntry = xInvEntry / vThis.x;
+                xExit = xInvExit / vThis.x;
+            }
+            if (vThis.y == 0f) {
+                yEntry = Float.NEGATIVE_INFINITY;
+                yExit = Float.POSITIVE_INFINITY;
+            } else {
+                yEntry = yInvEntry / vThis.y;
+                yExit = yInvExit / vThis.y;
+            }
+
+            float entryTime = Math.max(xEntry, yEntry),
+                  exitTime = Math.min(xExit, yExit);
+
+            if(entryTime > exitTime
+            || (xEntry < 0f && yEntry < 0f)
+            || xEntry > 1f
+            || yEntry > 1f) {
+                return collideBasic(pThis, other, pOther);
+                // return null;
+            } else {
+                float normalX, normalY;
+
+                if(xEntry > yEntry) {
+                    if(xInvEntry < 0f) {
+                        normalX = 1f;
+                        normalY = 0f;
+                    } else {
+                        normalX = -1f;
+                        normalY = 0f;
+                    }
+                } else {
+                    if(yInvEntry < 0f) {
+                        normalX = 0f;
+                        normalY = 1f;
+                    } else {
+                        normalX = 0f;
+                        normalY = -1f;
+                    }
+                }
+
+                return new Contact(pThis, pOther, this, other, new PVector(normalX, normalY), entryTime);
             }
         }
 
@@ -86,9 +192,6 @@ public class Collision {
                     && point.y >= object.y
                     && point.y <= object.y + size.y;
         }
-
-
-
 
         //Attempt at implementing stretched out collisions, not working if time check at using something like this but not essential
 //        private Contact collideBasic(Object_Plugin.Position pThis, BasicCollider other, Object_Plugin.Position pOther) {

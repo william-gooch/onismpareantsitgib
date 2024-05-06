@@ -118,7 +118,7 @@ public class Player_Plugin implements Plugin_Interface {
 
                                             if (!dom.findEntitiesWith(Collider.class, Position.class)
                                                     .stream().anyMatch(object -> {
-                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerHeight)), object.comp1().collider, object.comp2());
+                                                        Contact c = box.comp1().collider.collide(new Position(box.comp3().get_above_head_position(game, player.comp3().position, playerHeight)), null, object.comp1().collider, object.comp2());
                                                         return c != null && object.comp2().position != box.comp2().position;
                                                     })) {
 
@@ -273,7 +273,7 @@ public class Player_Plugin implements Plugin_Interface {
                 if (Math.abs(velocity.y) > maxSpeed && gravity.x != 0) velocity.y *= 1 - (impulseDamping * deltaTime);
 
                 if(position.walled != 0 && position.walled != position.prev_walled && pressDirection.y == -1) {
-
+                    System.out.println("Wall jumped");
                     if(gravity.y != 0) {
                         velocity.y = -jumpSpeed * wallJumpPower * gravity.y;
                         velocity.x = -position.walled * jumpSpeed * wallJumpPower;

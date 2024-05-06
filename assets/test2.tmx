@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="23">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
   <data encoding="csv">
@@ -63,24 +63,30 @@
   <object id="13" name="Door" type="door" gid="24" x="384" y="384" width="16" height="16">
    <properties>
     <property name="onTrigger" value="open"/>
+    <property name="openDirection" type="int" value="2"/>
    </properties>
   </object>
-  <object id="14" name="Block" type="block" gid="7" x="130" y="126" width="12" height="12"/>
   <object id="15" name="Button" type="button" gid="12" x="112" y="272" width="16" height="16">
    <properties>
     <property name="onImage" type="int" value="17"/>
     <property name="trigger" type="object" value="13"/>
    </properties>
   </object>
-  <object id="16" name="Player Spawn" type="player_spawn" x="120" y="361">
+  <object id="16" name="Player Spawn" type="player_spawn" x="190" y="165">
    <point/>
   </object>
-  <object id="17" name="Dock" type="dock" gid="13" x="288" y="400" width="16" height="16"/>
+  <object id="17" name="Dock" type="dock" gid="13" x="288" y="400" width="16" height="16">
+   <properties>
+    <property name="trigger" type="object" value="18"/>
+   </properties>
+  </object>
   <object id="18" name="Gravity" type="gravity" x="0" y="1">
    <point/>
   </object>
-  <object id="19" x="-212" y="-81">
-   <point/>
+  <object id="22" name="Block" type="block" gid="7" x="161" y="223" width="14" height="14">
+   <properties>
+    <property name="value" type="int" value="0"/>
+   </properties>
   </object>
   <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
    <point/>
