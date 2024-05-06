@@ -209,7 +209,6 @@ public class Object_Plugin implements Plugin_Interface {
                 aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
             }
 
-
             if(obj.comp2().isBouncy && obj.entity().has(Player.class) && otherEntity.has(Ground.class) && aboveThreshold) {
                 obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
                 firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
@@ -283,7 +282,7 @@ public class Object_Plugin implements Plugin_Interface {
 
         BiConsumer<Entity, Entity> onCollide = null;
         boolean isTrigger = false;
-        boolean isBouncy = true;
+        boolean isBouncy = false;
 
         public Collider(Collider_Interface collider) {
             this.collider = collider;
