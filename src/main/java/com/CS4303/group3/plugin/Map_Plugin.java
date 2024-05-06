@@ -15,6 +15,7 @@ import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
 import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.ISprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.RepeatedSprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
@@ -340,7 +341,29 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("gravity", obj -> {
                 return game.dom.createEntity(
                     new Position(new PVector()), // to make sure gravity gets deleted when world is reset
-                    new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f))
+                    new Gravity(new PVector(obj.getX() * tileScale, obj.getY() * tileScale))
+                );
+            }),
+            Map.entry("spikes", obj -> {
+
+                PImage spikeImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "spikes.png");
+                RepeatedSprite sprite = new RepeatedSprite(spikeImage, map.getTileWidth() * tileScale, map.getTileHeight() * tileScale);
+
+                return game.dom.createEntity(
+                    new Position(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
+                    new Spike_Plugin.Spikes(obj.getWidth() * tileScale,obj.getHeight() * tileScale),
+                    new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
+                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
+                            other.get(Player.class).lives--;
+                            if(other.get(Player.class).lives <= 0) {
+                                //player has died, restart the level
+                                System.out.println("Player has died");
+                            }
+                            other.get(Player.class).invulnerability = 1f;
+
+                        }
+                    }),
+                    new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
                 );
             })
         );

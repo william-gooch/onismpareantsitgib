@@ -93,6 +93,30 @@ public class Sprite_Plugin implements Plugin_Interface {
         }
     }
 
+    static class RepeatedSprite implements ISprite {
+        PImage image;
+        float baseWidth, baseHeight;
+
+        RepeatedSprite(PImage image, float baseWidth, float baseHeight) {
+            this.image = image;
+            this.baseWidth = baseWidth;
+            this.baseHeight = baseHeight;
+        }
+
+        @Override
+        public void draw(Game drawing, Entity sprite, float width, float height) {
+            int tilesX = Game.floor(width / baseWidth);
+            int tilesY = Game.floor(height / baseHeight);
+            float tileWidth = width / tilesX;
+            float tileHeight = height / tilesY;
+            for(float i = 0; i < tilesX; i++) {
+                for(float j = 0; j < tilesY; j++) {
+                    drawing.image(image, i * tileWidth, j * tileHeight, tileWidth, tileHeight);
+                }
+            }
+        }
+    }
+
     static class StateSprite implements ISprite {
         String currentState;
         HashMap<String, ISprite> states;
