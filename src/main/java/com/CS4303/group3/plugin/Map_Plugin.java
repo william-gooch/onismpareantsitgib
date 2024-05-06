@@ -14,6 +14,7 @@ import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
 import com.CS4303.group3.utils.Collision;
@@ -154,7 +155,7 @@ public class Map_Plugin implements Plugin_Interface {
             PImage tileImage = getTileImage(tile);
             return game.dom.createEntity(
                 new Position(new PVector(x, y - height)),
-                new Sprite(tileImage, width, height)
+                new SpriteRenderer(new Sprite(tileImage), width, height)
             );
         }
 
@@ -225,19 +226,19 @@ public class Map_Plugin implements Plugin_Interface {
                 PImage offImage = getTileImage(obj.getTile());
                 PImage onImage = getTileImage(obj.getTile().getTileset().getTile((int) obj.getProperty("onImage")));
                 StateSprite sprite = new StateSprite();
-                sprite.addState("off", new Sprite(offImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
-                sprite.addState("on", new Sprite(onImage, obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                sprite.addState("off", new Sprite(offImage));
+                sprite.addState("on", new Sprite(onImage));
                 sprite.setState("off");
                 Entity e = game.dom.createEntity(
                     new Position(new PVector(obj.getX() * tileScale, (obj.getY() - obj.getHeight()) * tileScale)),
-                    sprite
+                    new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
                 );
                 Button button = new Button((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
                 button.addEventListener(new ButtonEventListener() {
 
                     @Override
                     public void onPush() {
-                        e.get(StateSprite.class).setState("on");
+                        sprite.setState("on");
                         var triggerObj = obj.getProperty("trigger");
                         if(triggerObj != null) {
                             var triggerEntity = objects.get(triggerObj);
@@ -252,7 +253,7 @@ public class Map_Plugin implements Plugin_Interface {
 
                     @Override
                     public void onRelease() {
-                        e.get(StateSprite.class).setState("off");
+                        sprite.setState("off");
                         var triggerObj = obj.getProperty("trigger");
                         if(triggerObj != null) {
                             var triggerEntity = objects.get(triggerObj);
