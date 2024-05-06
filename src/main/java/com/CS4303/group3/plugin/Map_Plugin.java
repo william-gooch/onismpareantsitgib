@@ -298,7 +298,7 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("door", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 Door d = new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
-                d.openDirection = 0; //(int) obj.getProperty("openDirection");
+                d.openDirection = (int) obj.getProperty("openDirection");
                 e.add(d);
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
