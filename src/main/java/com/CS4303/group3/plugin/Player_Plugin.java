@@ -273,7 +273,7 @@ public class Player_Plugin implements Plugin_Interface {
                 if (Math.abs(velocity.y) > maxSpeed && gravity.x != 0) velocity.y *= 1 - (impulseDamping * deltaTime);
 
                 if(position.walled != 0 && position.walled != position.prev_walled && pressDirection.y == -1) {
-
+                    System.out.println("Wall jumped");
                     if(gravity.y != 0) {
                         velocity.y = -jumpSpeed * wallJumpPower * gravity.y;
                         velocity.x = -position.walled * jumpSpeed * wallJumpPower;

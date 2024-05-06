@@ -126,11 +126,11 @@ public class Object_Plugin implements Plugin_Interface {
         if (firstCollision == null) {
             obj.comp1().position.add(obj.comp4().velocity);
         } else {
-            if(firstCollision.collisionTime() == 0) {
-                //if already colliding move backwards
-                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.1f));
-            }
-            obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * firstCollision.collisionTime() * 0.8f));
+//            if(firstCollision.collisionTime() == 0) {
+//                //if already colliding move backwards
+//                obj.comp1().position.sub(obj.comp4().velocity.copy().mult(0.001f));
+//            }
+            obj.comp1().position.add(obj.comp4().velocity.copy().mult(time_remaining * (firstCollision.collisionTime() - 0.01f)));
 //                        if(game.abs(firstCollision.cNormal().x) == 0) obj.comp1().position.x += obj.comp4().velocity.copy().x;
 //                        else obj.comp1().position.x += obj.comp4().velocity.copy().x * firstCollision.collisionTime();
 //                        if(game.abs(firstCollision.cNormal().y) == 0) obj.comp1().position.y += obj.comp4().velocity.copy().y;
@@ -138,14 +138,24 @@ public class Object_Plugin implements Plugin_Interface {
 
 //                        float dotprod = obj.comp4().velocity.dot(firstCollision.cNormal()) * (1 - firstCollision.collisionTime());
 //                        obj.comp4().velocity.set(firstCollision.cNormal().y * dotprod, firstCollision.cNormal().x * dotprod);
-            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
-                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
 
             if (firstCollision.cNormal().dot(Resource.get(game, Gravity.class).gravity()) < 0 && time_remaining == 1) {
                 obj.comp1().grounded = true;
+                obj.comp1().prev_walled = 0;
+                obj.comp1().walled = 0;
             }
 
-            //TODO: check if colliding on the x-direction, if it is set to be walled
+            //check if colliding on the x-direction, if it is set to be walled
+            if((firstCollision.cNormal().x * Resource.get(game, Gravity.class).gravity().y != 0
+                    || firstCollision.cNormal().y * Resource.get(game, Gravity.class).gravity().x != 0) && time_remaining == 1) {
+                if(Resource.get(game, Gravity.class).gravity().x != 0) obj.comp1().walled = obj.comp4().velocity.y > 0 ? 1 : -1;
+                else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
+
+                System.out.println(obj.comp1().walled);
+            }
+
+            obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                    firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
 
             resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
         }
