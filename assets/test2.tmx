@@ -56,7 +56,7 @@
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-9,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,13,3,3,3,3,3,9
+9,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,3,3,9
 </data>
  </layer>
  <objectgroup id="5" name="Object Layer 1">
@@ -75,22 +75,25 @@
   <object id="16" name="Player Spawn" type="player_spawn" x="190" y="165">
    <point/>
   </object>
-  <object id="17" name="Dock" type="dock" gid="13" x="288" y="400" width="16" height="16">
-   <properties>
-    <property name="trigger" type="object" value="18"/>
-   </properties>
-  </object>
   <object id="18" name="Gravity" type="gravity" x="0" y="1">
    <point/>
   </object>
   <object id="22" name="Block" type="block" gid="7" x="161" y="223" width="14" height="14">
    <properties>
-    <property name="value" type="int" value="0"/>
+    <property name="ruleType" value="Directional"/>
+    <property name="value" type="int" value="2"/>
    </properties>
   </object>
   <object id="20" name="Exit Point" type="exit_point" x="397.375" y="377.063">
    <point/>
   </object>
   <object id="23" name="Spikes" type="spikes" x="48" y="368" width="176" height="16"/>
+  <object id="23" name="Dock" type="dock" gid="13" x="192" y="400" width="16" height="13.5">
+   <properties>
+    <property name="defaultValue" value="Down"/>
+    <property name="ruleType" value="Directional"/>
+    <property name="trigger" type="object" value="18"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

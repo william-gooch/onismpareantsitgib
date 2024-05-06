@@ -54,7 +54,7 @@ public class Box_Plugin implements Plugin_Interface {
         // });
     }
 
-    static class Box {
+    static class Box<T> {
         //this is currently used for determining the arrow on the front, better to store the sprite to be rendered when graphics are sorted
         public enum directions {
             UP,
@@ -63,9 +63,10 @@ public class Box_Plugin implements Plugin_Interface {
             RIGHT
         }
 
-        public BiConsumer action = null;
         public rule_types rule_type;
+        public Entity docked = null;
         public PVector size = new PVector(0,0);
+        public T value;
         public directions direction;
 
         public Box() {}
@@ -73,15 +74,9 @@ public class Box_Plugin implements Plugin_Interface {
         public Box(PVector size) {this.size = size;}
 
 
-        public Box(BiConsumer r, PVector size, rule_types rule_type, directions direction) {
-            action = r;
-            this.size = size;
+        public Box(rule_types rule_type, T value) {
+            this.value = value;
             this.rule_type = rule_type;
-            this.direction = direction;
-        }
-
-        public void run_action(Game game, Changeable.Changeable_Interface changeable) {
-            action.accept(game, changeable);
         }
     }
 

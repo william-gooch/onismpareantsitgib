@@ -20,6 +20,7 @@ import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
+import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
@@ -82,7 +83,7 @@ public class Map_Plugin implements Plugin_Interface {
         int layer
     ) { }
 
-    static class TileMap {
+    static class TileMap<T> {
         float tileScale = 1;
         TiledMap map;
 
@@ -197,6 +198,7 @@ public class Map_Plugin implements Plugin_Interface {
                             e = createSpriteFromObject(obj);
                         }
                         if(obj.getProperty("onTrigger") != null) {
+                            System.out.println(obj.getProperty("onTrigger"));
                             Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
                             if(trigger != null) {
                                 e.add(trigger);
@@ -224,7 +226,18 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
-                e.add(new Box(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
+                rule_types rule_type = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                T value = null;
+                if(rule_type == rule_types.DIRECTIONAL) {
+                    int val = (int) obj.getProperty("value");
+                    if(val == 0) value = (T) new PVector(0,1); //down
+                    if(val == 1) value = (T) new PVector(1,0); //right
+                    if(val == 2) value = (T) new PVector(0,-1); //up
+                    if(val == 3) value = (T) new PVector(-1,0); //left
+                } else {
+
+                }
+                e.add(new Box(rule_type, value));
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 return e;
             }),
@@ -285,7 +298,7 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("door", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 Door d = new Door((int) (obj.getWidth() * tileScale), (int) (obj.getHeight() * tileScale));
-                d.openDirection = (int) obj.getProperty("openDirection");
+                d.openDirection = 0; //(int) obj.getProperty("openDirection");
                 e.add(d);
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 e.add(new Ground(new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale)));
@@ -332,17 +345,59 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("dock", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 //need to find a way to link to the changeable in the entity being changed
+                rule_types ruleType = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
+                var trigObj = obj.getProperty("trigger");
+                Changeable changeable = null;
+                if(trigObj != null) {
+                    var trigEntity = objects.get(trigObj);
+                    if(trigEntity != null) {
+                        changeable = trigEntity.get(Changeable.class);
+                    }
+                }
+
+                T default_value;
+                if(ruleType == rule_types.DIRECTIONAL) {
+                    String default_value_string = (String) obj.getProperty("defaultValue");
+                    if(default_value_string.equals("Down")) {
+                        default_value = (T) new PVector(0,1);
+                    } else {
+                        default_value = (T) new PVector(0,-1);
+                    }
+                    //TODO: other directions
+                } else {
+                    default_value = null;
+                    //TODO: have a map of strings to functions
+                }
                 e.add(new Docking_Plugin.Docking(
                     new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                    null, rule_types.OPERATIONAL, null, null
+                    default_value, ruleType, changeable, null
                 ));
+//                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (self, other) -> {
+                    if(other.has(Box.class) && other.get(Box.class).rule_type == self.get(Docking_Plugin.Docking.class).rule_type) {
+                        //lock box into place (remove velocity)
+                        System.out.println(other.get(Box.class).value);
+                        other.removeType(Velocity.class);
+
+
+                        //apply box value to the changeable
+                        if(other.get(Box.class).docked == null) self.get(Docking_Plugin.Docking.class).changeable.get().change(other.get(Box.class).value);
+                        self.get(Docking_Plugin.Docking.class).block = other;
+                        other.get(Box.class).docked = self;
+                    }
+                }, false));
                 return e;
             }),
             Map.entry("gravity", obj -> {
-                return game.dom.createEntity(
+                Gravity g = new Gravity(new PVector(obj.getX() * tileScale * 1f, obj.getY() * tileScale * 1f));
+                Entity e = game.dom.createEntity(
                     new Position(new PVector()), // to make sure gravity gets deleted when world is reset
-                    new Gravity(new PVector(obj.getX() * tileScale, obj.getY() * tileScale))
+                    new Gravity(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
+                    new Changeable(g),
+                    g
                 );
+
+                return e;
             }),
             Map.entry("spikes", obj -> {
 
@@ -365,6 +420,7 @@ public class Map_Plugin implements Plugin_Interface {
                     }),
                     new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
                 );
+                return e;
             })
         );
     }

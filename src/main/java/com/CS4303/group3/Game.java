@@ -117,7 +117,7 @@ public class Game extends PApplet {
             rotation = initial_rotation;
         }
         if(rotation != 0) {
-            System.out.println(rotation);
+           // System.out.println(rotation);
             translate(scale / 2, scale / 2);
             rotate(rotation);
             translate(-scale / 2, -scale / 2);
