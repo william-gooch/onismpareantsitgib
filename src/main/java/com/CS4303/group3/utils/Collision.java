@@ -75,15 +75,15 @@ public class Collision {
             );
         }
 
-        private static boolean AABBCheck(
+        public static boolean AABBCheck(
             PVector aPos, PVector aSize,
             PVector bPos, PVector bSize
         ) {
             return
-                   aPos.x + aSize.x   >= bPos.x
-                && aPos.x             <= bPos.x + bSize.x
-                && aPos.y + aSize.y   >= bPos.y
-                && aPos.y             <= bPos.y + bSize.y;
+                   aPos.x + aSize.x   > bPos.x
+                && aPos.x             < bPos.x + bSize.x
+                && aPos.y + aSize.y   > bPos.y
+                && aPos.y             < bPos.y + bSize.y;
         }
 
         private Contact collideBasic(PVector pThis, BasicCollider other, PVector pOther) {

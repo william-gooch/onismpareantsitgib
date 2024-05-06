@@ -42,6 +42,7 @@
   <object id="7" name="Door" type="door" gid="24" x="144" y="144" width="16" height="16">
    <properties>
     <property name="onTrigger" value="open"/>
+    <property name="openDirection" type="int" value="2"/>
    </properties>
   </object>
   <object id="8" name="Button" type="button" gid="12" x="96" y="96" width="16" height="16">

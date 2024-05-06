@@ -3,6 +3,7 @@ package com.CS4303.group3.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.tiledreader.TiledMap;
@@ -12,7 +13,11 @@ import com.CS4303.group3.Resource;
 import com.CS4303.group3.Resource.ResourceEntity;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.*;
+import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.ISprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
+import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
@@ -344,24 +349,37 @@ public class Game_Plugin implements Plugin_Interface {
             // int playerX = (int) (map.player_position.x * game.scale);
             // int playerY = (int) (map.player_position.x * game.scale);
             float playerRatio = 36f / 26f;
+            // float playerRatio = 1;
             float playerWidth = 10 * scale;
             float playerHeight = playerWidth * playerRatio;
-            PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player.png");
+            PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player-anim.png");
+
+            List<ISprite> sprites = AnimatedSprite.framesFromSpriteSheet(playerImage, 4);
+
+            StateSprite playerSprite = new StateSprite();
+            playerSprite.addState("idle", sprites.get(0));
+            playerSprite.addState("throw", sprites.get(3));
+
+            AnimatedSprite runSprite = new AnimatedSprite();
+            runSprite.addFrame(sprites.get(1), 0.2f);
+            runSprite.addFrame(sprites.get(2), 0.2f);
+            playerSprite.addState("run", runSprite);
+
+            playerSprite.setState("idle");
+
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
                 new Velocity(),
-                new Sprite(
-                    playerImage,
-                    playerWidth,
-                    playerHeight,
-                    new PVector(0.25f, 0.5f)
-                ),
+                new SpriteRenderer(playerSprite, playerHeight, playerHeight, new PVector(1-(1/playerRatio), 0.5f)),
                 new Player(),
                 new Grab(40),
                 new PlayerMovement(),
                 new Body(),
                 Collider.BasicCollider(playerWidth, playerHeight)
             );
+
+            game.playerWidth = playerWidth;
+            game.playerHeight = playerHeight;
         }
 
         public void createExit(Game game, float x, float y){
@@ -401,7 +419,7 @@ public class Game_Plugin implements Plugin_Interface {
 
             dom.createEntity(
                 new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2)),
-                new Sprite(logo, logoWidth, logoHeight)
+                new SpriteRenderer(new Sprite(logo), logoWidth, logoHeight)
             );
         }
     }
