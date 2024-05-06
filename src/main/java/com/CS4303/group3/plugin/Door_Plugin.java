@@ -53,6 +53,7 @@ public class Door_Plugin implements Plugin_Interface {
         public Changeable.Changeable_Interface open;
         public final float UPDATE_DELAY = 0.01f;
         public final float LOWERING_INCREMENT = 1f;
+        public int openDirection = 0;
 
         public Door(int height, int width) {
             this.height = height;
@@ -84,26 +85,27 @@ public class Door_Plugin implements Plugin_Interface {
 
         public void lower(Game game, PVector pos) {
             if (height > 0 && width > 0) {
-                Gravity gravity = Resource.get(game, Gravity.class);
 
-                if (gravity.gravity().y > 0) {
+                if (openDirection == 0) {
 
                     height -= LOWERING_INCREMENT;
                     pos.y += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().y < 0) {
+                } else if (openDirection == 2) {
 
                     height -= LOWERING_INCREMENT;
+                    pos.y -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x > 0) {
+                } else if (openDirection == 1) {
 
                     width -= LOWERING_INCREMENT;
 
                     pos.x += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x < 0) {
+                } else if (openDirection == 3) {
 
                     width -= LOWERING_INCREMENT;
+                    pos.x -= LOWERING_INCREMENT;
 
                 }
 
@@ -120,26 +122,27 @@ public class Door_Plugin implements Plugin_Interface {
 
         public void raise(PVector pos, Game game) {
 
-            Gravity gravity = Resource.get(game, Gravity.class);
             if (height < maxHeight || width < maxWidth) {
-                if (gravity.gravity().y > 0) {
+                if (openDirection == 0) {
 
                     height += LOWERING_INCREMENT;
                     pos.y -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().y < 0) {
+                } else if (openDirection == 2) {
 
                     height += LOWERING_INCREMENT;
+                    pos.y += LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x > 0) {
+                } else if (openDirection == 1) {
 
                     width += LOWERING_INCREMENT;
 
                     pos.x -= LOWERING_INCREMENT;
 
-                } else if (gravity.gravity().x < 0) {
+                } else if (openDirection == 3) {
 
                     width += LOWERING_INCREMENT;
+                    pos.x += LOWERING_INCREMENT;
 
                 }
             }

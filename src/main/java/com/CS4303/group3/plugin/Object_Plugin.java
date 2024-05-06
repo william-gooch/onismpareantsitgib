@@ -54,35 +54,35 @@ public class Object_Plugin implements Plugin_Interface {
                 });
         });
         
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Position.class, Velocity.class)
-                .stream().forEach(obj -> {
-                    draw.call(drawing -> {
-                        drawing.line(obj.comp1().position.x, obj.comp1().position.y, obj.comp1().position.x + obj.comp2().velocity.x, obj.comp1().position.y + obj.comp2().velocity.y);
-                    });
-                });
-        });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Velocity.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 drawing.line(obj.comp1().position.x, obj.comp1().position.y, obj.comp1().position.x + obj.comp2().velocity.x, obj.comp1().position.y + obj.comp2().velocity.y);
+        //             });
+        //         });
+        // });
 
 
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Position.class, Collider.class)
-                .stream().forEach(obj -> {
-                    draw.call(drawing -> {
-                        PVector size = ((BasicCollider)obj.comp2().collider).size;
-                        drawing.rect(obj.comp1().position.x, obj.comp1().position.y, size.x, size.y);
-                    });
-                });
-        });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Collider.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
+        //                 drawing.rect(obj.comp1().position.x, obj.comp1().position.y, size.x, size.y);
+        //             });
+        //         });
+        // });
 
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Position.class, Collider.class, Velocity.class)
-                .stream().forEach(obj -> {
-                    draw.call(drawing -> {
-                        PVector size = ((BasicCollider)obj.comp2().collider).size;
-                        drawing.rect(obj.comp1().position.x + obj.comp3().velocity.x, obj.comp1().position.y + obj.comp3().velocity.y, size.x, size.y);
-                    });
-                });
-        });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Position.class, Collider.class, Velocity.class)
+        //         .stream().forEach(obj -> {
+        //             draw.call(drawing -> {
+        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
+        //                 drawing.rect(obj.comp1().position.x + obj.comp3().velocity.x, obj.comp1().position.y + obj.comp3().velocity.y, size.x, size.y);
+        //             });
+        //         });
+        // });
     }
 
     public static boolean preCollision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
@@ -152,6 +152,10 @@ public class Object_Plugin implements Plugin_Interface {
                 else obj.comp1().walled = obj.comp4().velocity.x > 0 ? 1 : -1;
 
                 System.out.println(obj.comp1().walled);
+            }
+
+            if(firstCollision.collisionTime() <= EPSILON) {
+                obj.comp1().position.add(firstCollision.cNormal());
             }
 
             obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,

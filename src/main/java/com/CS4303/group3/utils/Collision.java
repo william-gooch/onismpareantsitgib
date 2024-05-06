@@ -158,8 +158,8 @@ public class Collision {
             || (xEntry < 0f && yEntry < 0f)
             || xEntry > 1f
             || yEntry > 1f) {
-                // return collideBasic(pThis, other, pOther);
-                return null;
+                return collideBasic(pThis, other, pOther);
+                // return null;
             } else {
                 float normalX, normalY;
 

@@ -239,21 +239,21 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
-            dom.createEntity(
-                    new Position(new PVector(400, 810)),
-                    new Spike_Plugin.Spikes(400,10),
-                    new Collider(new BasicCollider(400,10), (self, other) -> {
-                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
-                            other.get(Player.class).lives--;
-                            if(other.get(Player.class).lives <= 0) {
-                                //player has died, restart the level
-                                System.out.println("Player has died");
-                            }
-                            other.get(Player.class).invulnerability = 1f;
+            // dom.createEntity(
+            //         new Position(new PVector(400, 810)),
+            //         new Spike_Plugin.Spikes(400,10),
+            //         new Collider(new BasicCollider(400,10), (self, other) -> {
+            //             if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
+            //                 other.get(Player.class).lives--;
+            //                 if(other.get(Player.class).lives <= 0) {
+            //                     //player has died, restart the level
+            //                     System.out.println("Player has died");
+            //                 }
+            //                 other.get(Player.class).invulnerability = 1f;
 
-                        }
-                    })
-            );
+            //             }
+            //         })
+            // );
 
             // create block for testing
             // dom.createEntity(
