@@ -11,7 +11,6 @@ import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.utils.Collision.*;
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import dev.dominion.ecs.api.*;
 import dev.dominion.ecs.api.Results.*;
@@ -66,35 +65,6 @@ public class Object_Plugin implements Plugin_Interface {
                 });
         });
         
-        // game.schedule.draw(draw -> {
-        //     dom.findEntitiesWith(Position.class, Velocity.class)
-        //         .stream().forEach(obj -> {
-        //             draw.call(drawing -> {
-        //                 drawing.line(obj.comp1().position.x, obj.comp1().position.y, obj.comp1().position.x + obj.comp2().velocity.x, obj.comp1().position.y + obj.comp2().velocity.y);
-        //             });
-        //         });
-        // });
-
-
-        // game.schedule.draw(draw -> {
-        //     dom.findEntitiesWith(Position.class, Collider.class)
-        //         .stream().forEach(obj -> {
-        //             draw.call(drawing -> {
-        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
-        //                 drawing.rect(obj.comp1().position.x, obj.comp1().position.y, size.x, size.y);
-        //             });
-        //         });
-        // });
-
-        // game.schedule.draw(draw -> {
-        //     dom.findEntitiesWith(Position.class, Collider.class, Velocity.class)
-        //         .stream().forEach(obj -> {
-        //             draw.call(drawing -> {
-        //                 PVector size = ((BasicCollider)obj.comp2().collider).size;
-        //                 drawing.rect(obj.comp1().position.x + obj.comp3().velocity.x, obj.comp1().position.y + obj.comp3().velocity.y, size.x, size.y);
-        //             });
-        //         });
-        // });
     }
 
     public static boolean preCollision(With4<Position, Collider, Body, Velocity> obj, With2<Position, Collider> other) {
@@ -236,11 +206,6 @@ public class Object_Plugin implements Plugin_Interface {
                             firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
                 }
             }
-
-//            if(entityAndContact.getKey().get(Collider.class).isTrigger && obj.comp2().isTrigger) {
-//                entityAndContact.getKey().get(Collider.class).triggerCollision(entityAndContact.getKey(), obj.entity());
-//                obj.comp2().triggerCollision(obj.entity(), entityAndContact.getKey());
-//            }
 
             resolve_collision(game, obj, time_remaining- firstCollision.collisionTime(), depth+1);
         }

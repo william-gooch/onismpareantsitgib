@@ -205,26 +205,6 @@ public class Player_Plugin implements Plugin_Interface {
                 }
             }
         });
-
-        //flip
-        
-
-
-        //draw the player
-        // game.schedule.draw(-1, draw -> {
-        //     dom.findEntitiesWith(Position.class, Player.class)
-        //         .stream().forEach(res -> {
-        //             var pos = res.comp1().position;
-        //             Gravity gravity = Resource.get(game, Gravity.class);
-        //             draw.call(drawing -> {
-        //                 //draw the player character
-        //                 drawing.fill(128);
-        //                 if(res.comp2().invulnerability > 0f) drawing.fill(128,128);
-        //                 if(gravity == null || gravity.gravity().y != 0) drawing.rect(pos.x, pos.y, playerWidth, playerHeight);
-        //                 else drawing.rect(pos.x, pos.y, playerHeight, playerWidth);
-        //             });
-        //         });
-        // });
     }
 
     static class PlayerMovement {

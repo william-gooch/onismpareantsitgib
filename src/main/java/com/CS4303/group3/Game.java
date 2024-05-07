@@ -34,9 +34,6 @@ public class Game extends PApplet {
 
     //Settings --Does not run this for some reason -- ask how william got this bit to run
     public void settings() {
-//        fullScreen();
-        // size((int)Math.floor(displayWidth * 0.5), (int)Math.floor(displayHeight * 0.5));
-
         if(displayHeight > displayWidth) {
             scale = displayWidth;
         } else scale = displayHeight * 0.8f;
@@ -49,9 +46,6 @@ public class Game extends PApplet {
     //Setup
     public void setup() {
         windowTitle("OH NO!!! I SENT MY PROFESSOR A RUDE EMAIL AND NEED TO SNEAK IN TO GET IT BACK!");
-        // size((int)Math.floor(displayWidth * 0.75), (int)Math.floor(displayHeight * 0.75));
-//        ((PGraphicsOpenGL) getGraphics()).textureSampling(2);
-//        frameRate(1);
 
         //start Dominion
         dom = Dominion.create();

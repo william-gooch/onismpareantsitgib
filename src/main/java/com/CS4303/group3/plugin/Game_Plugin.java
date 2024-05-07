@@ -202,20 +202,7 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         public void createScene(Game game, Dominion dom, String level_name) {
-            // // Initialize the world map
-//             Map map;
-//             try {
-//                 map = mapper.readValue(new File(level_name), Map.class);
-//             } catch(IOException e) {return;}
-//
-//             //create solid ground sections
-//             for(Ground_Tile ground_tile : map.ground_tiles) {
-//                 dom.createEntity(
-//                     new Position(ground_tile.position.copy().mult(game.scale)),
-//                     new Ground(ground_tile.size.copy().mult(game.scale)),
-//                     Collider.BasicCollider((int)(ground_tile.size.x * game.scale), (int)(ground_tile.size.y * game.scale))
-//                 );
-//             }
+            // Initialize the world map
             AssetManager am = Resource.get(game, AssetManager.class);
             TiledMap m = am.getResource(TiledMap.class, "test_fragile.tmx");
 //            TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
@@ -223,161 +210,13 @@ public class Game_Plugin implements Plugin_Interface {
             dom.createEntity(
                 new TileMap(game, m)
             );
-            
-//             int playerWidth = (int) (game.scale/30);
-//             int playerHeight = (int) (game.scale/30);
-            // int playerWidth = (int) game.playerWidth;//26;
-            // int playerHeight = (int) game.playerHeight;//36;
-
-            // create button for testing
-            // float loweringSpeed = 0.2f;
-            // dom.createEntity(
-            //         new Position(new PVector(150, 100)),
-            //         new Button(playerWidth, playerHeight, loweringSpeed),
-            //         new Collider(new BasicCollider(playerWidth, playerWidth), (self, other) -> {
-            //             self.get(Button.class).pushed = true;
-            //             self.get(Button.class).lastPushed = 0;
-            //         }));
-
-            //initialise forces
-//            Gravity g = new Gravity();
-//            dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
-
-//            dom.createEntity(
-//                    new Position(new PVector(50, 50)),
-//                    new Enemy_Plugin.Patrol_AI(10, 20, 20),
-//                    new Body(),
-//                    new Velocity(),
-//                    new Collider(new BasicCollider(20,20), (collision) -> {
-//                        // check if collision normal is negative y (i.e. getting hit from above)
-//                        if(collision.contact().cNormal().y < 0) {
-//                            System.out.println("oof ouch owie im dead");
-//                            collision.self().get(Enemy_Plugin.Patrol_AI.class).death_animation = 2f;
-//                            collision.self().get(Collider.class).onCollide = null;
-//                            if(collision.other().has(Velocity.class)) {
-//                                collision.other().get(Velocity.class).velocity.y *= -1;
-//                            }
-//                            return;
-//                        }
-//
-//                        if(collision.other().has(Player.class) && collision.other().get(Player.class).invulnerability == 0f) {
-//                            System.out.println("Damaged Player, player is now invulnerable");
-//                            collision.other().get(Player.class).lives--;
-//                            if (collision.other().get(Player.class).lives <= 0) {
-//                                //player has died, restart the level
-//                                System.out.println("Player has died");
-//                            }
-//                            collision.other().get(Player.class).invulnerability = 1f;
-//                        }
-//                    }, false)
-//            );
-
-            // dom.createEntity(
-            //         new Position(new PVector(400, 810)),
-            //         new Spike_Plugin.Spikes(400,10),
-            //         new Collider(new BasicCollider(400,10), (self, other) -> {
-            //             if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
-            //                 other.get(Player.class).lives--;
-            //                 if(other.get(Player.class).lives <= 0) {
-            //                     //player has died, restart the level
-            //                     System.out.println("Player has died");
-            //                 }
-            //                 other.get(Player.class).invulnerability = 1f;
-
-            //             }
-            //         })
-            // );
-
-            // create block for testing
-            // dom.createEntity(
-            //         new Position(new PVector(100, 100)),
-            //         new Velocity(0.5f),
-            //         Collider.BasicCollider(playerWidth, playerWidth),
-            //         new Body(),
-            //         new Grabbable(),
-            //         new Box(Box_Plugin.change_direction_up, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.UP));
-
-            // dom.createEntity(
-            //         new Position(new PVector(100, 200)),
-            //         new Velocity(0.5f),
-            //         Collider.BasicCollider(playerWidth, playerWidth),
-            //         new Body(),
-            //         new Grabbable(),
-            //         new Box(Box_Plugin.change_direction_down, new PVector(playerWidth, playerWidth), rule_types.OPERATIONAL, Box.directions.DOWN));
-
-
-            // dom.createEntity(
-            //         new Position(new PVector(110, game.scale * 0.9f)),
-            //         new Docking_Plugin.Docking(new PVector(playerWidth, playerWidth), null, rule_types.OPERATIONAL, Resource.get(game, Gravity.class),
-            //                 new Docking_Plugin.Docking.Text("Gravity goes ", new PVector(10, game.scale * 0.9f), new PVector(100, playerHeight)))
-            // );
-
-            // Entity dock = dom.findEntitiesWith(Docking_Plugin.Docking.class).stream().findFirst().get().entity();
-            // Entity box = dom.findEntitiesWith(Box.class).stream().findFirst().get().entity();
-            // box.removeType(Velocity.class);
-            // box.get(Body.class).disableCollision();
-            // dock.get(Docking_Plugin.Docking.class).insert_new_rule(box, dock.get(Position.class).position, game);
-
-
-            // dom.createEntity(
-            //         new Position(new PVector(100 - playerWidth/2, 100 - playerHeight/2)),
-            //         new Velocity(),
-            //         new Player(playerWidth, playerHeight),
-            //         new Grab(40),
-            //         new Sprite(game.loadImage("player.png"), playerWidth, playerHeight),
-            //         new PlayerMovement(game.scale/3f, game.scale/40f, game.scale/40f, game.scale/100f, game.scale/40f, game.scale/2000f, game.scale/800f),
-            //         new Body(),
-            //         Collider.BasicCollider(playerWidth, playerHeight)
-            // );
-
-            // int doorWidth = playerWidth / 2;
-            // int doorHeight = playerHeight;
-
-            // create two Door for testing
-            // dom.createEntity(
-            //         new Position(new PVector(100, 100)),
-            //         new Door(doorWidth, doorHeight),
-            //         new Collider(new BasicCollider(doorWidth, doorHeight)));
-
-            // dom.createEntity(
-            //             new Position(new PVector(100, 50)),
-            //             new Door(doorWidth, doorHeight),
-            //             new Collider(new BasicCollider(doorWidth, doorHeight)));
-
-
-
-
-            // PVector[] test_path = new PVector[4];
-            // test_path[0] = new PVector(100,100);
-            // test_path[1] = new PVector(100,300);
-            // test_path[2] = new PVector(300,300);
-            // test_path[3] = new PVector(300,100);
-
-            // dom.createEntity(
-            //         new Position(new PVector(100,100)),
-            //         new Enemy_Plugin.Basic_AI(test_path),
-            //         new Collider(new BasicCollider(playerWidth, playerHeight), (self, other) -> {
-            //             if(other.has(Player.class) && other.get(Player.class).invulnerability == 0f) {
-            //                 System.out.println("Damaged Player, player is now invulnerable");
-            //                 other.get(Player.class).lives--;
-            //                 if (other.get(Player.class).lives <= 0) {
-            //                     //player has died, restart the level
-            //                     System.out.println("Player has died");
-            //                 }
-            //                 other.get(Player.class).invulnerability = 1f;
-            //             }
-            //         }, false)
-            // );
 
         }
 
         public void createPlayer(Game game, float x, float y, float scale) {
 
-            // int playerX = (int) (map.player_position.x * game.scale);
-            // int playerY = (int) (map.player_position.x * game.scale);
             float playerRatio = 36f / 26f;
-            // float playerRatio = 1;
             float playerWidth = 10 * scale;
             float playerHeight = playerWidth * playerRatio;
             PImage playerImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "player-anim.png");
