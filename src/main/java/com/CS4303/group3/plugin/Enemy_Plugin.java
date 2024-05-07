@@ -14,7 +14,6 @@ import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
-import com.CS4303.group3.utils.Map;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import javafx.util.Pair;

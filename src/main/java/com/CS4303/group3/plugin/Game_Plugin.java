@@ -27,8 +27,6 @@ import com.CS4303.group3.plugin.Button_Plugin.*;
 import com.CS4303.group3.plugin.Door_Plugin.*;
 import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Collision.BasicCollider;
-import com.CS4303.group3.utils.Map;
-import com.CS4303.group3.utils.Map.Ground_Tile;
 
 import dev.dominion.ecs.api.*;
 import dev.dominion.ecs.api.Results.With1;
