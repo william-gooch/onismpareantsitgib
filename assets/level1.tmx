@@ -50,7 +50,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="Object Layer 1">
-  <object id="13" name="Door" type="door" gid="24" x="303.333" y="223.667" width="16" height="16">
+  <object id="13" name="Door" type="door" gid="24" x="304" y="224" width="16" height="16">
    <properties>
     <property name="onTrigger" value="open"/>
     <property name="openDirection" type="int" value="2"/>
