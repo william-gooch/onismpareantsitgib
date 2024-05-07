@@ -252,6 +252,10 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
+                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                if(obj.getProperty("ruleType") == null) {
+                    return e;
+                }
                 rule_types ruleType = null;
                 switch ((String) obj.getProperty("ruleType")) {
                     case "Directional":
@@ -294,7 +298,6 @@ public class Map_Plugin implements Plugin_Interface {
                     }
                 }
                 e.add(new Box(ruleType, value));
-                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 return e;
             }),
             Map.entry("button", obj -> {
