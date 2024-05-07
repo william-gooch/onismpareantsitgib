@@ -84,8 +84,8 @@ public class Player_Plugin implements Plugin_Interface {
                         var grabPos = grabber.comp2().grabObj.get(Position.class);
                         Gravity gravity_entity = Resource.get(game, Gravity.class);
                         if(gravity_entity == null) return;
-                        PVector gravity = gravity_entity.gravity();
-                        grabPos.previous_position = grabPos.position;
+                        PVector gravity = gravity_entity.gravity().copy().normalize();
+                        grabPos.previous_position = grabPos.position.copy();
                         //set to be above head dependent on gravity
                         grabPos.position = PVector.add(grabber.comp1().position, new PVector(-game.playerWidth * 1.2f * gravity.x, -game.playerWidth * 1.2f * gravity.y, 0));
                     }
