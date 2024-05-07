@@ -251,7 +251,9 @@ public class Game_Plugin implements Plugin_Interface {
                     new Enemy_Plugin.Patrol_AI(10, 20, 20),
                     new Body(),
                     new Velocity(),
-                    new Collider(new BasicCollider(20,20), (self, other) -> {
+                    new Collider(new BasicCollider(20,20), (collision) -> {
+                        var other = collision.other();
+                        var self = collision.self();
                         if(other.get(Position.class).position.copy().sub(self.get(Position.class).position).dot(Resource.get(game, Gravity.class).gravity()) < 0) self.get(Enemy_Plugin.Patrol_AI.class).flipped = !self.get(Enemy_Plugin.Patrol_AI.class).flipped;
                         if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
                             other.get(Player.class).lives--;
