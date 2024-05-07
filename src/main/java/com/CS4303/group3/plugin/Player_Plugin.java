@@ -158,7 +158,7 @@ public class Player_Plugin implements Plugin_Interface {
                                                     dock.get(Docking_Plugin.Docking.class).block = null;
 
                                                     //reset dock to default
-//                                                    dock.get(Docking_Plugin.Docking.class).get().get().change(dock.get(Docking_Plugin.Docking.class).default_val);
+                                                    dock.get(Docking_Plugin.Docking.class).get().get().change(dock.get(Docking_Plugin.Docking.class).default_val);
 
                                                     box.entity().get(Box.class).docked = null;
                                                 }

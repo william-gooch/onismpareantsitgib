@@ -480,8 +480,10 @@ public class Map_Plugin implements Plugin_Interface {
                         }
                         collision.other().removeType(Velocity.class);
 
+                        if(collision.self().get(Docking_Plugin.Docking.class).get() == null) return;
 
                         //apply box value to the changeable
+                        collision.self().get(Docking_Plugin.Docking.class).get().get().change(collision.other().get(Box_Plugin.Box.class).value);
                         collision.self().get(Docking_Plugin.Docking.class).block = collision.other();
                         collision.other().get(Box.class).docked = collision.self();
                     }

@@ -29,20 +29,20 @@ public class Docking_Plugin implements Plugin_Interface {
 //                    });
 //        });
 
-        game.schedule.update(() -> {
-            game.dom.findEntitiesWith(Docking.class)
-                    .stream().forEach(dock -> {
-                        if(dock.comp().get() == null) return;
-
-                        //apply box value to the changeable
-                        if(dock.comp().block != null) {
-                            dock.comp().get().get().change(dock.comp().block.get(Box_Plugin.Box.class).value);
-                        }
-                        else {
-                            dock.comp().get().get().change(dock.comp().default_val);
-                        }
-                    });
-        });
+//        game.schedule.update(() -> {
+//            game.dom.findEntitiesWith(Docking.class)
+//                    .stream().forEach(dock -> {
+//                        if(dock.comp().get() == null) return;
+//
+//                        //apply box value to the changeable
+//                        if(dock.comp().block != null) {
+//                            dock.comp().get().get().change(dock.comp().block.get(Box_Plugin.Box.class).value);
+//                        }
+//                        else {
+//                            dock.comp().get().get().change(dock.comp().default_val);
+//                        }
+//                    });
+//        });
 
 
         //draw the docker gap
