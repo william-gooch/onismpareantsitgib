@@ -227,12 +227,14 @@ public class Object_Plugin implements Plugin_Interface {
                 aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
             }
 
-            if(/*obj.comp2().isBouncy */obj.comp2().state == Collider.states.BOUNCY && aboveThreshold) {
-                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
-                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
-            }else{
-                obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
-                firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+            if(!otherEntity.isDeleted()) {
+                if (/*obj.comp2().isBouncy */obj.comp2().state == Collider.states.BOUNCY && aboveThreshold || otherEntity.get(Collider.class).state == Collider.states.BOUNCY) {
+                    obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x,
+                            firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
+                } else {
+                    obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : 0,
+                            firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : 0);
+                }
             }
 
 //            if(entityAndContact.getKey().get(Collider.class).isTrigger && obj.comp2().isTrigger) {
