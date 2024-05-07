@@ -46,13 +46,13 @@
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,3,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,15,15,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,3,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,15,15,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,
 10,0,0,0,0,0,0,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,9,
-10,0,0,0,0,2,3,9,9,9,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+10,0,0,0,0,2,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,3,3,3,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
@@ -60,7 +60,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="Object Layer 1">
-  <object id="13" name="Door" type="door" gid="24" x="382.528" y="287.879" width="16" height="16">
+  <object id="13" name="Door" type="door" gid="24" x="384" y="288" width="16" height="16">
    <properties>
     <property name="onTrigger" value="open"/>
     <property name="openDirection" type="int" value="2"/>
@@ -78,7 +78,7 @@
     <property name="value" type="int" value="2"/>
    </properties>
   </object>
-  <object id="20" name="Exit Point" type="exit_point" x="396.083" y="285.73">
+  <object id="20" name="Exit Point" type="exit_point" x="396.518" y="282.121">
    <point/>
   </object>
   <object id="24" type="enemy" x="127.466" y="287.759" width="16" height="16">
@@ -97,7 +97,7 @@
    </properties>
   </object>
   <object id="31" name="Patrol Enemy" type="patrol_enemy" x="244.271" y="293.253" width="8" height="8"/>
-  <object id="33" name="Dock" type="dock" gid="13" x="144.179" y="0.149406" width="16" height="16" rotation="-180">
+  <object id="33" name="Dock" type="dock" gid="13" x="144.116" y="0.086906" width="16" height="16" rotation="-180">
    <properties>
     <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
