@@ -11,6 +11,7 @@ import dev.dominion.ecs.api.Dominion;
 
 public class Input_Plugin implements Plugin_Interface {
     Dominion dom;
+    boolean waiting_left = false, waiting_right = false, waiting_jump = false, waiting_throw = false, waiting = false, waiting_settings = false;
 
     @Override
     public void build(Game game) {
@@ -23,6 +24,37 @@ public class Input_Plugin implements Plugin_Interface {
             if(input == null) return;
             input.keysDown.add(game.keyCode);
             input.lastKeyDown = game.keyCode;
+            if(!waiting && game.paused) {
+                if (game.keyCode == 49) {
+                    waiting = true;
+                    waiting_left = true;
+                } else if(game.keyCode == 50) {
+                    waiting = true;
+                    waiting_right = true;
+                } else if(game.keyCode == 51) {
+                    waiting = true;
+                    waiting_jump = true;
+                } else if(game.keyCode == 52) {
+                    waiting = true;
+                    waiting_throw = true;
+                } else if(game.keyCode == 48) {
+                    waiting = true;
+                    waiting_settings = true;
+                }
+            } else if(waiting) {
+                waiting = false;
+                if(waiting_throw) input.keybinds.put(InputSystem.keys.THROW, game.keyCode);
+                if(waiting_jump) input.keybinds.put(InputSystem.keys.JUMP, game.keyCode);
+                if(waiting_left) input.keybinds.put(InputSystem.keys.MOVE_LEFT, game.keyCode);
+                if(waiting_right) input.keybinds.put(InputSystem.keys.MOVE_RIGHT, game.keyCode);
+                if(waiting_settings) input.keybinds.put(InputSystem.keys.SETTINGS, game.keyCode);
+                waiting_left = false;
+                waiting_right = false;
+                waiting_jump = false;
+                waiting_throw = false;
+                waiting = false;
+                waiting_settings = false;
+            }
         });
 
         game.schedule.keyUp(() -> {
@@ -30,6 +62,7 @@ public class Input_Plugin implements Plugin_Interface {
             if(input == null) return;
             input.keysDown.remove(game.keyCode);
         });
+
     }
 
     public static class InputSystem {

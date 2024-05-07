@@ -89,7 +89,7 @@ public class Game_Plugin implements Plugin_Interface {
                             drawing.push();
                             drawing.textAlign(PConstants.CENTER, PConstants.TOP);
                             drawing.textSize(30);
-                            drawing.fill(255);
+                            drawing.fill(255, 0, 255);
                             drawing.text(res.comp().text(), 10, game.scale/2 + res.comp().textPosition(), game.scale - 10, game.scale);
                             drawing.textSize(20);
                             drawing.text(res.comp().subText(), 10, game.scale/2 + res.comp().subTextPosition(), game.scale - 10, game.scale);
@@ -219,9 +219,9 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-//            TiledMap m = am.getResource(TiledMap.class, "level"+(level)+".tmx");
+            TiledMap m = am.getResource(TiledMap.class, "level"+(level)+".tmx");
 //            TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
-            TiledMap m = am.getResource(TiledMap.class, "test_bouncy.tmx");
+//            TiledMap m = am.getResource(TiledMap.class, "test_bouncy.tmx");
             dom.createEntity(
                 new TileMap(game, m)
             );

@@ -228,7 +228,6 @@ public class Object_Plugin implements Plugin_Interface {
             }
 
             if(/*obj.comp2().isBouncy */obj.comp2().state == Collider.states.BOUNCY && aboveThreshold) {
-                System.out.println("Bouncing");
                 obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
                 firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
             }else{
