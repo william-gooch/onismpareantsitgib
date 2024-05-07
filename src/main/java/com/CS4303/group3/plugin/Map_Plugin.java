@@ -178,17 +178,24 @@ public class Map_Plugin implements Plugin_Interface {
                   x = obj.getX() * tileScale,
                   y = obj.getY() * tileScale;
 
+            float rotation = obj.getRotation()*(PConstants.PI/180);
+            PVector pos = new PVector(x, y);
+            // translate to the center
+            pos.sub(new PVector(width / 2, height / 2));
+            // then translate to the bottom-left corner (where it is by default), rotated to make sure it's always in the right spot
+            pos.sub(new PVector(-width / 2, height / 2).rotate(rotation));
+
             TiledTile tile = obj.getTile();
             if(tile == null) {
                 return game.dom.createEntity(
-                    new Position(new PVector(x, y - height))
+                    new Position(pos)
                 );
             }
 
             PImage tileImage = getTileImage(tile);
             return game.dom.createEntity(
-                new Position(new PVector(x, y - height)),
-                new SpriteRenderer(new Sprite(tileImage), width, height)
+                new Position(pos),
+                new SpriteRenderer(new Sprite(tileImage), width, height, rotation)
             );
         }
 
