@@ -251,10 +251,6 @@ public class Object_Plugin implements Plugin_Interface {
         // some objects may have custom collision callbacks (e.g. buttons)
         obj.comp2().triggerCollision(obj.entity(), other.entity(), collision);
         other.comp2().triggerCollision(other.entity(), obj.entity(), collision);
-        obj.comp2().triggerCollision(obj.entity(), other.entity());
-        if(!(other.entity().has(Enemy_Plugin.Basic_AI.class)
-                || other.entity().has(Enemy_Plugin.Patrol_AI.class)
-                || other.entity().has(Spike_Plugin.Spikes.class))) other.comp2().triggerCollision(other.entity(), obj.entity());
 
         // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
         // if so, skip over handling the collision after this point
