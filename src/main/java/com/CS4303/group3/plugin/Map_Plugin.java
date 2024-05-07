@@ -488,9 +488,12 @@ public class Map_Plugin implements Plugin_Interface {
                 if(textObj != null) t = new Docking_Plugin.Docking.Text((String) textObj.getProperty("Content"),
                         new PVector(textObj.getX()*tileScale, textObj.getY()*tileScale), new PVector(textObj.getWidth()*tileScale, textObj.getHeight()*tileScale));
 
+
+
+
                 Docking_Plugin.Docking d = new Docking_Plugin.Docking(
                         new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                        default_value, ruleType, changeable, t
+                        default_value, ruleType, changeable, t, obj.getRotation()
                 );
                 e.add(d);
                 e.add(new Changeable(d));
@@ -499,21 +502,15 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
                     if(collision.other().has(Box.class) && collision.other().get(Box.class).rule_type == collision.self().get(Docking_Plugin.Docking.class).rule_type) {
                         //lock box into place (remove velocity)
-                        PVector gravity = Resource.get(game, Gravity.class).gravity();
-                        collision.other().get(Position.class).position.copy().add(
-                                new PVector(collision.other().get(Velocity.class).velocity.x * game.abs(gravity.y),
-                                        collision.other().get(Velocity.class).velocity.y * game.abs(gravity.x)
-                                ));
+                        if(collision.self().get(Docking_Plugin.Docking.class).rotation % 180 == 0) {
+                            collision.other().get(Position.class).position.x = collision.self().get(Position.class).position.copy().x;
+                        } else {
+                            collision.other().get(Position.class).position.y = collision.self().get(Position.class).position.copy().y;
+                        }
                         collision.other().removeType(Velocity.class);
 
 
-
-
-                        if(collision.self().get(Docking_Plugin.Docking.class).get() == null) return;
-
-
                         //apply box value to the changeable
-                        if(collision.other().get(Box.class).docked == null) collision.self().get(Docking_Plugin.Docking.class).get().get().change(collision.other().get(Box.class).value);
                         collision.self().get(Docking_Plugin.Docking.class).block = collision.other();
                         collision.other().get(Box.class).docked = collision.self();
                     }
