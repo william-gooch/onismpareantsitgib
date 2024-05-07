@@ -1,17 +1,13 @@
 package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
-import com.CS4303.group3.Resource;
-import com.CS4303.group3.plugin.Force_Plugin.Gravity;
-import com.CS4303.group3.utils.Changeable;
-
 import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;
 
 /**
  * Door_Plugin class that represents a door in the game
-    * 
+ * 
  */
 public class Door_Plugin implements Plugin_Interface {
 
