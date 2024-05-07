@@ -326,6 +326,7 @@ public class Map_Plugin implements Plugin_Interface {
                             if(triggerEntity != null) {
                                 var trigger = triggerEntity.get(Trigger.class);
                                 if(trigger != null) {
+                                    System.out.println("Opening");
                                     trigger.trigger(game, triggerEntity, true);
                                 }
                             }
