@@ -24,35 +24,6 @@ public class Box_Plugin implements Plugin_Interface {
     public void build(Game game) {
         dom = game.dom;
         playerSize = (int) game.playerWidth;
-
-        
-        //hadle object collisions
-
-        //draw the object
-        // game.schedule.draw(draw -> {
-        //     dom.findEntitiesWith(Position.class, Box.class)
-        //         .stream().forEach(res -> {
-        //             var pos = res.comp1().position;
-        //             draw.call(drawing -> {
-        //                 //draw the box
-        //                 drawing.fill(128,128,0);
-        //                 drawing.rect(pos.x, pos.y, playerSize, playerSize);
-        //                 drawing.fill(0);
-
-        //                 //draw an arrow
-        //                 drawing.pushMatrix();
-        //                 drawing.translate(pos.x+playerSize/2, pos.y+playerSize/2);
-        //                 if(res.comp2().direction == Box.directions.UP) drawing.rotate(PApplet.radians(-90));
-        //                 if(res.comp2().direction == Box.directions.DOWN) drawing.rotate(PApplet.radians(90));
-
-        //                 drawing.line(0,0,playerSize/2, 0);
-        //                 drawing.line(playerSize/2, 0, playerSize/2 - 8, -8);
-        //                 drawing.line(playerSize/2, 0, playerSize/2 - 8, 8);
-
-        //                 drawing.popMatrix();
-        //             });
-        //         });
-        // });
     }
 
     static class Box<T> {
