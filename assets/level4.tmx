@@ -104,7 +104,7 @@
   </object>
   <object id="49" name="Dock" type="dock" gid="13" x="47.9941" y="128.055" width="16" height="16">
    <properties>
-    <property name="defaultValue" value="Up"/>
+    <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
@@ -129,14 +129,14 @@
   </object>
   <object id="53" name="Dock" type="dock" gid="13" x="80" y="64.2131" width="16" height="16" rotation="-180">
    <properties>
-    <property name="defaultValue" value="Up"/>
+    <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
   </object>
   <object id="54" name="Dock" type="dock" gid="13" x="368" y="96" width="16" height="16" rotation="180">
    <properties>
-    <property name="defaultValue" value="Up"/>
+    <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
