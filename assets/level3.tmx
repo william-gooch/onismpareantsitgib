@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="29">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="39">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
   <data encoding="csv">
@@ -30,82 +30,93 @@
 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
 </data>
  </layer>
- <layer id="1" name="Tile Layer 1" width="25" height="25">
+ <layer id="1" name="Tile Layer 1" width="25" height="25" opacity="0.9">
   <data encoding="csv">
-9,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,9,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,8,
+9,15,15,15,15,15,15,15,0,15,15,15,15,1,15,15,15,15,15,15,15,15,15,15,9,
+10,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,20,20,21,21,22,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,20,21,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
+10,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,21,21,21,21,21,21,21,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,21,21,21,21,21,8,
-10,0,0,0,0,0,0,0,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,20,20,0,0,0,0,20,20,0,0,0,0,0,0,0,0,0,0,0,8,
-10,3,3,3,4,0,0,0,0,0,0,0,0,0,0,20,20,0,0,0,0,0,0,0,8,
+10,3,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,15,15,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,20,21,21,21,21,21,21,21,21,21,21,21,8,
-16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-0,0,0,0,0,0,0,20,21,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-3,21,21,21,21,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-9,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,9
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+10,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,
+10,0,0,0,0,0,0,20,21,21,21,21,21,21,21,21,21,3,3,3,3,3,3,3,9,
+9,0,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9
 </data>
  </layer>
  <objectgroup id="5" name="Object Layer 1">
-  <object id="13" name="Door" type="door" gid="24" x="382.153" y="128.004" width="16" height="16">
+  <object id="13" name="Door" type="door" gid="24" x="382.528" y="287.879" width="16" height="16">
    <properties>
     <property name="onTrigger" value="open"/>
     <property name="openDirection" type="int" value="2"/>
    </properties>
   </object>
-  <object id="15" name="Button" type="button" gid="12" x="31.5" y="96" width="16" height="16">
-   <properties>
-    <property name="onImage" type="int" value="17"/>
-    <property name="trigger" type="object" value="13"/>
-   </properties>
-  </object>
-  <object id="16" name="Player Spawn" type="player_spawn" x="14.5" y="336">
+  <object id="16" name="Player Spawn" type="player_spawn" x="23.5" y="331.5">
    <point/>
   </object>
   <object id="18" name="Gravity" type="gravity" x="0" y="1">
    <point/>
   </object>
-  <object id="22" name="Block" type="block" gid="7" x="48.5557" y="223.448" width="14" height="14">
+  <object id="22" name="Block" type="block" gid="7" x="336.556" y="303.448" width="14" height="14">
    <properties>
     <property name="ruleType" value="Directional"/>
     <property name="value" type="int" value="2"/>
    </properties>
   </object>
-  <object id="20" name="Exit Point" type="exit_point" x="396.583" y="122.73">
+  <object id="20" name="Exit Point" type="exit_point" x="396.083" y="285.73">
    <point/>
   </object>
-  <object id="24" type="enemy" x="208.633" y="255.426" width="16" height="16">
+  <object id="24" type="enemy" x="127.466" y="287.759" width="16" height="16">
    <properties>
     <property name="path" type="object" value="26"/>
    </properties>
   </object>
-  <object id="26" name="Enemy Path" type="path" x="241.668" y="263.725">
-   <polyline points="0,0 110.218,0"/>
+  <object id="26" name="Enemy Path" type="path" x="137.335" y="296.225">
+   <polyline points="0,0 67.718,0"/>
   </object>
-  <object id="27" name="Button" type="button" gid="12" x="369.069" y="271.219" width="16" height="16">
+  <object id="29" name="Dock" type="dock" gid="13" x="368.731" y="320.095" width="16" height="16">
    <properties>
-    <property name="onImage" type="int" value="17"/>
+    <property name="defaultValue" value="Up"/>
+    <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
   </object>
-  <object id="28" name="Button" type="button" gid="12" x="129.294" y="16.043" width="16" height="16" rotation="-180">
+  <object id="31" name="Patrol Enemy" type="patrol_enemy" x="244.271" y="293.253" width="8" height="8"/>
+  <object id="33" name="Dock" type="dock" gid="13" x="144.179" y="0.149406" width="16" height="16" rotation="-180">
    <properties>
-    <property name="onImage" type="int" value="17"/>
+    <property name="defaultValue" value="Down"/>
+    <property name="ruleType" value="Directional"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
   </object>
+  <object id="35" name="Block" type="block" gid="7" x="95.5" y="17.1667" width="14" height="14" rotation="-180">
+   <properties>
+    <property name="ruleType" value="Directional"/>
+    <property name="value" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="36" name="Block" type="block" gid="28" x="175.75" y="31.125" width="16" height="16"/>
+  <object id="37" name="Button" type="button" gid="12" x="193" y="79.5" width="16" height="16">
+   <properties>
+    <property name="onImage" type="int" value="17"/>
+    <property name="trigger" type="object" value="13"/>
+   </properties>
+  </object>
+  <object id="38" name="Spikes" type="spikes" x="143.5" y="64.5" width="32.5" height="16"/>
  </objectgroup>
 </map>

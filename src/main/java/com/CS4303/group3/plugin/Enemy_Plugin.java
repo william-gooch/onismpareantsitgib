@@ -128,17 +128,17 @@ public class Enemy_Plugin implements Plugin_Interface {
         });
 
         //draw the patrol AI
-        game.schedule.draw(draw -> {
-            dom.findEntitiesWith(Object_Plugin.Position.class, Patrol_AI.class)
-                    .stream().forEach(res -> {
-                        var pos = res.comp1().position;
-                        draw.call(drawing -> {
-                            //draw the player character
-                            drawing.fill(255,0,0);
-                            drawing.rect(pos.x, pos.y, playerSize, playerSize);
-                        });
-                    });
-        });
+        // game.schedule.draw(draw -> {
+        //     dom.findEntitiesWith(Object_Plugin.Position.class, Patrol_AI.class)
+        //             .stream().forEach(res -> {
+        //                 var pos = res.comp1().position;
+        //                 draw.call(drawing -> {
+        //                     //draw the player character
+        //                     drawing.fill(255,0,0);
+        //                     drawing.rect(pos.x, pos.y, playerSize, playerSize);
+        //                 });
+        //             });
+        // });
     }
 
     public static Entity createEnemy(Game game, TiledObject obj, float tileScale, AI enemyAI) {
