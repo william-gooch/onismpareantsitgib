@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="39">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="41">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
   <data encoding="csv">
@@ -46,13 +46,13 @@
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,3,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
-10,15,15,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,3,3,3,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
+9,15,15,15,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 10,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,
 10,0,0,0,0,0,0,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,9,
-10,0,0,0,0,2,3,9,9,9,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+10,0,0,0,0,2,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,3,3,3,3,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
@@ -93,6 +93,7 @@
    <properties>
     <property name="defaultValue" value="Up"/>
     <property name="ruleType" value="Directional"/>
+    <property name="text" type="object" value="39"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
   </object>
@@ -101,6 +102,7 @@
    <properties>
     <property name="defaultValue" value="Down"/>
     <property name="ruleType" value="Directional"/>
+    <property name="text" type="object" value="40"/>
     <property name="trigger" type="object" value="18"/>
    </properties>
   </object>
@@ -110,7 +112,7 @@
     <property name="value" type="int" value="0"/>
    </properties>
   </object>
-  <object id="36" name="Block" type="block" gid="28" x="175.75" y="31.125" width="16" height="16"/>
+  <object id="36" name="Block" type="block" gid="28" x="175.75" y="31.125" width="14" height="16"/>
   <object id="37" name="Button" type="button" gid="12" x="193" y="79.5" width="16" height="16">
    <properties>
     <property name="onImage" type="int" value="17"/>
@@ -118,5 +120,15 @@
    </properties>
   </object>
   <object id="38" name="Spikes" type="spikes" x="143.5" y="64.5" width="32.5" height="16"/>
+  <object id="39" name="Text" type="text" x="320" y="288" width="47.5" height="15.5">
+   <properties>
+    <property name="Content" value="Gravity is"/>
+   </properties>
+  </object>
+  <object id="40" name="Text" type="text" x="80" y="16" width="47.5" height="15.5">
+   <properties>
+    <property name="Content" value="Gravity is"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
