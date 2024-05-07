@@ -1,12 +1,10 @@
 package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
-import com.CS4303.group3.Resource;
 import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
-import javafx.scene.control.TextFormatter;
 import processing.core.PConstants;
 import processing.core.PVector;
 
