@@ -69,7 +69,7 @@ public class Game_Plugin implements Plugin_Interface {
                     wm.newLevel();
                 }
             }
-            if(wm.level > 10) {
+            if(wm.level > 10) { //num of levels
                 wm.gameOver();
             }
         });
@@ -219,7 +219,7 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "level"+(level)+".tmx");
+            TiledMap m = am.getResource(TiledMap.class, "level"+(4)+".tmx");
 //            TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
 //            TiledMap m = am.getResource(TiledMap.class, "test_bouncy.tmx");
             dom.createEntity(
@@ -438,7 +438,17 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         private void createGameOver(Dominion dom) {
-            dom.createEntity(new TextScreen("Game over!", "Press [SPACE] to play again.", -50, 50));
+            dom.createEntity(new TextScreen("", "Press [SPACE] to play again.", 0, 255));
+            AssetManager am = Resource.get(game, AssetManager.class);
+            PImage logo = am.getResource(PImage.class, "GameOver.png");
+            float logoRatio = PApplet.round((float)game.width / (float)logo.width),
+                    logoWidth = logo.width * logoRatio,
+                    logoHeight = logo.height * logoRatio;
+
+            dom.createEntity(
+                    new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2 - 50)),
+                    new SpriteRenderer(new Sprite(logo), logoWidth, logoHeight)
+            );
         }
 
         private void createTitleScreen(Dominion dom) {
