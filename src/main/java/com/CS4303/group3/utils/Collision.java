@@ -5,7 +5,6 @@ import java.util.*;
 import com.CS4303.group3.plugin.Object_Plugin;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
-import javafx.geometry.Pos;
 import processing.core.PVector;
 
 public class Collision {

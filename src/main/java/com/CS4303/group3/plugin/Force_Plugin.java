@@ -2,10 +2,8 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
-import com.CS4303.group3.plugin.Input_Plugin.InputSystem;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 
-import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import processing.core.PVector;

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.CS4303.group3.Game;
-import com.CS4303.group3.Resource;
-import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
 
 import dev.dominion.ecs.api.*;

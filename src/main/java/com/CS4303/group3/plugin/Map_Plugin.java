@@ -13,8 +13,6 @@ import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.Player;
-import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
-import com.CS4303.group3.plugin.Sprite_Plugin.ISprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.RepeatedSprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.Sprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
@@ -22,20 +20,14 @@ import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
 import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Changeable_Interface;
-import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
-import javafx.geometry.Pos;
 import processing.core.*;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.swing.plaf.nimbus.State;
 
 import org.tiledreader.*;
 

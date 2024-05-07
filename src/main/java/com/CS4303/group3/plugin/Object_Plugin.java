@@ -1,13 +1,10 @@
 package com.CS4303.group3.plugin;
 
 import java.util.Comparator;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
-import com.CS4303.group3.plugin.Map_Plugin.Ground;
-import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.utils.Collision.*;

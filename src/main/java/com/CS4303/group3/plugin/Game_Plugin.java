@@ -1,16 +1,10 @@
 package com.CS4303.group3.plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
-
 import org.tiledreader.TiledMap;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
-import com.CS4303.group3.Resource.ResourceEntity;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Player_Plugin.*;
 import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
@@ -22,15 +16,9 @@ import com.CS4303.group3.plugin.Input_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
-import com.CS4303.group3.plugin.Box_Plugin.*;
-import com.CS4303.group3.plugin.Button_Plugin.*;
-import com.CS4303.group3.plugin.Door_Plugin.*;
-import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
 import dev.dominion.ecs.api.*;
-import dev.dominion.ecs.api.Results.With1;
-import dev.dominion.ecs.api.Results.With2;
 import processing.core.*;
 import com.fasterxml.jackson.databind.*;
 

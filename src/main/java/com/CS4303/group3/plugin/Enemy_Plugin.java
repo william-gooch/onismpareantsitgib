@@ -16,12 +16,10 @@ import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
-import javafx.util.Pair;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.tiledreader.TiledObject;

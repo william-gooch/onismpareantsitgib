@@ -2,18 +2,9 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
-import com.CS4303.group3.plugin.Object_Plugin.Position;
-
-import com.CS4303.group3.utils.Changeable;
-import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
-import processing.core.PApplet;
 import processing.core.PVector;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Box_Plugin implements Plugin_Interface {
     Dominion dom;

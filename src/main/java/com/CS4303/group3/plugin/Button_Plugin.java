@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import com.CS4303.group3.Game;
 
-import com.CS4303.group3.utils.Changeable;
 import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
