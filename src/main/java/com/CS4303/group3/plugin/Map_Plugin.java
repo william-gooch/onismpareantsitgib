@@ -60,6 +60,7 @@ public class Map_Plugin implements Plugin_Interface {
 
     public static class Ground {
         public PVector size;
+        public String type = "default";
         //maybe have a tileset
 
         public Ground(PVector size) {
@@ -88,6 +89,32 @@ public class Map_Plugin implements Plugin_Interface {
             //change all colliders associated with ground
             game.dom.findEntitiesWith(Ground.class, Collider.class)
                     .stream().forEach(ground -> {
+                        ground.comp2().state = (Collider.states) value;
+                        System.out.println(ground.comp2().state);
+                    });
+        }
+    }
+
+    public static class All_Ground_Of_Type extends Changeable_Interface {
+        public Game game;
+        private String type;
+
+        public All_Ground_Of_Type(Game game, String type) {
+            super(null);
+            this.game = game;
+            this.type = type;
+        }
+
+        @Override
+        public void change(Object value) {
+            System.out.println("changing?");
+            if(!(value instanceof Collider.states)) return;
+
+            //change all colliders associated with ground
+            game.dom.findEntitiesWith(Ground.class, Collider.class)
+                    .stream()
+                    .filter(ground -> ground.comp1().type.equals(this.type))
+                    .forEach(ground -> {
                         ground.comp2().state = (Collider.states) value;
                         System.out.println(ground.comp2().state);
                     });
@@ -151,7 +178,11 @@ public class Map_Plugin implements Plugin_Interface {
             if(!tile.getCollisionObjects().isEmpty()) {
                 var o = tile.getCollisionObjects().get(0);
                 e.add(Collider.BasicCollider(o.getWidth() * tileScale, o.getHeight() * tileScale, o.getX() * tileScale, o.getY() * tileScale));
-                e.add(new Ground(new PVector(o.getWidth() * tileScale, o.getHeight() * tileScale)));
+                var ground = new Ground(new PVector(o.getWidth() * tileScale, o.getHeight() * tileScale));
+                if(tile.getProperty("type") != null) {
+                    ground.type = (String) tile.getProperty("type");
+                }
+                e.add(ground);
             }
 
             return e;
@@ -230,6 +261,11 @@ public class Map_Plugin implements Plugin_Interface {
                         } else {
                             e = createSpriteFromObject(obj);
                         }
+                        if(obj.getTile() != null
+                        && !obj.getTile().getCollisionObjects().isEmpty()
+                        && !e.has(Collider.class)) {
+                            e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+                        }
                         if(obj.getProperty("onTrigger") != null) {
                             System.out.println(obj.getProperty("onTrigger"));
                             Trigger trigger = Trigger_Plugin.STANDARD_TRIGGERS.get(obj.getProperty("onTrigger")); 
@@ -291,6 +327,8 @@ public class Map_Plugin implements Plugin_Interface {
                     String val = (String) obj.getProperty("value");
                     if(val.equals("Ground")) {
                         value = (T) new Changeable(new All_Ground(game));
+                    } else if(val.equals("Glass")) {
+                        value = (T) new Changeable(new All_Ground_Of_Type(game, "glass"));
                     } else if(val.equals("Player")) {
                         value = (T) new Changeable(new Player_Plugin.Player_Changer(game));
                     }

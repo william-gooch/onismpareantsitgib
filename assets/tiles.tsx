@@ -2,6 +2,9 @@
 <tileset version="1.10" tiledversion="1.10.2" name="tiles" tilewidth="16" tileheight="16" tilecount="36" columns="6">
  <image source="tiles-new.png" width="96" height="96"/>
  <tile id="0">
+  <properties>
+   <property name="type" value="glass"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
   </objectgroup>
