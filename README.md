@@ -1,7 +1,9 @@
-compile with - mvn compile assembly:single
+# OH NO!!! I SENT MY PROFESSOR A RUDE EMAIL AND NEED TO SNEAK IN TO GET IT BACK!
 
-run with - java -jar ./target/onismpareantsitgib-1.0-jar-with-dependencies.jar
+This game is written in Processing as a standard Java application.
 
-To create a level edit the pom.xml file and compile as above (look into different build targets with maven)
+It can be run with `mvn compile exec:java`.
+Alternatively, it can be packaged as a JAR file with `mvn compile assembly:single`. A pre-built version of the game is included in the ZIP folder.
 
-run with java -jar ./target/onismpareantsitgib-1.0-jar-with-dependencies.jar <level_to_write_to:OPTIONAL> <level_to_read_from:OPTIONAL>
+Run this with `java -jar ./target/onismpareantsitgib-1.0-jar-with-dependencies.jar`
+    or `java -jar ./onismpareantsitgib.jar` for the pre-built version.
