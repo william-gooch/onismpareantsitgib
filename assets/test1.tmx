@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="17">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="18">
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer id="4" name="Tile Layer 2" width="10" height="10">
   <data encoding="csv">
@@ -75,5 +75,6 @@
     <property name="path" type="object" value="9"/>
    </properties>
   </object>
+  <object id="17" name="Patrol Enemy" type="patrol_enemy" x="20" y="128" width="8" height="8"/>
  </objectgroup>
 </map>

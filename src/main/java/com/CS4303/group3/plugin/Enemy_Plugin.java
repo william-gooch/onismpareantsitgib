@@ -2,19 +2,30 @@ package com.CS4303.group3.plugin;
 
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
+import com.CS4303.group3.plugin.Assets_Plugin.AssetManager;
 import com.CS4303.group3.plugin.Force_Plugin.Gravity;
 import com.CS4303.group3.plugin.Object_Plugin.Position;
+import com.CS4303.group3.plugin.Object_Plugin.Velocity;
+import com.CS4303.group3.plugin.Player_Plugin.Player;
+import com.CS4303.group3.plugin.Object_Plugin.Collider;
+import com.CS4303.group3.plugin.Sprite_Plugin.AnimatedSprite;
+import com.CS4303.group3.plugin.Sprite_Plugin.ISprite;
 import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.utils.Collision;
+import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Map;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import javafx.util.Pair;
 import processing.core.PConstants;
+import processing.core.PImage;
 import processing.core.PVector;
 
 import java.util.Comparator;
+import java.util.List;
+
+import org.tiledreader.TiledObject;
 
 public class Enemy_Plugin implements Plugin_Interface {
     Dominion dom;
@@ -59,19 +70,22 @@ public class Enemy_Plugin implements Plugin_Interface {
                         //delete entity if fully dead
                         if(ai.comp().death_animation <= 0) dom.deleteEntity(ai.entity());
                     });
-        });
-        game.schedule.update(() -> {
+
             dom.findEntitiesWith(Patrol_AI.class)
                     .stream().filter(ai -> ai.comp().death_animation > 0).forEach(ai -> {
                         //reduce the time on the death animation
                         ai.comp().death_animation -= game.schedule.dt();
+                        if(ai.entity().has(SpriteRenderer.class)) {
+                            var sprite = ai.entity().get(SpriteRenderer.class);
+                            if(sprite.sprite instanceof StateSprite) {
+                                ((StateSprite) sprite.sprite).setState("dead");
+                            }
+                        }
 
                         //delete entity if fully dead
                         if(ai.comp().death_animation <= 0) dom.deleteEntity(ai.entity());
                     });
         });
-
-
 
         //draw the basic AI
         // game.schedule.draw(draw -> {
@@ -98,6 +112,19 @@ public class Enemy_Plugin implements Plugin_Interface {
                         player.comp2().flipX = false;
                     }
                 });
+
+            dom.findEntitiesWith(Position.class, SpriteRenderer.class, Patrol_AI.class)
+                .stream().forEach(player -> {
+                    PVector gravity = (PVector) Resource.get(game, Gravity.class).get();
+                    player.comp2().rotation = gravity.heading() - PConstants.PI/2;
+
+                    float velocityPerpToGravity = player.comp3().getDirection(game, player.comp1()).dot(gravity.copy().rotate(PConstants.PI/2));
+                    if(velocityPerpToGravity > 0) {
+                        player.comp2().flipX = true;
+                    } else if (velocityPerpToGravity < 0) {
+                        player.comp2().flipX = false;
+                    }
+                });
         });
 
         //draw the patrol AI
@@ -112,6 +139,60 @@ public class Enemy_Plugin implements Plugin_Interface {
                         });
                     });
         });
+    }
+
+    public static Entity createEnemy(Game game, TiledObject obj, float tileScale, AI enemyAI) {
+        PImage enemyImage = Resource.get(game, AssetManager.class).getResource(PImage.class, "enemy-anim.png");
+        List<ISprite> frames = AnimatedSprite.framesFromSpriteSheet(enemyImage, 10);
+
+        AnimatedSprite normalSprite = new AnimatedSprite();
+        frames
+            .stream()
+            .limit(7)
+            .forEach(f -> normalSprite.addFrame(f, 1f/30f));
+        for(int i = 0; i < 16; i++) {
+            normalSprite.addFrame(frames.get(7 + (i%2)), 1f/30f);
+        }
+
+        StateSprite sprite = new StateSprite();
+        sprite.addState("alive", normalSprite);
+        sprite.addState("dead", frames.get(9));
+        sprite.setState("alive");
+
+        Entity e = game.dom.createEntity(
+            new Position(new PVector(obj.getX() * tileScale, obj.getY() * tileScale)),
+            new SpriteRenderer(sprite, obj.getWidth() * tileScale, obj.getHeight() * tileScale)
+        );
+        e.add(enemyAI);
+        e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
+            // check if collision normal is positive y (i.e. getting hit from above)
+            PVector gravity = Resource.get(game, Gravity.class).gravity();
+            if(collision.contact().cNormal().dot(gravity) > 0) {
+                System.out.println("oof ouch owie im dead");
+                if(collision.self().has(Enemy_Plugin.Basic_AI.class)) {
+                    collision.self().get(Enemy_Plugin.Basic_AI.class).death_animation = 2f;
+                }
+                if(collision.self().has(Enemy_Plugin.Patrol_AI.class)) {
+                    collision.self().get(Enemy_Plugin.Patrol_AI.class).death_animation = 2f;
+                }
+                collision.self().get(Collider.class).onCollide = null;
+                if(collision.other().has(Velocity.class)) {
+                    collision.other().get(Velocity.class).velocity.y *= -1;
+                }
+                return;
+            }
+
+            if(collision.other().has(Player.class) && collision.other().get(Player.class).invulnerability == 0f) {
+                System.out.println("Damaged Player, player is now invulnerable");
+                collision.other().get(Player.class).lives--;
+                if (collision.other().get(Player.class).lives <= 0) {
+                    //player has died, restart the level
+                    System.out.println("Player has died");
+                }
+                collision.other().get(Player.class).invulnerability = 1f;
+            }
+        }, false));
+        return e;
     }
 
     public interface AI {

@@ -24,7 +24,11 @@ public class Collision {
 
         PVector cNormal,
         float collisionTime
-    ) {}
+    ) {
+        public Contact flipped() {
+            return new Contact(p2, p1, c2, c1, cNormal.copy().mult(-1), collisionTime);
+        }
+    }
 
     //basic collider -- need to update if dealing with non box collisions
     public static class BasicCollider implements Collider_Interface {
