@@ -111,5 +111,6 @@
     <property name="Content" value="Gravity is"/>
    </properties>
   </object>
+  <object id="27" type="patrol_enemy" x="120" y="96" width="16" height="16"/>
  </objectgroup>
 </map>
