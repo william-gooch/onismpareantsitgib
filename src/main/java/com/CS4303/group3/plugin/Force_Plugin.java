@@ -46,7 +46,7 @@ public class Force_Plugin implements Plugin_Interface {
             dom.findEntitiesWith(Velocity.class)
                 .stream().forEach(res -> {
                     PVector velocity = res.comp().velocity;
-                    velocity.add(gravity.gravity().copy().mult(game.scale/10f * game.schedule.dt())); //if(!res.comp2().grounded)
+                    velocity.add(gravity.gravity().copy().mult(game.scale/20f * game.schedule.dt())); //if(!res.comp2().grounded)
                 });
         });
 

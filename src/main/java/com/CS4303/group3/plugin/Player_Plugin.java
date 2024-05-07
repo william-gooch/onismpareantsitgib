@@ -4,6 +4,7 @@ package com.CS4303.group3.plugin;
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.plugin.Input_Plugin.*;
+import com.CS4303.group3.plugin.Input_Plugin.InputSystem.keys;
 import com.CS4303.group3.plugin.Object_Plugin.*;
 import com.CS4303.group3.plugin.Sprite_Plugin.*;
 import com.CS4303.group3.plugin.Map_Plugin.*;
@@ -247,11 +248,11 @@ public class Player_Plugin implements Plugin_Interface {
 
         public PlayerMovement() {
             this.acceleration = 75f;
-            this.impulseDamping = 12f;
+            this.impulseDamping = 16f;
             this.stopDamping = 15f;
             this.maxSpeed = 6f;
-            this.jumpSpeed = 13f;
-            this.airSlowdown = 0.3f;
+            this.jumpSpeed = 10f;
+            this.airSlowdown = 0.1f;
             this.wallJumpPower = 0.7f;
         }
 
