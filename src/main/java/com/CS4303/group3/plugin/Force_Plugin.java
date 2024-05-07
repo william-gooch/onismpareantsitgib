@@ -17,28 +17,6 @@ public class Force_Plugin implements Plugin_Interface {
     public void build(Game game) {
         dom = game.dom;
 
-        game.schedule.update(() -> {
-            InputSystem input = Resource.get(game, InputSystem.class);
-            Gravity gravity = Resource.get(game, Gravity.class);
-            if(input == null || gravity == null) return;
-            if(input.isKeyDown(39)) { //gravity goes right
-                game.rotation_time = 0f;
-                gravity.change(new PVector(1,0));
-            }
-            if(input.isKeyDown(37)) { //gravity goes left
-                game.rotation_time = 0f;
-                gravity.change(new PVector(-1,0));
-            }
-            if(input.isKeyDown(40)) { //gravity goes down
-                game.rotation_time = 0f;
-                gravity.change(new PVector(0,1));
-            }
-            if(input.isKeyDown(38)) { //gravity goes up
-                game.rotation_time = 0f;
-                gravity.change(new PVector(0,-1));
-            }
-        });
-
         //apply gravity to all objects
         game.schedule.update(() -> {
             Gravity gravity = Resource.get(game, Gravity.class);
