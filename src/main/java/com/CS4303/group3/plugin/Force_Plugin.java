@@ -83,6 +83,8 @@ public class Force_Plugin implements Plugin_Interface {
 
         @Override
         public void change(Object value) {
+//            System.out.println("Test");
+//            System.out.println(((PVector) value).setMag(((PVector)get()).mag()));
             super.change(((PVector) value).setMag(((PVector)get()).mag()));
         }
 

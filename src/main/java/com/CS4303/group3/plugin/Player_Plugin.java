@@ -10,6 +10,7 @@ import com.CS4303.group3.plugin.Map_Plugin.*;
 import com.CS4303.group3.plugin.Box_Plugin.*;
 import com.CS4303.group3.plugin.Force_Plugin.*;
 import com.CS4303.group3.plugin.Game_Plugin.WorldManager;
+import com.CS4303.group3.utils.Changeable_Interface;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 import com.CS4303.group3.utils.Collision.Collider_Interface;
@@ -157,7 +158,7 @@ public class Player_Plugin implements Plugin_Interface {
                                                     dock.get(Docking_Plugin.Docking.class).block = null;
 
                                                     //reset dock to default
-                                                    dock.get(Docking_Plugin.Docking.class).changeable.get().change(dock.get(Docking_Plugin.Docking.class).default_val);
+                                                    dock.get(Docking_Plugin.Docking.class).get().get().change(dock.get(Docking_Plugin.Docking.class).default_val);
 
                                                     box.entity().get(Box.class).docked = null;
                                                 }
@@ -319,6 +320,28 @@ public class Player_Plugin implements Plugin_Interface {
 
         public Player() {
             this.lives = 3;
+        }
+    }
+
+    public static class Player_Changer extends Changeable_Interface {
+        Game game;
+
+        public Player_Changer(Game game) {
+            super(null);
+            this.game = game;
+        }
+
+        @Override
+        public void change(Object value) {
+            System.out.println("Changing the players state");
+            if(!(value instanceof Collider.states)) return;
+
+            System.out.println("Test");
+            //change the players collision system
+            game.dom.findEntitiesWith(Player.class, Collider.class)
+                    .stream().forEach(player -> {
+                        player.comp2().state = (Collider.states) value;
+                    });
         }
     }
 

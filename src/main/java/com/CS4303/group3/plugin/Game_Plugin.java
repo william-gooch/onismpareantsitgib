@@ -219,7 +219,8 @@ public class Game_Plugin implements Plugin_Interface {
 //                 );
 //             }
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test"+(level)+".tmx");
+//            TiledMap m = am.getResource(TiledMap.class, "test"+(level+1)+".tmx");
+            TiledMap m = am.getResource(TiledMap.class, "test_bouncy.tmx");
             //TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             //TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             dom.createEntity(
@@ -246,23 +247,34 @@ public class Game_Plugin implements Plugin_Interface {
 //            dom.createEntity(g, new Changeable(g));
             dom.createEntity(new Drag());
 
-            dom.createEntity(
-                    new Position(new PVector(50, 50)),
-                    new Enemy_Plugin.Patrol_AI(10, 20, 20),
-                    new Body(),
-                    new Velocity(),
-                    new Collider(new BasicCollider(20,20), (self, other) -> {
-                        if(other.get(Position.class).position.copy().sub(self.get(Position.class).position).dot(Resource.get(game, Gravity.class).gravity()) < 0) self.get(Enemy_Plugin.Patrol_AI.class).flipped = !self.get(Enemy_Plugin.Patrol_AI.class).flipped;
-                        if(other.has(Player.class) && other.get(Player.class).invulnerability <= 0f) {
-                            other.get(Player.class).lives--;
-                            if(other.get(Player.class).lives <= 0) {
-                                //player has died, restart the level
-                                System.out.println("Player has died");
-                            }
-                            other.get(Player.class).invulnerability = 1f;
-                        }
-                        }, false)
-            );
+//            dom.createEntity(
+//                    new Position(new PVector(50, 50)),
+//                    new Enemy_Plugin.Patrol_AI(10, 20, 20),
+//                    new Body(),
+//                    new Velocity(),
+//                    new Collider(new BasicCollider(20,20), (collision) -> {
+//                        // check if collision normal is negative y (i.e. getting hit from above)
+//                        if(collision.contact().cNormal().y < 0) {
+//                            System.out.println("oof ouch owie im dead");
+//                            collision.self().get(Enemy_Plugin.Patrol_AI.class).death_animation = 2f;
+//                            collision.self().get(Collider.class).onCollide = null;
+//                            if(collision.other().has(Velocity.class)) {
+//                                collision.other().get(Velocity.class).velocity.y *= -1;
+//                            }
+//                            return;
+//                        }
+//
+//                        if(collision.other().has(Player.class) && collision.other().get(Player.class).invulnerability == 0f) {
+//                            System.out.println("Damaged Player, player is now invulnerable");
+//                            collision.other().get(Player.class).lives--;
+//                            if (collision.other().get(Player.class).lives <= 0) {
+//                                //player has died, restart the level
+//                                System.out.println("Player has died");
+//                            }
+//                            collision.other().get(Player.class).invulnerability = 1f;
+//                        }
+//                    }, false)
+//            );
 
             // dom.createEntity(
             //         new Position(new PVector(400, 810)),

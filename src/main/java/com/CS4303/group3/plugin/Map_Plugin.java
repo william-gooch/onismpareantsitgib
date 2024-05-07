@@ -21,13 +21,16 @@ import com.CS4303.group3.plugin.Sprite_Plugin.SpriteRenderer;
 import com.CS4303.group3.plugin.Sprite_Plugin.StateSprite;
 import com.CS4303.group3.plugin.Trigger_Plugin.Trigger;
 import com.CS4303.group3.utils.Changeable;
+import com.CS4303.group3.utils.Changeable_Interface;
 import com.CS4303.group3.utils.Collision;
 import com.CS4303.group3.utils.Collision.BasicCollider;
 
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
+import javafx.geometry.Pos;
 import processing.core.*;
 
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,27 @@ public class Map_Plugin implements Plugin_Interface {
             game.fill(255);
             game.stroke(255);
             game.rect(position.x, position.y, size.x, size.y);
+        }
+    }
+
+    public static class All_Ground extends Changeable_Interface {
+        public Game game;
+
+        public All_Ground(Game game) {
+            super(null);
+            this.game = game;
+        }
+
+        @Override
+        public void change(Object value) {
+            if(!(value instanceof Collider.states)) return;
+
+            //change all colliders associated with ground
+            game.dom.findEntitiesWith(Ground.class, Collider.class)
+                    .stream().forEach(ground -> {
+                        ground.comp2().state = (Collider.states) value;
+                        System.out.println(ground.comp2().state);
+                    });
         }
     }
 
@@ -228,21 +252,48 @@ public class Map_Plugin implements Plugin_Interface {
                 e.add(new Velocity(0.5f));
                 e.add(new Body());
                 e.add(new Grabbable());
-                String rt = ((String) obj.getProperty("ruleType"));
-                rule_types rule_type;
-                if(rt != null) rule_type = rt.equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
-                else rule_type = null;
+                rule_types ruleType = null;
+                switch ((String) obj.getProperty("ruleType")) {
+                    case "Directional":
+                        ruleType = rule_types.DIRECTIONAL;
+                        break;
+                    case "Boolean":
+                        ruleType = rule_types.BOOLEAN;
+                        break;
+                    case "Operational":
+                        ruleType = rule_types.OPERATIONAL;
+                        break;
+                    case "Target":
+                        ruleType = rule_types.TARGET;
+                        break;
+                }
                 T value = null;
-                if(rule_type == rule_types.DIRECTIONAL) {
+                if(ruleType == rule_types.DIRECTIONAL) {
                     int val = (int) obj.getProperty("value");
                     if(val == 0) value = (T) new PVector(0,1); //down
                     if(val == 1) value = (T) new PVector(1,0); //right
                     if(val == 2) value = (T) new PVector(0,-1); //up
                     if(val == 3) value = (T) new PVector(-1,0); //left
-                } else {
-
                 }
-                e.add(new Box(rule_type, value));
+                else if(ruleType == rule_types.TARGET) {
+                    //check map of String to class types
+                    String val = (String) obj.getProperty("value");
+                    if(val.equals("Ground")) {
+                        value = (T) new Changeable(new All_Ground(game));
+                    } else if(val.equals("Player")) {
+                        value = (T) new Changeable(new Player_Plugin.Player_Changer(game));
+                    }
+                } else if(ruleType == rule_types.BOOLEAN) {
+                    value = (T)(Boolean)obj.getProperty("value");
+                } else if(ruleType == rule_types.OPERATIONAL) {
+                    String val = (String) obj.getProperty("value");
+                    if(val.equals("Bouncy")) {
+                        value = (T) Collider.states.BOUNCY;
+                    } else if(val.equals("Fragile")) {
+                        value = (T) Collider.states.FRAGILE;
+                    }
+                }
+                e.add(new Box(ruleType, value));
                 e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
                 return e;
             }),
@@ -373,43 +424,95 @@ public class Map_Plugin implements Plugin_Interface {
             Map.entry("dock", obj -> {
                 Entity e = createSpriteFromObject(obj);
                 //need to find a way to link to the changeable in the entity being changed
-                rule_types ruleType = ((String) obj.getProperty("ruleType")).equals("Directional") ? rule_types.DIRECTIONAL : rule_types.OPERATIONAL;
-                var trigObj = obj.getProperty("trigger");
-                Changeable changeable = null;
-                if(trigObj != null) {
-                    var trigEntity = objects.get(trigObj);
-                    if(trigEntity != null) {
-                        changeable = trigEntity.get(Changeable.class);
-                    }
+                rule_types ruleType = null;
+                switch ((String) obj.getProperty("ruleType")) {
+                    case "Directional":
+                        ruleType = rule_types.DIRECTIONAL;
+                        break;
+                    case "Boolean":
+                        ruleType = rule_types.BOOLEAN;
+                        break;
+                    case "Operational":
+                        ruleType = rule_types.OPERATIONAL;
+                        break;
+                    case "Target":
+                        ruleType = rule_types.TARGET;
+                        break;
                 }
 
-                T default_value;
+                TiledObject trigObj = (TiledObject) obj.getProperty("trigger");
+                Changeable changeable = null;
+                if(trigObj != null) {
+//                    if(trigObj.getName() == "Dock") {
+//
+//                    } else {
+                    System.out.println(trigObj.getName() + "__");
+
+                    var trigEntity = objects.get(trigObj);
+                    if (trigEntity != null) {
+                        System.out.println("has trigger");
+                        changeable = trigEntity.get(Changeable.class);
+                    }
+//                    }
+                }
+
+                T default_value = null;
                 if(ruleType == rule_types.DIRECTIONAL) {
                     String default_value_string = (String) obj.getProperty("defaultValue");
-                    if(default_value_string.equals("Down")) {
-                        default_value = (T) new PVector(0,1);
-                    } else {
-                        default_value = (T) new PVector(0,-1);
+                    switch (default_value_string) {
+                        case "Down":
+                            default_value = (T) new PVector(0,1);
+                            break;
+                        case "Up":
+                            default_value = (T) new PVector(0,-1);
+                            break;
+                        case "Right":
+                            default_value = (T) new PVector(1,0);
+                            break;
+                        case "Left":
+                            default_value = (T) new PVector(-1,0);
+                            break;
                     }
-                    //TODO: other directions
-                } else {
+                }
+                else if(ruleType == rule_types.BOOLEAN) {
+                    default_value = (T) (Boolean) obj.getProperty("defaultValue");
+                }
+                else if(ruleType == rule_types.OPERATIONAL) {
                     default_value = null;
                     //TODO: have a map of strings to functions
                 }
-                e.add(new Docking_Plugin.Docking(
-                    new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
-                    default_value, ruleType, changeable, null
-                ));
+
+                TiledObject textObj = (TiledObject) obj.getProperty("text");
+                Docking_Plugin.Docking.Text t = null;
+                if(textObj != null) t = new Docking_Plugin.Docking.Text((String) textObj.getProperty("Content"),
+                        new PVector(textObj.getX()*tileScale, textObj.getY()*tileScale), new PVector(textObj.getWidth()*tileScale, textObj.getHeight()*tileScale));
+
+                Docking_Plugin.Docking d = new Docking_Plugin.Docking(
+                        new PVector(obj.getWidth() * tileScale, obj.getHeight() * tileScale),
+                        default_value, ruleType, changeable, t
+                );
+                e.add(d);
+                e.add(new Changeable(d));
 //                e.add(Collider.BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale));
+
                 e.add(new Collider(new BasicCollider(obj.getWidth() * tileScale, obj.getHeight() * tileScale), (collision) -> {
                     if(collision.other().has(Box.class) && collision.other().get(Box.class).rule_type == collision.self().get(Docking_Plugin.Docking.class).rule_type) {
                         //lock box into place (remove velocity)
-                        System.out.println(collision.other().get(Box.class).value);
+                        PVector gravity = Resource.get(game, Gravity.class).gravity();
+                        collision.other().get(Position.class).position.copy().add(
+                                new PVector(collision.other().get(Velocity.class).velocity.x * game.abs(gravity.y),
+                                        collision.other().get(Velocity.class).velocity.y * game.abs(gravity.x)
+                                ));
                         collision.other().removeType(Velocity.class);
 
 
+
+
+                        if(collision.self().get(Docking_Plugin.Docking.class).get() == null) return;
+
+
                         //apply box value to the changeable
-                        if(collision.other().get(Box.class).docked == null) collision.self().get(Docking_Plugin.Docking.class).changeable.get().change(collision.other().get(Box.class).value);
+                        if(collision.other().get(Box.class).docked == null) collision.self().get(Docking_Plugin.Docking.class).get().get().change(collision.other().get(Box.class).value);
                         collision.self().get(Docking_Plugin.Docking.class).block = collision.other();
                         collision.other().get(Box.class).docked = collision.self();
                     }

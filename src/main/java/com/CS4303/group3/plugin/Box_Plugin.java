@@ -98,7 +98,9 @@ public class Box_Plugin implements Plugin_Interface {
 
     public enum rule_types {
         DIRECTIONAL,
-        OPERATIONAL
+        OPERATIONAL,
+        BOOLEAN,
+        TARGET
     }
 
 

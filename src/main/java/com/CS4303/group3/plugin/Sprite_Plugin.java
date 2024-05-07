@@ -20,7 +20,7 @@ public class Sprite_Plugin implements Plugin_Interface {
     public void build(Game game) {
         dom = game.dom;
 
-        game.schedule.draw(draw -> {
+        game.schedule.draw(4, draw -> {
             dom.findEntitiesWith(Position.class, SpriteRenderer.class)
                 .stream().forEach(sprite -> {
                     draw.call(drawing -> sprite.comp2().draw(drawing, sprite.entity()));

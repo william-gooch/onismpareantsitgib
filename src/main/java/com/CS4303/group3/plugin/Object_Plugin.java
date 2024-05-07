@@ -142,10 +142,10 @@ public class Object_Plugin implements Plugin_Interface {
         } else {
             Contact firstCollision = entityAndContact.getValue();
 
-            if(obj.comp2().isFragile) {
+            if(/*obj.comp2().isFragile */obj.comp2().state == Collider.states.FRAGILE) {
                 game.dom.deleteEntity(obj.entity());
             }
-            if(entityAndContact.getKey().get(Collider.class).isFragile) {
+            if(/*entityAndContact.getKey().get(Collider.class).isFragile */entityAndContact.getKey().get(Collider.class).state == Collider.states.FRAGILE) {
                 game.dom.deleteEntity(entityAndContact.getKey());
             }
 //            if(firstCollision.collisionTime() == 0) {
@@ -191,7 +191,7 @@ public class Object_Plugin implements Plugin_Interface {
             }
 
             if(firstCollision.collisionTime() <= EPSILON) {
-                System.out.println(game.frameCount + "] oops im inside an object " + firstCollision.cNormal());
+//                System.out.println(game.frameCount + "] oops im inside an object " + firstCollision.cNormal());
                 obj.comp1().position.add(firstCollision.cNormal());
             }
 
@@ -203,7 +203,7 @@ public class Object_Plugin implements Plugin_Interface {
 
             Entity otherEntity = entityAndContact.getKey();
             if(otherEntity.has(Body.class) && otherEntity.has(Velocity.class)) {
-                System.out.println("tryna push " + firstCollision.cNormal());
+//                System.out.println("tryna push " + firstCollision.cNormal());
                 otherEntity.get(Velocity.class).velocity.add(
                     firstCollision.cNormal().y == 0 ? obj.comp4().velocity.x * 0.3f : 0,
                     firstCollision.cNormal().x == 0 ? obj.comp4().velocity.y * 0.3f : 0
@@ -227,7 +227,8 @@ public class Object_Plugin implements Plugin_Interface {
                 aboveThreshold = obj.comp4().velocity.x * (time_remaining * (firstCollision.collisionTime() - 0.01f)) < -bounceThreshold;
             }
 
-            if(obj.comp2().isBouncy && aboveThreshold) {
+            if(/*obj.comp2().isBouncy */obj.comp2().state == Collider.states.BOUNCY && aboveThreshold) {
+                System.out.println("Bouncing");
                 obj.comp4().velocity.set(firstCollision.cNormal().x == 0 ? obj.comp4().velocity.x : -obj.comp4().velocity.x ,
                 firstCollision.cNormal().y == 0 ? obj.comp4().velocity.y : -obj.comp4().velocity.y);
             }else{
@@ -251,10 +252,10 @@ public class Object_Plugin implements Plugin_Interface {
         // some objects may have custom collision callbacks (e.g. buttons)
         obj.comp2().triggerCollision(obj.entity(), other.entity(), collision);
         other.comp2().triggerCollision(other.entity(), obj.entity(), collision);
-        obj.comp2().triggerCollision(obj.entity(), other.entity());
-        if(!(other.entity().has(Enemy_Plugin.Basic_AI.class)
-                || other.entity().has(Enemy_Plugin.Patrol_AI.class)
-                || other.entity().has(Spike_Plugin.Spikes.class))) other.comp2().triggerCollision(other.entity(), obj.entity());
+//        obj.comp2().triggerCollision(obj.entity(), other.entity());
+//        if(!(other.entity().has(Enemy_Plugin.Basic_AI.class)
+//                || other.entity().has(Enemy_Plugin.Patrol_AI.class)
+//                || other.entity().has(Spike_Plugin.Spikes.class))) other.comp2().triggerCollision(other.entity(), obj.entity());
 
         // some objects may be *only* triggers for those callbacks (i.e. they aren't solid objects)
         // if so, skip over handling the collision after this point
@@ -304,12 +305,19 @@ public class Object_Plugin implements Plugin_Interface {
     public static class Collider {
         Collider_Interface collider;
 
+        public enum states {
+            BOUNCY,
+            FRAGILE,
+            NORMAL
+        }
+
         public static record Collision (Entity self, Entity other, Contact contact) {}
 
         Consumer<Collision> onCollide = null;
         boolean isTrigger = false;
-        boolean isBouncy = false;
-        boolean isFragile = false;
+        states state = states.NORMAL;
+        public boolean isBouncy = false;
+        public boolean isFragile = false;
 
         public Collider(Collider_Interface collider) {
             this.collider = collider;

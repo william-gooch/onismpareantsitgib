@@ -29,16 +29,27 @@ public class Trigger_Plugin {
     public static final Map<String, Trigger> STANDARD_TRIGGERS = Map.ofEntries(
         Map.entry("open", new Trigger((game, self, value) -> {
             if (self.has(Door.class)) {
-                self.get(Door.class).change((boolean) value);
+//                self.get(Door.class).change((boolean) value);
                 self.get(Door.class).moveDoor(game, self.get(Position.class).position);
             }
         })),
         Map.entry("gravity", new Trigger((game, self, value) -> {
             if(self.has(Changeable.class)) {
+                System.out.println("Test");
                 self.get(Changeable.class).get().change(value);
             } else {
                 self.add(new Changeable(self.get(Gravity.class)));
             }
+        })),
+        Map.entry("change_target", new Trigger((game, self, value) -> {
+            System.out.println("Test123");
+            if(self.has(Changeable.class)) {
+
+                self.get(Changeable.class).get().change(value);
+            } else {
+                self.add(new Changeable(self.get(Docking_Plugin.Docking.class)));
+            }
         }))
+
     );
 }

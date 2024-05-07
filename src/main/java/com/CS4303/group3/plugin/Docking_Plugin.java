@@ -3,6 +3,7 @@ package com.CS4303.group3.plugin;
 import com.CS4303.group3.Game;
 import com.CS4303.group3.Resource;
 import com.CS4303.group3.utils.Changeable;
+import com.CS4303.group3.utils.Changeable_Interface;
 import dev.dominion.ecs.api.Dominion;
 import dev.dominion.ecs.api.Entity;
 import javafx.scene.control.TextFormatter;
@@ -32,7 +33,7 @@ public class Docking_Plugin implements Plugin_Interface {
 
 
         //draw the docker gap
-        game.schedule.draw(-5, drawing -> {
+        game.schedule.draw(10, drawing -> {
             dom.findEntitiesWith(Docking.class, Object_Plugin.Position.class)
                     .stream().forEach(dock -> {
                         if(dock.comp1().text != null) {
@@ -40,7 +41,7 @@ public class Docking_Plugin implements Plugin_Interface {
                                 draw.fill(255,0,255);
                                 draw.textSize(16);
                                 draw.textAlign(PConstants.LEFT, PConstants.CENTER);
-                                draw.rect(dock.comp2().position.x, dock.comp2().position.y, dock.comp1().size.x, dock.comp1().size.y);
+//                                draw.rect(dock.comp2().position.x, dock.comp2().position.y, dock.comp1().size.x, dock.comp1().size.y);
                                 draw.text(dock.comp1().text.text, dock.comp1().text.position.x, dock.comp1().text.position.y, dock.comp1().text.size.x, dock.comp1().text.size.y);
                             });
                         }
@@ -48,11 +49,11 @@ public class Docking_Plugin implements Plugin_Interface {
         });
     }
 
-    public static class Docking<T> {
+    public static class Docking<T> extends Changeable_Interface {
         PVector size;
         Entity block = null;
         Box_Plugin.rule_types rule_type;
-        Changeable changeable;
+//        Changeable changeable;
         T default_val;
 
         Text text;
@@ -61,18 +62,21 @@ public class Docking_Plugin implements Plugin_Interface {
         float insert_range = 80f;
 
         public Docking(PVector size, T default_val, Box_Plugin.rule_types rule_type, Changeable changeable, Text text) {
+            super(changeable);
             this.size = size;
             this.default_val = default_val;
             this.rule_type = rule_type;
-            this.changeable = changeable;
+//            this.changeable = changeable;
             this.text = text;
 
             //set default val
 //            if(changeable != null) set_default_val();
         };
 
+        public Changeable get() {return (Changeable) super.get();}
+
         public void set_default_val() {
-            changeable.get().change(default_val);
+            ((Changeable)get()).get().change(default_val);
         }
 
         //returns true if the two positions are close enough to swap
