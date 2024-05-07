@@ -91,8 +91,9 @@ public class Box_Plugin implements Plugin_Interface {
         public PVector get_above_head_position(Game game, PVector player_position, float player_size) {
             Force_Plugin.Gravity gravity = Resource.get(game, Force_Plugin.Gravity.class);
             if(gravity == null) return new PVector(0,0);
+            PVector gravityNorm = gravity.gravity().copy().normalize();
 
-            return PVector.add(player_position, new PVector(-player_size * 1.2f * gravity.gravity().x, -player_size * 1.2f * gravity.gravity().y, 0));
+            return PVector.add(player_position, new PVector(-player_size * 1.2f * gravityNorm.x, -player_size * 1.2f * gravityNorm.y, 0));
         }
     }
 
