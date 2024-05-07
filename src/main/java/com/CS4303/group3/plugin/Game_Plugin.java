@@ -192,9 +192,7 @@ public class Game_Plugin implements Plugin_Interface {
         public void createScene(Game game, Dominion dom, String level_name) {
             // Initialize the world map
             AssetManager am = Resource.get(game, AssetManager.class);
-            TiledMap m = am.getResource(TiledMap.class, "test_fragile.tmx");
-//            TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
-//            TiledMap m = am.getResource(TiledMap.class, "test_bouncy.tmx");
+            TiledMap m = am.getResource(TiledMap.class, "level"+level+".tmx");
             dom.createEntity(
                 new TileMap(game, m)
             );
