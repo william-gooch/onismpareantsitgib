@@ -43,25 +43,6 @@ public class Button_Plugin implements Plugin_Interface {
 
                 });
         });
-
-        //draw the object
-        // game.schedule.draw(draw -> {
-        //     dom.findEntitiesWith(Position.class, Button.class)
-        //         .stream().forEach(res -> {
-        //             var pos = res.comp1().position;
-        //             var height = res.comp2().height;
-        //             var width = res.comp2().width;
-        //             draw.call(drawing -> {
-        //                 //draw the player character
-        //                 if(res.comp2().pushed) {
-        //                     drawing.fill(255, 0, 0);
-        //                 } else {
-        //                     drawing.fill(255, 165, 0);
-        //                 }
-        //                 drawing.rect(pos.x, pos.y, height, width);
-        //             });
-        //         });
-        // });
     }
 
     /**

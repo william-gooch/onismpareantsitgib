@@ -15,36 +15,6 @@ public class Docking_Plugin implements Plugin_Interface {
         //check if a block is docked, if it is docked for the first time run it's action
         dom = game.dom;
 
-//        game.schedule.update(() -> {
-//            dom.findEntitiesWith(Box_Plugin.Box.class)
-//                    .stream().forEach(box -> {
-//                        //check if the block is docked in any docking
-//                        dom.findEntitiesWith(Docking.class, Object_Plugin.Position.class)
-//                                .stream().forEach(docking -> {
-//                                    if(docking.comp1().contains(box.entity(), docking.comp2().position)) {
-//                                        System.out.println("The box has been docked");
-//                                    }
-//                                });
-//
-//                    });
-//        });
-
-//        game.schedule.update(() -> {
-//            game.dom.findEntitiesWith(Docking.class)
-//                    .stream().forEach(dock -> {
-//                        if(dock.comp().get() == null) return;
-//
-//                        //apply box value to the changeable
-//                        if(dock.comp().block != null) {
-//                            dock.comp().get().get().change(dock.comp().block.get(Box_Plugin.Box.class).value);
-//                        }
-//                        else {
-//                            dock.comp().get().get().change(dock.comp().default_val);
-//                        }
-//                    });
-//        });
-
-
         //draw the docker gap
         game.schedule.draw(10, drawing -> {
             dom.findEntitiesWith(Docking.class, Object_Plugin.Position.class)
@@ -54,7 +24,6 @@ public class Docking_Plugin implements Plugin_Interface {
                                 draw.fill(255,0,255);
                                 draw.textSize(16);
                                 draw.textAlign(PConstants.LEFT, PConstants.CENTER);
-//                                draw.rect(dock.comp2().position.x, dock.comp2().position.y, dock.comp1().size.x, dock.comp1().size.y);
                                 draw.text(dock.comp1().text.text, dock.comp1().text.position.x, dock.comp1().text.position.y, dock.comp1().text.size.x, dock.comp1().text.size.y);
                             });
                         }
@@ -67,7 +36,6 @@ public class Docking_Plugin implements Plugin_Interface {
         Entity block = null;
         Box_Plugin.rule_types rule_type;
         float rotation;
-//        Changeable changeable;
         T default_val;
 
         Text text;
@@ -80,12 +48,8 @@ public class Docking_Plugin implements Plugin_Interface {
             this.size = size;
             this.default_val = default_val;
             this.rule_type = rule_type;
-//            this.changeable = changeable;
             this.text = text;
             this.rotation = rotation;
-
-            //set default val
-//            if(changeable != null) set_default_val();
         };
 
         public Changeable get() {return (Changeable) super.get();}
