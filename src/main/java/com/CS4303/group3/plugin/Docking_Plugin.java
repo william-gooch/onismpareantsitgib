@@ -29,6 +29,21 @@ public class Docking_Plugin implements Plugin_Interface {
 //                    });
 //        });
 
+        game.schedule.update(() -> {
+            game.dom.findEntitiesWith(Docking.class)
+                    .stream().forEach(dock -> {
+                        if(dock.comp().get() == null) return;
+
+                        //apply box value to the changeable
+                        if(dock.comp().block != null) {
+                            dock.comp().get().get().change(dock.comp().block.get(Box_Plugin.Box.class).value);
+                        }
+                        else {
+                            dock.comp().get().get().change(dock.comp().default_val);
+                        }
+                    });
+        });
+
 
         //draw the docker gap
         game.schedule.draw(10, drawing -> {
@@ -51,6 +66,7 @@ public class Docking_Plugin implements Plugin_Interface {
         PVector size;
         Entity block = null;
         Box_Plugin.rule_types rule_type;
+        float rotation;
 //        Changeable changeable;
         T default_val;
 
@@ -59,13 +75,14 @@ public class Docking_Plugin implements Plugin_Interface {
 
         float insert_range = 80f;
 
-        public Docking(PVector size, T default_val, Box_Plugin.rule_types rule_type, Changeable changeable, Text text) {
+        public Docking(PVector size, T default_val, Box_Plugin.rule_types rule_type, Changeable changeable, Text text, float rotation) {
             super(changeable);
             this.size = size;
             this.default_val = default_val;
             this.rule_type = rule_type;
 //            this.changeable = changeable;
             this.text = text;
+            this.rotation = rotation;
 
             //set default val
 //            if(changeable != null) set_default_val();
