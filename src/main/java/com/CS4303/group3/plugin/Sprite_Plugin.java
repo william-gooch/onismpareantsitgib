@@ -34,6 +34,7 @@ public class Sprite_Plugin implements Plugin_Interface {
         float width;
         float height;
         PVector anchorPoint;
+        PVector offset = new PVector();
         float rotation = 0;
         boolean flipX = false;
         boolean flipY = false;
@@ -62,7 +63,7 @@ public class Sprite_Plugin implements Plugin_Interface {
             drawing.push();
 
             // move to correct location
-            drawing.translate(position.x, position.y);
+            drawing.translate(position.x + offset.x * width, position.y + offset.y * width);
 
             // rotate around anchor point
             drawing.translate(width / 2, height / 2);

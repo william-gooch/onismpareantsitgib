@@ -396,11 +396,13 @@ public class Game_Plugin implements Plugin_Interface {
             playerSprite.addState("run", runSprite);
 
             playerSprite.setState("idle");
+            var spriteRenderer = new SpriteRenderer(playerSprite, playerHeight, playerHeight, new PVector(0.4f, 0.5f));
+            spriteRenderer.offset = new PVector(-0.15f, 0f);
 
             game.dom.createEntity(
                 new Position(new PVector(x - playerWidth/2, y - playerHeight/2)),
                 new Velocity(),
-                new SpriteRenderer(playerSprite, playerHeight, playerHeight, new PVector(1-(1/playerRatio), 0.5f)),
+                spriteRenderer,
                 new Player(),
                 new Grab(40),
                 new PlayerMovement(),
