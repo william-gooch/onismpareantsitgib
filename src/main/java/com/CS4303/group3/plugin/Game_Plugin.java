@@ -261,17 +261,8 @@ public class Game_Plugin implements Plugin_Interface {
         }
 
         private void createGameOver(Dominion dom) {
-            dom.createEntity(new TextScreen("", "Press [SPACE] to play again.", 0, 255));
-            AssetManager am = Resource.get(game, AssetManager.class);
-            PImage logo = am.getResource(PImage.class, "GameOver.png");
-            float logoRatio = PApplet.round((float)game.width / (float)logo.width),
-                    logoWidth = logo.width * logoRatio,
-                    logoHeight = logo.height * logoRatio;
+            dom.createEntity(new TextScreen("You Got Caught!", "The professor looked at their phone\nPress [SPACE] to play again.", 0, 255));
 
-            dom.createEntity(
-                    new Position(new PVector(game.width/2 - logoWidth/2, game.height/2 - logoHeight/2 - 50)),
-                    new SpriteRenderer(new Sprite(logo), logoWidth, logoHeight)
-            );
         }
 
         private void createTitleScreen(Dominion dom) {
